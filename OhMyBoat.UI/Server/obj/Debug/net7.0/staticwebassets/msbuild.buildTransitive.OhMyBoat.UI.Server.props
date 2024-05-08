@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\OhMyBoat.UI.Server.props" />
+</Project>
