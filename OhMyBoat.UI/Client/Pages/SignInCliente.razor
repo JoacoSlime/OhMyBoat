@@ -1,0 +1,46 @@
+@page "/sign_in_cliente"
+@using OhMyBoat.UI.Shared.Entidades;
+
+
+    <h1>Crear cuenta.</h1>
+    <p>Por favor complete sus datos.</p>
+    <hr>
+
+    <label for="email"><b>E-mail</b></label>
+    <input type="text" placeholder="Ingrese Email" name="email" required>
+
+    <label for="psw"><b>Contraseña</b></label>
+    <input type="password" placeholder="Ingrese Contraseña" name="psw" required>
+
+    <label for="psw-repeat"><b>Repita su contraseña</b></label>
+    <input type="password" placeholder="Repita Contraseña" name="psw-repeat" required>
+
+    <label for="psw-repeat"><b>Seleccione su fecha de nacimiento</b></label>
+    <input type="datetime-local" id="Test_DatetimeLocal">
+
+
+
+
+@code{
+    private Cliente cliente = new Cliente();
+
+        /*[Display(Name = "Correo electronico")]
+        [Required]
+        [EmailAddress(ErrorMessage = "Ingrese un correo electronico válido.")]
+        public string Email { get; set; }
+
+        [Display(Name = "Nombre de usuario")]
+        [Required]
+        public string UserName { get; set; }
+
+        [Display(Name = "Contraseña")]
+        [Required]
+        [MinLength(8, ErrorMessage = "La contraseña debe contener al menos 8 caracteres.")]
+        public string Password { get; set; }
+
+        [Required] 
+        public bool Bloqueado { get; set; }
+
+        public string Contacto { get; set; } */
+} 
+    

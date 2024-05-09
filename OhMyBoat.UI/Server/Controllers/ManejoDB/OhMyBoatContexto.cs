@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using OhMyBoat.UI.Server.Data;
+using OhMyBoat.UI.Shared.Entidades;
 
 namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 {
@@ -21,5 +22,13 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
         // Aca se sufre
 
+        public void agregarCliente(Cliente cliente_nuevo){
+            using (var db = new OhMyBoatUIServerContext()){
+                db.Clientes.Add(cliente_nuevo);
+                db.SaveChanges();
+            }
+        }
+    
     }
+
 }
