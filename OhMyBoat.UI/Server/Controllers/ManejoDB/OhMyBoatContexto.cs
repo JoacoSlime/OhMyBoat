@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OhMyBoat.UI.Server.Data;
 using OhMyBoat.UI.Shared.Entidades;
 
@@ -22,13 +23,14 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
         // Aca se sufre
 
-        public void agregarCliente(Cliente cliente_nuevo){
+        public bool agregarCliente(Cliente cliente_nuevo){
             using (var db = new OhMyBoatUIServerContext()){
-                db.Clientes.Add(cliente_nuevo);
-                db.SaveChanges();
+                if (db.Clientes.Where(cli => cli.Email == cliente_nuevo.Email).IsNullOrEmpty()){
+                    db.Clientes.Add(cliente_nuevo);
+                    db.SaveChanges();
+                    return true;
+                }else{ return false; }
             }
         }
-    
     }
-
 }
