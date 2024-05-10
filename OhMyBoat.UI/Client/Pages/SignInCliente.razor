@@ -1,28 +1,75 @@
 @page "/sign_in_cliente"
 @using OhMyBoat.UI.Shared.Entidades;
 
-
-    <h1>Crear cuenta.</h1>
+    <h1>Crear cuenta</h1>
     <p>Por favor complete sus datos.</p>
     <hr>
 
     <label for="email"><b>E-mail</b></label>
-    <input type="text" placeholder="Ingrese Email" name="email" required>
+    <input type="text" placeholder="Ingrese Email" name="email" required > 
+    <p></p>
+    <input @value="E_mail" />
+    
+    
+    <p></p>
+    <label for="nombre"><b>Nombre Completo</b></label>
+    <div id="nombre-contains"> Ingrese su nombre y apellido completos.</div>
+    <input type="text" placeholder="Nombre Completo" name="nombre" required <!--@bind="Nombre"-->> 
+    <p></p>
+    <input @value="Nombre" />
+    
+<!--
+    <input id="txtWord" name="txtWord" placeholder="Enter your text" 
+    value ="@value" @onchange="onChange" @onkeyup="Enter" />
+<input @bind="cliente.Email" />
+    <input @value="E_mail" />
 
+    o sino
+
+    <input @bind="Username" />
+
+    o
+
+    <input @bind-value="Username" />
+
+    o
+
+    <InputText @bind-Value="Username" />
+
+-->
+    
+    <div id="password-constraints"> La contraseña debe contener al menos 8 caracteres.</div>
+    <div id="password-constraints_2"> Además, debe contener al menos un caracter especial, una mayúscula y dos números.</div>
     <label for="psw"><b>Contraseña</b></label>
     <input type="password" placeholder="Ingrese Contraseña" name="psw" required>
-
+    <p></p>
     <label for="psw-repeat"><b>Repita su contraseña</b></label>
     <input type="password" placeholder="Repita Contraseña" name="psw-repeat" required>
+    <input @value="Passwrd" />
+    
 
-    <label for="psw-repeat"><b>Seleccione su fecha de nacimiento</b></label>
+    <p></p>
+    <label for="fecha de nacimiento"><b>Seleccione su fecha de nacimiento</b></label>
     <input type="datetime-local" id="Test_DatetimeLocal">
+    <input @value="FechaNac" />
 
+    <input type="Registrarse" value="Registrarse">
 
 
 
 @code{
-    private Cliente cliente = new Cliente();
+
+    private DateTime FechaNac { get; set; }
+    private DateTime fechaNow = DateTime.Now;
+    private TimeSpan EighteenYearSpan = new TimeSpan(6574,5, 0, 0, 0);
+
+    if DateTime.Substraction(fechaNow, FechaNac) == EighteenYearSpan {
+        public string Nombre { get; set; } ="";
+        public string E_mail { get; set; } ="";
+        public string Passwrd { get; set; } ="";
+        private Cliente cliente = new Cliente(Nombre, E_mail, Passwrd);
+
+    }//else {mensaje de que no es mayor de edad}
 
         /*[Display(Name = "Correo electronico")]
         [Required]
@@ -42,5 +89,6 @@
         public bool Bloqueado { get; set; }
 
         public string Contacto { get; set; } */
-} 
+
+}
     
