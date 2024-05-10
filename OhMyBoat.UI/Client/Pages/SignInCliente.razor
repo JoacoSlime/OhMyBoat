@@ -55,40 +55,49 @@
 
     <input type="Registrarse" value="Registrarse">
 
-
-
 @code{
+    static bool IsMayusc(char c){
+        return (c >= 'A' && c <= 'Z');
+    }
+    static bool HasNum(string password){
+        char[] characters = password.ToCharArray();
+        int numCounter = 0;
+        foreach (char c in characters){
+            if (char.IsNumber(c)){
+                numCounter ++;
+            }
+        }
+        return numCounter > 1;
+    }
+    static bool HasSymbol(char c){
+        String specials = "!?¿¡#$%&/=+-*_@";
+        return specials.Contains(c);
+    }
+    static bool IsLong(string password){
+        return password.Length >= 8;
+    }
 
+    static bool IsValidPassword(string password){
+        return
+        IsLong(password) && 
+        TieneNum(password) &&
+        password.Any(c => IsMayusc(c)) && 
+        password.Any(c => HasSymbol(c));
+    }
     private DateTime FechaNac { get; set; }
     private DateTime fechaNow = DateTime.Now;
     private TimeSpan EighteenYearSpan = new TimeSpan(6574,5, 0, 0, 0);
 
-    if DateTime.Substraction(fechaNow, FechaNac) == EighteenYearSpan {
-        public string Nombre { get; set; } ="";
+    @if (DateTime.Substraction(fechaNow, FechaNac) == EighteenYearSpan) {
+        
         public string E_mail { get; set; } ="";
+        public string Nombre { get; set; } ="";
         public string Passwrd { get; set; } ="";
-        private Cliente cliente = new Cliente(Nombre, E_mail, Passwrd);
+
+        @if IsValidPassword(Passwrd){
+            private Cliente cliente = new Cliente(Nombre, E_mail, Passwrd);
+        }//else {mensaje de que la contraseña es debil}
 
     }//else {mensaje de que no es mayor de edad}
 
-        /*[Display(Name = "Correo electronico")]
-        [Required]
-        [EmailAddress(ErrorMessage = "Ingrese un correo electronico válido.")]
-        public string Email { get; set; }
-
-        [Display(Name = "Nombre de usuario")]
-        [Required]
-        public string UserName { get; set; }
-
-        [Display(Name = "Contraseña")]
-        [Required]
-        [MinLength(8, ErrorMessage = "La contraseña debe contener al menos 8 caracteres.")]
-        public string Password { get; set; }
-
-        [Required] 
-        public bool Bloqueado { get; set; }
-
-        public string Contacto { get; set; } */
-
 }
-    

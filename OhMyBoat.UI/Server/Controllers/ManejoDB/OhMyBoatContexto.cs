@@ -23,13 +23,13 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
         // Aca se sufre
 
-        public bool agregarCliente(Cliente cliente_nuevo){
+        public async void AgregarCliente(Cliente cliente_nuevo){
+            await
             using (var db = new OhMyBoatUIServerContext()){
                 if (db.Clientes.Where(cli => cli.Email == cliente_nuevo.Email).IsNullOrEmpty()){
                     db.Clientes.Add(cliente_nuevo);
                     db.SaveChanges();
-                    return true;
-                }else{ return false; }
+                }
             }
         }
     }
