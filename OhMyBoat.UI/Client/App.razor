@@ -10,14 +10,9 @@
                 <NotAuthorized>
 
                     @{
-                        if (context.User.Identity?.IsAuthenticated != true)
-                            navManager.NavigateTo("/");
-                        else
-                        {
-                            <P class="alert alert-danger"> alto ahi papu que estas haciendo @context.User</P>
-
+                        if (context.User.Identity?.IsAuthenticated != true) {
+                            <MoroImagen/>
                         }
-                           
                     }
                     
 
