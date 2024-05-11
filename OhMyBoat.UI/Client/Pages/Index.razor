@@ -1,8 +1,29 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager navManager
+
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+    
+    <h1>Bienvenido a OhMyBoat!</h1>
+    <AuthorizeView>
+        <Authorized>
+            <p>¡Utiliza el panel de la izquierda para empezar a navegar!</p>
+        </Authorized>
+        <NotAuthorized>
+            <div>
+                <button class="btn nav_button btn-primary login_button" @onclick="routeLogIn">Iniciar Sesión</button>
+                <button class="btn nav_button btr-secondary register_button" @onclick="routeRegister">Registrarse</button>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 
-Welcome to your new app.
-ME PICAN LOS COCOOOOOOOOOOOOOOOOOOOS
+@code {
+    private void routeLogIn() {
+        navManager.NavigateTo("/login");
+    }
+    private void routeRegister() {
+        navManager.NavigateTo("/register");
+    }
+}

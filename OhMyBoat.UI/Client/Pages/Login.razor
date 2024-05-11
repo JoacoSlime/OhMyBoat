@@ -1,4 +1,4 @@
-﻿@page "/Login"
+﻿@page "/login"
 @layout LoginLayout
 @inject NavigationManager Navegador
 
@@ -53,7 +53,7 @@
         {
 
             var sesionUsuario = await loginRespones.Content.ReadFromJsonAsync<SesionDTO>();
-            var autenticacionEX = (AutenticacionExtension)authenticacationProvider;
+            var autenticacionEX = (AuthenticationExtension)authenticacationProvider;
             await autenticacionEX.ActualizarEstadoAutenticacion(sesionUsuario);
 
             Navegador.NavigateTo("/");
