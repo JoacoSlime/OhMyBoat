@@ -26,8 +26,8 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async void AgregarCliente(Cliente cliente_nuevo){
             await
             using (var db = new OhMyBoatUIServerContext()){
-                if (db.Clientes.Where(cli => cli.Email == cliente_nuevo.Email).IsNullOrEmpty()){
-                    db.Clientes.Add(cliente_nuevo);
+                if (db.Usuarios.Where(cli => cli.Email == cliente_nuevo.Email).IsNullOrEmpty()){
+                    db.Usuarios.Add(cliente_nuevo);
                     db.SaveChanges();
                 }
             }
