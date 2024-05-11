@@ -1,6 +1,10 @@
 ﻿@page "/fetchdata"
 @using OhMyBoat.UI.Shared
+
 @inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;          // esto va en todas las fucking paginas que se requiera un rol 
+@attribute [Authorize(Roles = "admin")]
 
 <PageTitle>Weather forecast</PageTitle>
 
@@ -8,6 +12,11 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
+
+<AuthorizeView>
+    <Authorized>
+
+        <h1> hola maldito invecil @context.User.Identity!.Name  </h1>
 @if (forecasts == null)
 {
     <p><em>Loading...</em></p>
@@ -36,6 +45,8 @@ else
         </tbody>
     </table>
 }
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private WeatherForecast[]? forecasts;

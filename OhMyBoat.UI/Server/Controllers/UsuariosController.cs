@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using OhMyBoat.UI.Server.Data;
 using OhMyBoat.UI.Shared.Entidades;
 
-namespace OhMyBoat.UI.Server.Controllers.ManejoDB
+namespace OhMyBoat.UI.Server.Controllers
 {
     public class UsuariosController : Controller
     {
@@ -22,20 +22,20 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
-              return _context.Usuario != null ? 
-                          View(await _context.Usuario.ToListAsync()) :
-                          Problem("Entity set 'OhMyBoatUIServerContext.Usuario'  is null.");
+            return _context.Usuarios != null ?
+                        View(await _context.Usuarios.ToListAsync()) :
+                        Problem("Entity set 'OhMyBoatUIServerContext.Usuario'  is null.");
         }
 
         // GET: Usuarios/Details/5
-        public async Task<IActionResult> Details(String? email)
+        public async Task<IActionResult> Details(string? email)
         {
-            if (_context.Usuario == null)
+            if (_context.Usuarios == null)
             {
                 return NotFound();
             }
 
-            var usuario = await _context.Usuario
+            var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(m => m.Email == email);
             if (usuario == null)
             {
@@ -70,12 +70,12 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         // GET: Usuarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Usuario == null)
+            if (id == null || _context.Usuarios == null)
             {
                 return NotFound();
             }
 
-            var usuario = await _context.Usuario.FindAsync(id);
+            var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario == null)
             {
                 return NotFound();
@@ -121,12 +121,12 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         // GET: Usuarios/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Usuario == null)
+            if (id == null || _context.Usuarios == null)
             {
                 return NotFound();
             }
 
-            var usuario = await _context.Usuario
+            var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (usuario == null)
             {
@@ -141,23 +141,23 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Usuario == null)
+            if (_context.Usuarios == null)
             {
                 return Problem("Entity set 'OhMyBoatUIServerContext.Usuario'  is null.");
             }
-            var usuario = await _context.Usuario.FindAsync(id);
+            var usuario = await _context.Usuarios.FindAsync(id);
             if (usuario != null)
             {
-                _context.Usuario.Remove(usuario);
+                _context.Usuarios.Remove(usuario);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UsuarioExists(int id)
         {
-          return (_context.Usuario?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Usuarios?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
