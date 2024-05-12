@@ -49,13 +49,11 @@
 
           
         var loginRespones = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/Login", login);
-        if (loginRespones.IsSuccessStatusCode)
-        {
+        if (loginRespones.IsSuccessStatusCode){
 
             var sesionUsuario = await loginRespones.Content.ReadFromJsonAsync<SesionDTO>();
             var autenticacionEX = (AuthenticationExtension)authenticacationProvider;
             await autenticacionEX.ActualizarEstadoAutenticacion(sesionUsuario);
-
             Navegador.NavigateTo("/");
         }
  

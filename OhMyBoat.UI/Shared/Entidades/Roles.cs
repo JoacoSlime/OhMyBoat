@@ -8,6 +8,6 @@ namespace OhMyBoat.UI.Shared.Entidades
 {
     public enum Roles
     {
-        Jefe, Empleado, Cliente
+        jefe, empleado, cliente
     }
 }
