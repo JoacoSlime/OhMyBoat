@@ -1,4 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using OhMyBoat.UI.Client.Extensions;
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager;
+@inject IJSRuntime JsRuntime;
+
 
 <div class="page">
     <div class="sidebar">
@@ -6,12 +12,32 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    <a @onclick=logoutClick href="javascript:void(0)">Cerrar Sesión</a>
+                </Authorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
 
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+
+
+@code {
+    private async Task logoutClick() {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Estás seguro de que quieres cerrar la sesión?"))
+            return;
+        await logout();
+    }
+    private async Task logout()
+    {
+        var authState = (AuthenticationExtension) authStateProvider;
+        await authState.ActualizarEstadoAutenticacion(null);
+        navManager.NavigateTo("/", true);
+    }
+}

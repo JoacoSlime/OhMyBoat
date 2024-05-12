@@ -6,12 +6,12 @@ using System.Security.Claims;
 namespace OhMyBoat.UI.Client.Extensions
 {
 
-    public class AutenticacionExtension : AuthenticationStateProvider
+    public class AuthenticationExtension : AuthenticationStateProvider
     {
         private readonly ISessionStorageService _sessionStorage;
         private ClaimsPrincipal _sinInformacion = new ClaimsPrincipal(new ClaimsIdentity());
 
-        public AutenticacionExtension(ISessionStorageService sessionStorage)
+        public AuthenticationExtension(ISessionStorageService sessionStorage)
         {
             _sessionStorage = sessionStorage;
         }
