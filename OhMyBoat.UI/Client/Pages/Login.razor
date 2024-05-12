@@ -8,6 +8,9 @@
 @using OhMyBoat.UI.Client.Extensions
 @using OhMyBoat.UI.Shared
 @using OhMyBoat.UI.Shared.Entidades
+@using System.Security.Cryptography;
+@using System.Text
+@inject IJSRuntime JsRuntime;
 
 
 
@@ -16,7 +19,7 @@
     <div class="col-lg-4 offset-lg-4 border">
 
         <div class="mb-3 text-center">
-            <h3>LOGIN</h3>
+            <img src="LogoColorTransp.jpg" width="300" height="400">
         </div>
 
         <div class="mb-3">
@@ -26,7 +29,7 @@
 
         <div class="mb-3">
             <label>Contraseña</label>
-            <input @bind="login.Password" class="form-control" />
+            <input @bind="contra" class="form-control" type="password"/>
         </div>
 
         <div class="mb-3">
@@ -39,27 +42,52 @@
 
 
 @code {
+    private string contra = "";
+    static string HashWithSha256(string ActualData)
+    {
+        using (SHA256 s = SHA256.Create())
+        {
+            byte[] bytes = s.ComputeHash(Encoding.UTF8.GetBytes(ActualData));
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                b.Append(bytes[i].ToString("x2"));
+            }
+            return b.ToString();
+        }
+    }
 
     private LoginDTO login = new LoginDTO();
 
-   
+
     public async Task iniciarSesion()
     {
-      //  Navegador.NavigateTo("/");
+        //  Navegador.NavigateTo("/");
+        login.Password = HashWithSha256(contra);
 
-          
         var loginRespones = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/Login", login);
-        if (loginRespones.IsSuccessStatusCode)
+        try
         {
-
-            var sesionUsuario = await loginRespones.Content.ReadFromJsonAsync<SesionDTO>();
-            var autenticacionEX = (AuthenticationExtension)authenticacationProvider;
-            await autenticacionEX.ActualizarEstadoAutenticacion(sesionUsuario);
-
-            Navegador.NavigateTo("/");
+            if (loginRespones.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var sesionUsuario = await loginRespones.Content.ReadFromJsonAsync<SesionDTO>();
+                var autenticacionEX = (AuthenticationExtension)authenticacationProvider;
+                await autenticacionEX.ActualizarEstadoAutenticacion(sesionUsuario);
+                Navegador.NavigateTo("/");
+            }
+            if (loginRespones.StatusCode == System.Net.HttpStatusCode.VariantAlsoNegotiates){ // bloqueado
+                        await JsRuntime.InvokeVoidAsync("alert", "El usuario esta bloqueado, Comuniquese con el jefe de OMB!");
+            }
+            if (loginRespones.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Usuario o contraseña no valida");
+            }
         }
- 
-       
+        catch(Exception a)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", a.ToString());
+        }
+
 
     }
 

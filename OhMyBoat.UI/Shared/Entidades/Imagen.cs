@@ -8,7 +8,7 @@ namespace OhMyBoat.UI.Shared.Entidades
 {
     public class Imagen
     {
-        public int ID { get; set; } = -1;
+        public int Id { get; set; } 
         public string base64imagen { get; set; } = "";
 
     }
