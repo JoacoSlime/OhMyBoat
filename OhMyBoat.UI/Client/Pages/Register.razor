@@ -64,10 +64,22 @@
         password.Any(c => IsMayusc(c)) && 
         password.Any(c => IsSymbol(c));
     }
+    private bool IsValidEmail(string mail){
+        if (mail.Length - mail.Replace("@", "").Length == 1 && 
+        (mail.Substring(mail.Length - 4).Equals(".com") || 
+        mail.Substring(mail.Length - 7).Equals(".com.ar")) ){
+            return true;
+        };
+        return false;
+    }
 
     async private void Registrarse() {
         if (Email == "") {
             await JsRuntime.InvokeVoidAsync("alert", "Flaco el email.");
+            return;
+        }
+        if (!IsValidEmail(Email)) {
+            await JsRuntime.InvokeVoidAsync("alert", "Ingrese un correo electrónico válido.");
             return;
         }
         if (Nombre == "") {
@@ -82,6 +94,6 @@
             await JsRuntime.InvokeVoidAsync("alert", "Tu contraseña no es lo suficientemente segura.\nComo mínimo debe tener 8 caracteres, y contener al menos un caracter especial, una mayúscula y dos números");
             return;
         }
-        Cliente cliente = new Cliente();
+        Cliente cliente = new Cliente(Nombre, Email, Password);
     }
 }
