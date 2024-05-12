@@ -8,9 +8,9 @@ namespace OhMyBoat.UI.Shared.Entidades
 {
     public class TokenRecu
     {
-        public int ID {  get; set; }    
+        public int Id {  get; set; }    
         public string StringAleatorioDelMomento { get; set; } = "";
-        public int IDUsuario { get; set; }
+        public int UsuarioId { get; set; }
         public DateTime FechaLimite { get; set; }
         public bool Usado { get; set; } = false;
 

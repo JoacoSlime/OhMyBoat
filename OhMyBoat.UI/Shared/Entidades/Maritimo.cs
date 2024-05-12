@@ -8,7 +8,7 @@ namespace OhMyBoat.UI.Shared.Entidades
 {
     public class Maritimo : Vehiculo
     { 
-        public int IDSucursal {  get; set; }
+        public int SucursalId {  get; set; }
         public float Eslora {  get; set; }
         public float Puntal {  get; set; }
         public float Deuda {  get; set; }

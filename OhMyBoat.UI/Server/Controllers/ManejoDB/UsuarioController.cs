@@ -35,11 +35,16 @@ namespace OhMyBoat.UI.Server.Controllers
                 if (temp != null)
                 {
                     sesionDTO.Rol = temp.Rol.ToString();
+                    if (temp.Rol==Roles.cliente && temp.Bloqueado)
+                        {
+                            return StatusCode(StatusCodes.Status506VariantAlsoNegotiates);
+                        }
+             
                     sesionDTO.Email = temp.Email;
                     sesionDTO.Nombre = temp.Nombre;
                     return StatusCode(StatusCodes.Status200OK, sesionDTO);
                 }
-                else return StatusCode(StatusCodes.Status200OK, null);
+                else return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired);
             }
                 
             /* if (login.Email == "sss" && login.Password == "aaa")
@@ -57,7 +62,7 @@ namespace OhMyBoat.UI.Server.Controllers
              */      
         }
 
-        private async bool verificarExistencia(string email)
+        private async Task<bool> VerificarExistencia(string email)
         {
             using (var db = new OhMyBoatUIServerContext())
             {
@@ -66,9 +71,11 @@ namespace OhMyBoat.UI.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Registrar([FromBody] Usuario usuario)
-        {
-            if (await verificarExistencia(usuario.Email))
+        [Route("Registrar")]
+        public async Task<IActionResult> Registrar([FromBody] Cliente c)
+        {/*
+            var resultado = await VerificarExistencia(usuario.Email);
+            if (resultado.result)
             {
                 return StatusCode(StatusCodes.Status200OK, false);
             }
@@ -80,7 +87,20 @@ namespace OhMyBoat.UI.Server.Controllers
                     await db.SaveChangesAsync();
                 }
                 return StatusCode(StatusCodes.Status200OK, true);
+            }*/
+
+            using (var db = new OhMyBoatUIServerContext())
+            {
+                if (db.Clientes.Where(cli => cli.Email == c.Email).IsNullOrEmpty())
+                {
+                    db.Clientes.Add(c);
+                    await db.SaveChangesAsync();
+                    return StatusCode(StatusCodes.Status200OK, c);
+                }
+                return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
             }
+            
+
         }
 
     }
