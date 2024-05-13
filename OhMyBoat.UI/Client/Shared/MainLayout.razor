@@ -12,13 +12,17 @@
     </div>
 
     <main>
-        <CascadingAuthenticationState>
-            <AuthorizeView>
-                <Authorized>
-                    <a @onclick=logoutClick href="javascript:void(0)">Cerrar Sesión</a>
-                </Authorized>
-            </AuthorizeView>
-        </CascadingAuthenticationState>
+        <div class="top-row px-4">
+            <CascadingAuthenticationState>
+                <AuthorizeView>
+                    <Authorized>
+                        <button class="btn-secondary" @onclick=logoutClick href="javascript:void(0)"><span class="oi oi-account-logout" aria-hidden="true"></span> Cerrar Sesión</button>
+                        <a href="profile" class="account-button"><span class="oi oi-person" title="Mi Cuenta" aria-hidden="true"></span></a>
+                        <span class="oi oi-icon-name" title="icon name" aria-hidden="true"></span>
+                    </Authorized>
+                </AuthorizeView>
+            </CascadingAuthenticationState>
+        </div>
 
         <article class="content px-4">
             @Body

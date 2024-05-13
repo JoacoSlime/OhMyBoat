@@ -4,7 +4,7 @@
 @inject HttpClient Http
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;          // esto va en todas las fucking paginas que se requiera un rol 
-@attribute [Authorize(Roles = "admin")]
+@attribute [Authorize(Roles = "jefe")]
 
 <PageTitle>Weather forecast</PageTitle>
 
@@ -15,8 +15,7 @@
 
 <AuthorizeView>
     <Authorized>
-
-        <h1> hola maldito invecil @context.User.Identity!.Name  </h1>
+        <h1> hola maldito @context.User.Identity!.Name</h1>
 @if (forecasts == null)
 {
     <p><em>Loading...</em></p>
