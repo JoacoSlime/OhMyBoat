@@ -1,16 +1,20 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
+@using OhMyBoat.UI.Client.Extensions;
+@using System.Security.Claims
+@using System;
 @inject NavigationManager navManager
+@inject AuthenticationStateProvider authStateProvider;
+@inject IJSRuntime JsRuntime;
+
 
 
 <PageTitle>Index</PageTitle>
-
     
-    <h1>Bienvenido a OhMyBoat!</h1>
-    
-    <AuthorizeView Roles="jefe">
-        <h1> hola maldito jefe</h1>
-    </AuthorizeView>
+    <h1>Bienvenido a OhMyBoat!</h1>    
+<AuthorizeView Roles="jefe">
+    <h1>hola maldito</h1>
+</AuthorizeView>
     <AuthorizeView Roles="empleado">
         <h1> hola maldito empleado, te voy a negrear</h1>
     </AuthorizeView>
@@ -30,10 +34,14 @@
     </AuthorizeView>
 
 @code {
+    
+    //@context.User.Claims.Where(c => c.Type==ClaimTypes.Email).First().Value PARA VER EL EMAIL
     private void routeLogIn() {
         navManager.NavigateTo("/login");
+        
     }
     private void routeRegister() {
         navManager.NavigateTo("/register");
     }
+    
 }

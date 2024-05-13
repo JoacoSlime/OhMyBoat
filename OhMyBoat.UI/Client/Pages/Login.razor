@@ -76,7 +76,7 @@
                 Navegador.NavigateTo("/");
             }
             if (loginRespones.StatusCode == System.Net.HttpStatusCode.VariantAlsoNegotiates){ // bloqueado
-                        await JsRuntime.InvokeVoidAsync("alert", "El usuario esta bloqueado, Comuniquese con el jefe de OMB!");
+                await JsRuntime.InvokeVoidAsync("alert", "El usuario esta bloqueado, Comuniquese con el jefe de OMB!");
             }
             if (loginRespones.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
             {
