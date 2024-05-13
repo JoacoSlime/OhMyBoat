@@ -8,7 +8,7 @@ namespace OhMyBoat.UI.Shared.Entidades
 {
     public class Sucursal
     {
-        public int ID {  get; set; }
+        public int Id {  get; set; }
         public string NombreSuck { get; set; } = "";
 }
 }
