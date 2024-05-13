@@ -61,9 +61,19 @@
 
 
     public async Task iniciarSesion()
-    {
-        //  Navegador.NavigateTo("/");
-        login.Password = HashWithSha256(contra);
+
+    {     
+
+        if (login.Email == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Flaco el email.");
+            return;
+        }
+        if (login.Password == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Flaco la contraseña");
+            return;
+        }
 
         var loginRespones = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/Login", login);
         try
@@ -91,46 +101,6 @@
 
     }
 
-
-        /*
-    <!DOCTYPE html>
-    <html>
-
-    <head>
-        <title> Login </title>
-    </head>
-
-        <body>
-        <h1>
-    iniciar sesion en OMB!
-    </h1>
-    <p>ingresa tus datos para iniciar sesion </p>
-    <form @onsubmit="iniciarSesion">
-
-            <div>
-            <label for="nombre">correo</label>
-            <input @bind="login.Email" class="form-control" placeholder="Correo electronico larva" id="correo" required />
-
-        </div>
-            <div>
-            <label for="contra">contraseña</label>
-            <input @bind="login.Password" class="form-control" placeholder="Contraseña" id="contra" required />
-
-        </div>
-            <div>
-            <button @onclick="iniciarSesion" type="submit">Enviar</button>
-    </div>
-
-        </form>
-
-        <p>
-        No tienes una cuenta?
-        <a target="_blank" href="https://www.linkedin.com">Registrate !</a>
-        </p>
-
-    </body>
-
-    </html>
-
-    */
+        }
+   }
 }
