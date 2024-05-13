@@ -63,7 +63,8 @@
     public async Task iniciarSesion()
 
     {     
-
+        login.Password = HashWithSha256(contra);
+        
         if (login.Email == "")
         {
             await JsRuntime.InvokeVoidAsync("alert", "Flaco el email.");
@@ -100,7 +101,4 @@
 
 
     }
-
-        }
-   }
 }

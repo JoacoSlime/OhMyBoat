@@ -6,25 +6,27 @@
 <PageTitle>Index</PageTitle>
 
     
-    <h1>Bienvenido a OhMyBoat!</h1>
+    <h1 class="text-center mb-5">¡Bienvenido a Oh My Boat!</h1>
     
     <AuthorizeView Roles="jefe">
-        <h1> hola maldito jefe</h1>
+        <h1 class="text-center"> hola maldito jefe</h1>
     </AuthorizeView>
     <AuthorizeView Roles="empleado">
-        <h1> hola maldito empleado, te voy a negrear</h1>
+        <h1 class="text-center"> hola maldito empleado, te voy a negrear</h1>
     </AuthorizeView>
     <AuthorizeView Roles="cliente">
-        <h1> hola maldito cliente, paga tus deudas</h1>
+        <h1 class="text-center"> hola maldito cliente, paga tus deudas</h1>
     </AuthorizeView>
     <AuthorizeView>
         <Authorized>
-        <p>¡Utiliza el panel de la izquierda para empezar a navegar!</p>
+        <p class="text-center">¡Utiliza el panel de la izquierda para empezar a navegar!</p>
         </Authorized>
         <NotAuthorized>
-            <div>
-                <button class="btn nav_button btn-primary login_button" @onclick="routeLogIn">Iniciar Sesión</button>
-                <button class="btn nav_button btr-secondary register_button" @onclick="routeRegister">Registrarse</button>
+            <div class="container d-flex justify-content-center align-items-center">
+                <div class="d-flex p-4 margin-auto flex-column justify-content-center align-items-center index_button_group">
+                    <button class="btn w-75 m-2 btn-lg btn-primary login_button" @onclick="routeLogIn">Iniciar Sesión</button>
+                    <button class="btn w-75 m-2 btn-lg btn-secondary register_button" @onclick="routeRegister">Registrarse</button>
+                </div>
             </div>
         </NotAuthorized>
     </AuthorizeView>
