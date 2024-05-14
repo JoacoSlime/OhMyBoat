@@ -14,94 +14,54 @@ namespace OhMyBoat.UI.Server.Controllers
     [ApiController]
     public class UsuarioController : ControllerBase
     {
-        
-
         [HttpPost]
         [Route("Login")]
-
-        // aca me conecto a la db despues lo cambio rey
-        
-
-
 
         public async Task<IActionResult> Login([FromBody] LoginDTO login)
         {
             SesionDTO sesionDTO = new SesionDTO();
 
-           
             using (var db = new OhMyBoatUIServerContext())
             {
-                var temp = db.Usuarios.Where(usuario => usuario.Email == login.Email && usuario.Password == login.Password).FirstOrDefault();
+                var temp = await db.Usuarios.Where(usuario => usuario.Email == login.Email && usuario.Password == login.Password).FirstOrDefaultAsync();
                 if (temp != null)
                 {
                     sesionDTO.Rol = temp.Rol.ToString();
-                    if (temp.Rol==Roles.cliente && temp.Bloqueado)
-                        {
-                            return StatusCode(StatusCodes.Status506VariantAlsoNegotiates);
-                        }
-             
+                    if (temp.Rol == Roles.cliente && temp.Bloqueado)
+                    {
+                        return StatusCode(StatusCodes.Status506VariantAlsoNegotiates);
+                    }
+
                     sesionDTO.Email = temp.Email;
                     sesionDTO.Nombre = temp.Nombre;
                     return StatusCode(StatusCodes.Status200OK, sesionDTO);
                 }
                 else return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired);
             }
-                
-            /* if (login.Email == "sss" && login.Password == "aaa")
-             {
-                 sesionDTO.Nombre = "admin";
-                 sesionDTO.Email = login.Email;
-                 sesionDTO.Rol = "admin";
-            }
-             else
-             {
-                 sesionDTO.Nombre = "cliente";
-                 sesionDTO.Email = login.Email;
-                 sesionDTO.Rol = "cliente";
-             }
-             */      
-        }
-
-        private async Task<bool> VerificarExistencia(string email)
-        {
-            using (var db = new OhMyBoatUIServerContext())
-            {
-                return await db.Usuarios.Where(u => u.Email == email).AnyAsync();
-            }
         }
 
         [HttpPost]
         [Route("Registrar")]
-        public async Task<IActionResult> Registrar([FromBody] Cliente c)
-        {/*
-            var resultado = await VerificarExistencia(usuario.Email);
-            if (resultado.result)
-            {
-                return StatusCode(StatusCodes.Status200OK, false);
+        public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
+        {
+            if (!Utils.IsValidEmail(c.Email)) {
+                return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
-            else
-            {
-                using (var db = new OhMyBoatUIServerContext())
-                {
-                    db.Usuarios.Add(usuario);
-                    await db.SaveChangesAsync();
-                }
-                return StatusCode(StatusCodes.Status200OK, true);
-            }*/
-
             using (var db = new OhMyBoatUIServerContext())
             {
                 if (db.Clientes.Where(cli => cli.Email == c.Email).IsNullOrEmpty())
                 {
-                    db.Clientes.Add(c);
+                    c.Rol = Roles.cliente;
+                    await db.Clientes.AddAsync(c);
                     await db.SaveChangesAsync();
                     return StatusCode(StatusCodes.Status200OK, c);
                 }
                 return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
             }
-            
 
         }
 
+
     }
 }
+
