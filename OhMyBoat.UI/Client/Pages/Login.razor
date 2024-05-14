@@ -89,9 +89,9 @@
             if (loginRespones.StatusCode == System.Net.HttpStatusCode.VariantAlsoNegotiates){ // bloqueado
                         await JsRuntime.InvokeVoidAsync("alert", "El usuario esta bloqueado, Comuniquese con el jefe de OMB!");
             }
-            if (loginRespones.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+            if (loginRespones.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired) // ta mal lo que pusiste
             {
-                await JsRuntime.InvokeVoidAsync("alert", "Usuario o contraseña no valida");
+                await JsRuntime.InvokeVoidAsync("alert", "Email o contraseña incorrectos");
             }
         }
         catch(Exception a)
