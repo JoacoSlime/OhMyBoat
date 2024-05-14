@@ -84,6 +84,15 @@
             return b.ToString();
         }
     }
+        private bool IsValidEmail(string mail){
+        if (mail.Length - mail.Replace("@", "").Length == 1 && 
+        (mail.Substring(mail.Length - 4).Equals(".com") || 
+        mail.Substring(mail.Length - 7).Equals(".com.ar") ||
+        mail.Substring(mail.Length - 3).Equals(".me")) ){
+            return true;
+        };
+        return false;
+    }
     private string passhashed = "";
 
     async private void Registrarse() {
