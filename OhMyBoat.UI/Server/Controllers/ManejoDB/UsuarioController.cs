@@ -23,7 +23,7 @@ namespace OhMyBoat.UI.Server.Controllers
 
             using (var db = new OhMyBoatUIServerContext())
             {
-                var temp = db.Usuarios.Where(usuario => usuario.Email == login.Email && usuario.Password == login.Password).FirstOrDefault();
+                var temp = await db.Usuarios.Where(usuario => usuario.Email == login.Email && usuario.Password == login.Password).FirstOrDefaultAsync();
                 if (temp != null)
                 {
                     sesionDTO.Rol = temp.Rol.ToString();
@@ -40,24 +40,19 @@ namespace OhMyBoat.UI.Server.Controllers
             }
         }
 
-        private async Task<bool> VerificarExistencia(string email)
-        {
-            using (var db = new OhMyBoatUIServerContext())
-            {
-                return await db.Usuarios.Where(u => u.Email == email).AnyAsync();
-            }
-        }
-
         [HttpPost]
         [Route("Registrar")]
         public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
         {
+            if (!Utils.IsValidEmail(c.Email)) {
+                return StatusCode(StatusCodes.Status418ImATeapot, null);
+            }
             using (var db = new OhMyBoatUIServerContext())
             {
                 if (db.Clientes.Where(cli => cli.Email == c.Email).IsNullOrEmpty())
                 {
                     c.Rol = Roles.cliente;
-                  
+                    await db.Clientes.AddAsync(c);
                     await db.SaveChangesAsync();
                     return StatusCode(StatusCodes.Status200OK, c);
                 }
@@ -67,8 +62,6 @@ namespace OhMyBoat.UI.Server.Controllers
         }
 
 
-
-
     }
-    }
+}
 
