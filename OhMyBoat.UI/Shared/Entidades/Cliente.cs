@@ -21,6 +21,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         */
         //es necesario o no el constructor? genera ambiguedades? necesito ese constructor vacio para que me deje de joder?
         /* public Cliente (String nombre, String email, String passw){
+
             Nombre = nombre;
             Email = email;
             Password = passw;

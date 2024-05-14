@@ -70,6 +70,7 @@
         password.Any(c => IsMayusc(c)) && 
         password.Any(c => IsSymbol(c));
     }
+
     static string HashWithSha256(string ActualData)
     {
         using (SHA256 s = SHA256.Create())
@@ -84,10 +85,15 @@
         }
     }
     private string passhashed = "";
+
     async private void Registrarse() {
 
         if (Email == "") {
             await JsRuntime.InvokeVoidAsync("alert", "Flaco el email.");
+            return;
+        }
+        if (!IsValidEmail(Email)) {
+            await JsRuntime.InvokeVoidAsync("alert", "Ingrese un correo electrónico válido.");
             return;
         }
         if (Nombre == "") {
@@ -102,6 +108,7 @@
             await JsRuntime.InvokeVoidAsync("alert", "Tu contraseña no es lo suficientemente segura.\nComo mínimo debe tener 8 caracteres, y contener al menos un caracter especial, una mayúscula y dos números");
             return;
         }
+
         passhashed = HashWithSha256(Password);
 
         Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed};
@@ -125,5 +132,6 @@
         }
 
         //mandar el cliente a registro
+
     }
 }
