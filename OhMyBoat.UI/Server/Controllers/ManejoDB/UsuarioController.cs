@@ -7,6 +7,7 @@ using OhMyBoat.UI.Server.Data;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 
 namespace OhMyBoat.UI.Server.Controllers
 {
@@ -16,7 +17,7 @@ namespace OhMyBoat.UI.Server.Controllers
     {
         [HttpPost]
         [Route("Login")]
-
+        // aca me conecto a la db despues lo cambio rey -Agus
         public async Task<IActionResult> Login([FromBody] LoginDTO login)
         {
             SesionDTO sesionDTO = new SesionDTO();
@@ -58,10 +59,44 @@ namespace OhMyBoat.UI.Server.Controllers
                 }
                 return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
             }
-
         }
 
+        [HttpPost]
+        [Route("ObtenerUsuario")]
+        public async Task<IActionResult> ObtenerUsuario([FromBody] LoginDTO a)
+        {
+            using (var db = new OhMyBoatUIServerContext())
+            {
+                var clie = await db.Usuarios.Where(u => u.Email == a.Email).FirstAsync();
+                if (clie != null)
+                {
+                    clie.Password = "que te importa lagarto";
+                    return StatusCode(StatusCodes.Status200OK, clie);
+                }
+                else return StatusCode(StatusCodes.Status403Forbidden, null);
 
+            }
+        }
+        /*
+        public async Task<IActionResult> Details(String? email)
+        {
+            using (var db = new OhMyBoatUIServerContext())
+            {
+                if (db.Usuarios == null)
+                {
+                    return NotFound();
+                }
+                var usuario = await db.Usuarios
+                    .FirstOrDefaultAsync(m => m.Email == email);
+                if (usuario == null)
+                {
+                    return NotFound();
+                }
+
+            }
+            
+        }
+        */
     }
 }
 

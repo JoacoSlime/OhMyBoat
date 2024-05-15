@@ -200,3 +200,6 @@ __pycache__/
 
 # Windows thumbnail cache files
 Thumbs.db
+
+# NO ME PICAN LOS COCOS
+*.sqlite
