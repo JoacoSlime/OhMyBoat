@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using OhMyBoat.UI.Shared
+
 <div class="top-row navbar navbar-dark">
     <div class="container-fluid">
         <a href="" class="navbar-logo">
@@ -10,7 +12,7 @@
         </button>
         <AuthorizeView>
             <div>
-                <h1>@context.User.Claims.Where(c => c.Type == ClaimTypes.Role).First().Value</h1>
+                <h1 class="navbar-role">@Utils.capitalizeRole(context.User.Claims.Where(c => c.Type == ClaimTypes.Role).First().Value.ToString())</h1>
             </div>
         </AuthorizeView>
     </div>

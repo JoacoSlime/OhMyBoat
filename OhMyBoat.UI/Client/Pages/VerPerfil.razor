@@ -1,5 +1,4 @@
-﻿@page "/profile"
-@using Microsoft.AspNetCore.Components.Authorization
+﻿@using Microsoft.AspNetCore.Components.Authorization
 @using OhMyBoat.UI.Client.Extensions;
 @using OhMyBoat.UI.Shared.Entidades;
 @using System.Security.Claims
@@ -11,21 +10,13 @@
 @inject NavigationManager Navegador;
 
 
-<div>   
-    @if (mostrar)
-    {
-        <div>
-            <h2> Email : @Email </h2>
-            <h2> Nombre : @Nombre</h2>
-            <h2> Contacto : @Contacto</h2>
-            <h2> Rol : @Rol.ToString()</h2>
-        </div>
-     }
-    else
-    {
-        <h3>Cargandooooo...</h3>
-    }
-  
+<div class="login-containter dflex">   
+    <div>
+        <h2> Email : @Email </h2>
+        <h2> Nombre : @Nombre</h2>
+        <h2> Contacto : @Contacto</h2>
+        <h2> Rol : @Rol.ToString()</h2>
+    </div>
     <div>
         <button class="btn btn-primary" @onclick="modificarPerfil">Modificar Perfil</button>        
         <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
@@ -34,7 +25,6 @@
 </div>
 
 @code {
-    private bool mostrar = false; //<button class="btn btn-primary" @onclick="traerUsuario">Ver</button>
     private string Nombre = "";
     private string Email = "";
     private string Contacto = "";
@@ -47,35 +37,24 @@
     }
     private async void traerUsuario()
     {
-        if (!mostrar)
-        {
-            var coso = await authStateProvider.GetAuthenticationStateAsync();
-            var emailDatos = coso.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
-            var log = new LoginDTO();
-            log.Email = emailDatos;
-            var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log); // ver ese coso
-            var mevoyamatar = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
+        var coso = await authStateProvider.GetAuthenticationStateAsync();
+        var emailDatos = coso.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        var log = new LoginDTO();
+        log.Email = emailDatos;
+        var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log); // ver ese coso
+        var mevoyamatar = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
 
-            if (mevoyamatar != null) { 
+        if (mevoyamatar != null) { 
 
-                Nombre = mevoyamatar.Nombre;
-                Email = mevoyamatar.Email;
-                Contacto = mevoyamatar.Contacto == null ? "Sin datos" : mevoyamatar.Contacto;
-                Rol = mevoyamatar.Rol;
-                mostrar = true;
-                StateHasChanged();
+            Nombre = mevoyamatar.Nombre;
+            Email = mevoyamatar.Email;
+            Contacto = mevoyamatar.Contacto == null ? "Sin datos" : mevoyamatar.Contacto;
+            Rol = mevoyamatar.Rol;
+            StateHasChanged();
 
-                // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));
+            // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));
 
-            } else await JsRuntime.InvokeVoidAsync("alert", "Explote");
-            
-        }
-        else
-        {
-            mostrar = false;
-        }
-
-
+        } else await JsRuntime.InvokeVoidAsync("alert", "Explote");
     }
     private void CambiarContra() => JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
     private void modificarPerfil() => JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
