@@ -44,7 +44,7 @@ using (var context = new OhMyBoatUIServerContext()) // ESTO ES PARA QUE NO EXPLO
     {
         context.Usuarios.Add(new OhMyBoat.UI.Shared.Entidades.Usuario() { Email = "admin@admin.com",Password="925427659676ada68e35f680a1f4c8da1cee5955d9bd014772d4b798c5bae13a",Nombre="Daniel",Rol=OhMyBoat.UI.Shared.Entidades.Roles.jefe}); // contra Admin1234.
         context.Usuarios.Add(new OhMyBoat.UI.Shared.Entidades.Usuario() { Email = "emple@gmail.com",Password="0eb6f152d72087e15b6d61aa17ddafdce855f96330d56f004f129e4504d60c5d", Nombre="Mariano",Rol=OhMyBoat.UI.Shared.Entidades.Roles.empleado});// contra Agua1234.
-        context.Clientes.Add(new OhMyBoat.UI.Shared.Entidades.Cliente() { Email = "pepoelpeposo@yahoo.com", Nombre="pepo Ramallo", Password = "0eb6f152d72087e15b6d61aa17ddafdce855f96330d56f004f129e4504d60c5d", Rol = OhMyBoat.UI.Shared.Entidades.Roles.cliente });// contra Agua1234.
+        context.Clientes.Add(new OhMyBoat.UI.Shared.Entidades.Cliente() { Email = "cliente@yahoo.com", Nombre="pepo Ramallo", Password = "0eb6f152d72087e15b6d61aa17ddafdce855f96330d56f004f129e4504d60c5d", Rol = OhMyBoat.UI.Shared.Entidades.Roles.cliente });// contra Agua1234.
         context.SaveChanges();
     }
     var connection = context.Database.GetDbConnection();

@@ -24,7 +24,7 @@
 
         <div class="mb-3">
             <label>Correo</label>
-            <input @bind="login.Email" class="form-control" />
+            <input @bind="email" class="form-control" />
         </div>
 
         <div class="mb-3">
@@ -43,6 +43,7 @@
 
 @code {
     private string contra = "";
+    private string email = "";
     static string HashWithSha256(string ActualData)
     {
         using (SHA256 s = SHA256.Create())
@@ -57,25 +58,24 @@
         }
     }
 
-    private LoginDTO login = new LoginDTO();
-
 
     public async Task iniciarSesion()
-
     {     
-        login.Password = HashWithSha256(contra);
-        
-        if (login.Email == "")
+        if (email == "")
         {
             await JsRuntime.InvokeVoidAsync("alert", "Flaco el email.");
             return;
         }
-        if (login.Password == "")
+        if (contra == "")
         {
             await JsRuntime.InvokeVoidAsync("alert", "Flaco la contraseña");
             return;
         }
-
+        
+        LoginDTO login = new LoginDTO();
+        login.Password = HashWithSha256(contra);
+        login.Email = email;
+        
         var loginRespones = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/Login", login);
         try
         {
