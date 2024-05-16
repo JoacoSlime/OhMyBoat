@@ -45,13 +45,6 @@ main {
         text-overflow: ellipsis;
     }
 
-VerPerfil {
-    border: 1px black;
-    display: flex;
-    flex-direction: column;
-    position: static;
-}
-
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
         display: none;

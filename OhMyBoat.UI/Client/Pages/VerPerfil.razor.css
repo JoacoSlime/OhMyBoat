@@ -1,0 +1,6 @@
+.login-container {
+    border: 1px black;
+    display: flex;
+    flex-direction: column;
+    position: static;
+}

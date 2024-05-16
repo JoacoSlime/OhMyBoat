@@ -16,10 +16,15 @@
     background-color: rgba(0,0,0,0.4);
 }
 
+.navbar-logo {
+    display: block;
+    height: auto;
+    width: 100%;
+}
 
 .navbar-logo > img {
     display: block;
-    max-height: 100%;
+    height: auto;
     width: 100%;
 }
 

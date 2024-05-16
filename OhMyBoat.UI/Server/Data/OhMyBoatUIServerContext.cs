@@ -33,7 +33,7 @@ namespace OhMyBoat.UI.Server.Data
 #nullable restore
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("data source=MePicanLosCocos.sqlite");
+            optionsBuilder.UseSqlite("data source=baseDeDatos.sqlite");
         }
 
     }
