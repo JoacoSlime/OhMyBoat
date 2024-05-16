@@ -32,13 +32,15 @@
     </div>
     <div class="form_field">
         <label for="fecha de nacimiento"><b>Seleccione su fecha de nacimiento</b></label>
-        <input @bind="FechaNac" type="date" id="Test_Date"/>
+        <input @bind="FechaNac" type="date"  max="@today" id="Test_Date"/>
     </div>
     <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>
 </html>
 
-@code{
 
+
+@code{
+     private string today = DateTime.Now.ToString("yyyy-MM-dd"); // no puedo nacer ma►4ana mi rey es lo que se me ocurrio capas existe otra cosa mas linda -slds
     [Required]
     private DateTime FechaNac { get; set; } = DateTime.Now;
     [Required]
@@ -94,6 +96,11 @@
         }   
         if (!IsValidPassword(Password)) {
             await JsRuntime.InvokeVoidAsync("alert", "Tu contraseña no es lo suficientemente segura.\nComo mínimo debe tener 8 caracteres, y contener al menos un caracter especial, una mayúscula y dos números");
+            return;
+        }
+        if (HasNum(Nombre))
+        {
+             await JsRuntime.InvokeVoidAsync("alert", "Papu no podes ser perro volador34");
             return;
         }
 
