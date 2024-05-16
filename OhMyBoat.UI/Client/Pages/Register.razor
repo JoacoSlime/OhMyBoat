@@ -79,19 +79,7 @@
         password.Any(c => IsSymbol(c));
     }
 
-    static string HashWithSha256(string ActualData)
-    {
-        using (SHA256 s = SHA256.Create())
-        {
-            byte[] bytes = s.ComputeHash(Encoding.UTF8.GetBytes(ActualData));
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                b.Append(bytes[i].ToString("x2"));
-            }
-            return b.ToString();
-        }
-    }
+    
     private string passhashed = "";
     private bool IsValidEmail(string a) => true;
     async private void Registrarse() {
@@ -109,7 +97,7 @@
             return;
         }
 
-        passhashed = HashWithSha256(Password);
+        passhashed = Utils.HashWithSha256(Password);
 
         Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed};
 
@@ -117,7 +105,7 @@
         await JsRuntime.InvokeVoidAsync("alert", "Instancie algo, mando coso a la api");
 
 
-        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/usuario/Registrar", cliente);
+        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/cuenta/RegistrarCliente", cliente);
 
         //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK){

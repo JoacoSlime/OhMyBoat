@@ -10,5 +10,5 @@ namespace OhMyBoat.UI.Shared.Entidades
     {
         public int Id {  get; set; }
         public string NombreSuck { get; set; } = "";
-}
+    }
 }

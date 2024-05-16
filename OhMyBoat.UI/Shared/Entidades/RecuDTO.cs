@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace OhMyBoat.UI.Shared.Entidades
 {
-    public class Imagen
+    public class RecuDTO
     {
-        public int Id { get; set; } 
-        public string base64imagen { get; set; } = "";
+        public string HashViejo { get; set; } = "";
+        public string HashNuevo { get; set;} = "";
+        public string Email { get; set;} = "";
+
 
     }
 }

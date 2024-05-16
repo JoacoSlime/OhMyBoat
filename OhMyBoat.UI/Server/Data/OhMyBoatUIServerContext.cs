@@ -22,7 +22,6 @@ namespace OhMyBoat.UI.Server.Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Denuncia> Denuncias { get; set; }
-        public DbSet<Imagen> Imagenes { get; set; }
         public DbSet<TokenRecu> Tokens { get; set; }
         public DbSet<Trueque> Trueques { get; set; }
         public DbSet<Turno> Turno { get; set; }
