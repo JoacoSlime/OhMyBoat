@@ -32,7 +32,15 @@
                         <span class="oi oi-plus" aria-hidden="true"></span> Counter
                     </NavLink>
                 </div>
-
+                <AuthorizeView Roles= "jefe,empleado" Context= "EmpladoOjefe" >
+                    <Authorized Context="EmpladoOjefe">
+                       <div class="nav-item px-3">
+                          <NavLink class="nav-link" href="ListadoClientes">
+                               <span class="oi oi-list-rich" aria-hidden="true"></span> Listar Clientes
+                           </NavLink>
+                     </div>
+                     </Authorized>
+                  </AuthorizeView>
                 <AuthorizeView Roles="jefe" Context="innerContext">
                     <Authorized Context="innerContext">
                         <div class="nav-item px-3">

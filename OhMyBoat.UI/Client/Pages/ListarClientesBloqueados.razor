@@ -25,6 +25,8 @@
         </tr>
     </thead>
     <tbody>
+        @if (ListaDeClientes != null)
+        {
         @foreach (var Cli in ListaDeClientes)
         {
             <tr>
@@ -34,6 +36,7 @@
                 <td>
                 </td>
             </tr>
+        }
         }
     </tbody>
 </table>
@@ -46,11 +49,15 @@
 
 List<Cliente> ListaDeClientes;
 
-private async void listar_clientes() {
-        var ListaDeClientes = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes");
+
+protected override async Task OnInitializedAsync()
+{
+            ListaDeClientes = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes");
         if (ListaDeClientes.Count == 0)
         {
               await JsRuntime.InvokeVoidAsync("alert", "Aun no hay clientes registrados.");
-        }
+        }        
     }
-}
+} 
+
+
