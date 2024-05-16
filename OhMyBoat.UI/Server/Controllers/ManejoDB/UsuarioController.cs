@@ -13,36 +13,38 @@ namespace OhMyBoat.UI.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //          Esta api la usamos para login y usuarios en general
     public class UsuarioController : ControllerBase
     {
-        [HttpPost]
-        [Route("Login")]
-        // aca me conecto a la db despues lo cambio rey -Agus
-        public async Task<IActionResult> Login([FromBody] LoginDTO login)
-        {
-            SesionDTO sesionDTO = new SesionDTO();
 
+
+        [HttpPost]
+        [Route("RegistrarEmpleado")]
+        public async Task<IActionResult> RegistrarEmple([FromBody] Usuario c)
+        {
+            if (!Utils.IsValidEmail(c.Email))
+            {
+                return StatusCode(StatusCodes.Status418ImATeapot, null);
+            }
             using (var db = new OhMyBoatUIServerContext())
             {
-                var temp = await db.Usuarios.Where(usuario => usuario.Email == login.Email && usuario.Password == login.Password).FirstOrDefaultAsync();
-                if (temp != null)
+                if (await db.Usuarios.Where(cli => cli.Email == c.Email).AnyAsync())
                 {
-                    sesionDTO.Rol = temp.Rol.ToString();
-                    if (temp.Rol == Roles.cliente && temp.Bloqueado)
-                    {
-                        return StatusCode(StatusCodes.Status506VariantAlsoNegotiates);
-                    }
-
-                    sesionDTO.Email = temp.Email;
-                    sesionDTO.Nombre = temp.Nombre;
-                    return StatusCode(StatusCodes.Status200OK, sesionDTO);
+                    c.Rol = Roles.empleado;
+                    // se tiene que mandar el email para recuperar la contraseña // <-------------------------------------------------------------//
+                    await db.Usuarios.AddAsync(c);
+                    await db.SaveChangesAsync();
+                    return StatusCode(StatusCodes.Status200OK, c);
                 }
-                else return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired);
+                return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
             }
         }
 
-        [HttpPost]
-        [Route("Registrar")]
+
+
+
+            [HttpPost]
+        [Route("RegistrarCliente")]
         public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
         {
             if (!Utils.IsValidEmail(c.Email)) {
@@ -75,6 +77,17 @@ namespace OhMyBoat.UI.Server.Controllers
                 }
                 else return StatusCode(StatusCodes.Status403Forbidden, null);
 
+            }
+        }
+        [HttpGet]
+        [Route("ListarClientes")]
+        public async Task<IEnumerable<Cliente>> Get()
+        {
+            using (var db = new OhMyBoatUIServerContext())
+            {
+                 var mongos = await db.Clientes.OrderBy(c => c.Bloqueado).ToListAsync();
+                 mongos.ForEach(c => c.Password = "Me pican los cocos"); // asi no hay un vivo 
+                 return mongos;
             }
         }
         /*

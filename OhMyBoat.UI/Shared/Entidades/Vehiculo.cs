@@ -11,7 +11,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         public int Id { get; set; }
         public int IDCliente { get; set; }
         public string Matricula { get; set; } = "";
-        public int? ImagenId {  get; set; }
+        public string? base64imagen {  get; set; }
         public int Antiguedad { get; set; }
         public string? descripcion { get; set; }
 
