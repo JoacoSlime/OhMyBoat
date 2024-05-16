@@ -12,17 +12,12 @@
     background-color: rgba(0,0,0,0.4);
 }
 
-.navbar-logo {
-    width:auto;
-    height:12rem;
-}
 
-/* .navbar-brand {
-    font-size: 1.1rem;
-    margin: 0;
-    padding: 0;
-    padding-top: 0.5rem;
-} */
+.navbar-logo > img {
+    display: block;
+    max-height: 100%;
+    width: 100%;
+}
 
 .oi {
     width: 2rem;
