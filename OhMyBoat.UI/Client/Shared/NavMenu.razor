@@ -4,7 +4,7 @@
 
 <div class="top-row navbar navbar-dark">
     <div class="container-fluid">
-        <a href="" class="navbar-logo">
+        <a href="" class="d-flex justify-content-center navbar-logo">
             <img src="Logo.jpg"/>
         </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -22,17 +22,26 @@
     <nav class="flex-column">
         <AuthorizeView>
             <Authorized>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                            <span class="oi oi-home" aria-hidden="true"></span> Home
-                        </NavLink>
-                    </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="counter">
-                        <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="oi oi-home" aria-hidden="true"></span> Home
                     </NavLink>
                 </div>
-
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="mis-ofertas">
+                        <span class="oi oi-cart-check-fill" aria-hidden="true"></span> Mis Ofertas
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="mis-vehiculos">
+                        <span class="oi oi-car-front-fill" aria-hidden="true"></span> Mis Vehiculos
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="buscar-navios">
+                        <span class="oi oi-magnifying-glass" aria-hidden="true"></span> Buscar Navios
+                    </NavLink>
+                </div>
                 <AuthorizeView Roles="jefe" Context="innerContext">
                     <Authorized Context="innerContext">
                         <div class="nav-item px-3">

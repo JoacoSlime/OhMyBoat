@@ -17,10 +17,14 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        <button class="btn-secondary" @onclick=logoutClick href="javascript:void(0)"><span class="oi oi-account-logout" aria-hidden="true"></span> Cerrar Sesión</button>
-                        <button @onclick=switchAccountComponent><span class="oi oi-person" title="Mi Cuenta" aria-hidden="true"></span></button>
+                        <button class="btn btn-secondary" @onclick=logoutClick href="javascript:void(0)"><span class="oi oi-account-logout" aria-hidden="true"></span> Cerrar Sesión</button>
+                        @if (showAccountButton) {
+                            <button class="btn account-button" @onclick=switchAccountComponent><span class="oi oi-person" title="Mi Cuenta" aria-hidden="true"></span></button>
+                        }
                         @if(showAccount) {
-                            <VerPerfil/>
+                            <div class="account-popup">
+                                <VerPerfil/>
+                            </div>
                         }
                     </Authorized>
                 </AuthorizeView>
@@ -36,6 +40,14 @@
 
 
 @code {
+    private bool showAccountButton { get; set; }
+    
+    protected override void OnParametersSet()
+    {
+        showAccountButton = (this.Body.Target as RouteView)?.RouteData?.PageType?.ToString() != "OhMyBoat.UI.Client.Pages.VerPerfil";
+        showAccount = false;
+    }
+
     private bool showAccount = false;
     private void switchAccountComponent() {
         showAccount = !showAccount;
