@@ -4,6 +4,7 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager navManager;
 @inject IJSRuntime JsRuntime;
+@using OhMyBoat.UI.Client.Pages;
 
 
 <div class="page">
@@ -17,8 +18,10 @@
                 <AuthorizeView>
                     <Authorized>
                         <button class="btn-secondary" @onclick=logoutClick href="javascript:void(0)"><span class="oi oi-account-logout" aria-hidden="true"></span> Cerrar Sesión</button>
-                        <a href="profile" class="account-button"><span class="oi oi-person" title="Mi Cuenta" aria-hidden="true"></span></a>
-                        <span class="oi oi-icon-name" title="icon name" aria-hidden="true"></span>
+                        <button @onclick=switchAccountComponent><span class="oi oi-person" title="Mi Cuenta" aria-hidden="true"></span></button>
+                        @if(showAccount) {
+                            <VerPerfil/>
+                        }
                     </Authorized>
                 </AuthorizeView>
             </CascadingAuthenticationState>
@@ -33,6 +36,10 @@
 
 
 @code {
+    private bool showAccount = false;
+    private void switchAccountComponent() {
+        showAccount = !showAccount;
+    }
     private async Task logoutClick() {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", "Estás seguro de que quieres cerrar la sesión?"))
             return;
