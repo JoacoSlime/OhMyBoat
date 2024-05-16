@@ -24,29 +24,29 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                        <span class="oi oi-home" aria-hidden="true"></span> Home
+                        <div class="d-flex flex-row align-items-center"><Icon Name="IconName.HouseFill" Size="IconSize.x3"></Icon> <span class="ms-2">Home</span></div>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="mis-ofertas">
-                        <span class="oi oi-cart-check-fill" aria-hidden="true"></span> Mis Ofertas
+                        <div class="d-flex flex-row align-items-center"><Icon Name="IconName.CartFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Ofertas</span></div>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="mis-vehiculos">
-                        <span class="oi oi-car-front-fill" aria-hidden="true"></span> Mis Vehiculos
+                        <div class="d-flex flex-row align-items-center"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Vehiculos</span></div>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="buscar-navios">
-                        <span class="oi oi-magnifying-glass" aria-hidden="true"></span> Buscar Navios
+                        <div class="d-flex flex-row align-items-center"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Buscar Navios</span></div>
                     </NavLink>
                 </div>
                 <AuthorizeView Roles="jefe" Context="innerContext">
                     <Authorized Context="innerContext">
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" href="fetchData">
-                                <span class="oi oi-list-rich" aria-hidden="true"></span> Test Admin Permisos
+                                <div class="d-flex flex-row align-items-center"><Icon Name="IconName.ShieldLockFill" Size="IconSize.x3"></Icon> <span class="ms-2">Test Admin Permisos</span></div>
                             </NavLink>
                         </div>
                     </Authorized>

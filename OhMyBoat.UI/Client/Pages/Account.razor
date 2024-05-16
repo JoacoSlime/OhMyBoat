@@ -18,7 +18,9 @@
 <div class="d-flex flex-column justify-content-center">   
     <div class="d-flex flex-column justify-content-center">
         <div class="d-flex flex-row align-items-center">
-            <img src=@Imagen class="profile-image" alt="User Profile">
+            <div class="image-div">
+                <img src=@Imagen class="profile-image" alt="User Profile">
+            </div>
             <p class="fs-1 mb-0"> Nombre : @Nombre</p>
         </div>
         <h2> Email : @Email </h2>
@@ -26,9 +28,14 @@
         <h2> Rol : @Rol.ToString()</h2>
     </div>
     <div>
-        <button class="btn btn-primary" @onclick="modificarPerfil">Modificar Perfil</button>        
-        <button class="btn btn-primary" @onclick="Aceptar">Aceptar</button>
-        <button class="btn btn-primary" @onclick="CambiarContra">Cambiar contraseña</button>
+        <button class="btn btn-primary" @onclick="VerPerfil">Ver Perfil</button>        
+        <button class="btn btn-primary" @onclick="EditarPerfil">Editar Perfil</button>
+        <button class="btn btn-secondary" @onclick=CerrarSesión href="javascript:void(0)">
+            <div class="d-flex flex-row align-items-center">
+                <Icon Name="IconName.BoxArrowLeft" Size="IconSize.x4"></Icon>
+                <span class="ms-2">Cerrar Sesión</span>
+            </div>
+        </button>
     </div>
 </div>
 
@@ -65,7 +72,13 @@
 
         } else await JsRuntime.InvokeVoidAsync("alert", "Explote");
     }
-    private void CambiarContra() => JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
-    private void modificarPerfil() => JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
-    private void Aceptar() => JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
+    private async Task VerPerfil() => navManager.NavigateTo("account");
+    private async Task EditarPerfil() => await JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
+    private async Task CerrarSesión() {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Estás seguro de que quieres cerrar la sesión?"))
+            return;
+        var authState = (AuthenticationExtension) authStateProvider;
+        await authState.ActualizarEstadoAutenticacion(null);
+        navManager.NavigateTo("/", true);
+    }
 }

@@ -17,13 +17,12 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        <button class="btn btn-secondary" @onclick=logoutClick href="javascript:void(0)"><span class="oi oi-account-logout" aria-hidden="true"></span> Cerrar Sesión</button>
                         @if (showAccountButton) {
-                            <button class="btn account-button" @onclick=switchAccountComponent><span class="oi oi-person" title="Mi Cuenta" aria-hidden="true"></span></button>
+                            <button class="btn account-button" @onclick=switchAccountComponent><Icon Name="IconName.PersonFill" Size="IconSize.x4"></Icon></button>
                         }
                         @if(showAccount) {
                             <div class="account-popup">
-                                <VerPerfil/>
+                                <Account/>
                             </div>
                         }
                     </Authorized>
@@ -51,16 +50,5 @@
     private bool showAccount = false;
     private void switchAccountComponent() {
         showAccount = !showAccount;
-    }
-    private async Task logoutClick() {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Estás seguro de que quieres cerrar la sesión?"))
-            return;
-        await logout();
-    }
-    private async Task logout()
-    {
-        var authState = (AuthenticationExtension) authStateProvider;
-        await authState.ActualizarEstadoAutenticacion(null);
-        navManager.NavigateTo("/", true);
     }
 }
