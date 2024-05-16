@@ -1,10 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
-<div class="top-row ps-3 navbar navbar-dark">
+<div class="top-row navbar navbar-dark">
     <div class="container-fluid">
-        <img class="navbar-logo" src="Logo.jpg"/>
+        <a href="" class="navbar-logo">
+            <img src="Logo.jpg"/>
+        </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span> Menu
         </button>
         <AuthorizeView>
             <div>
@@ -15,9 +17,9 @@
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <AuthorizeView>
-        <Authorized>
-            <nav class="flex-column">
+    <nav class="flex-column">
+        <AuthorizeView>
+            <Authorized>
                     <div class="nav-item px-3">
                         <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                             <span class="oi oi-home" aria-hidden="true"></span> Home
@@ -29,17 +31,18 @@
                     </NavLink>
                 </div>
 
-                <AuthorizeView Roles="admin" Context="innerContext">
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="fetchdata">
-                            <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-                        </NavLink>
-                    </div>
+                <AuthorizeView Roles="jefe" Context="innerContext">
+                    <Authorized Context="innerContext">
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="fetchData">
+                                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                            </NavLink>
+                        </div>
+                    </Authorized>
                 </AuthorizeView>
-            </nav>
-        </Authorized>
-    </AuthorizeView>
-
+            </Authorized>
+        </AuthorizeView>
+    </nav>
 </div>
 
 @code {
