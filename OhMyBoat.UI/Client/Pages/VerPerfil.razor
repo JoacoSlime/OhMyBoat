@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using OhMyBoat.UI.Client.Extensions;
 @using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
 @using System.Security.Claims
 @using System;
 @inject HttpClient HttpClient
@@ -10,7 +11,7 @@
 @inject NavigationManager Navegador;
 
 
-<div class="login-containter dflex">   
+<div class="account-popup">   
     <div>
         <h2> Email : @Email </h2>
         <h2> Nombre : @Nombre</h2>
@@ -28,14 +29,14 @@
     private string Nombre = "";
     private string Email = "";
     private string Contacto = "";
-    private Roles Rol = Roles.cliente;
+    private string Rol = "";
     private Usuario user = new Usuario() { Email = "", Nombre = "", Contacto = "" };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        traerUsuario();
+        await traerUsuario();
     }
-    private async void traerUsuario()
+    private async Task traerUsuario()
     {
         var coso = await authStateProvider.GetAuthenticationStateAsync();
         var emailDatos = coso.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
@@ -48,8 +49,8 @@
 
             Nombre = mevoyamatar.Nombre;
             Email = mevoyamatar.Email;
-            Contacto = mevoyamatar.Contacto == null ? "Sin datos" : mevoyamatar.Contacto;
-            Rol = mevoyamatar.Rol;
+            Contacto = mevoyamatar.Contacto == null ? "-" : mevoyamatar.Contacto;
+            Rol = Utils.capitalizeString(mevoyamatar.Rol.ToString());
             StateHasChanged();
 
             // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));

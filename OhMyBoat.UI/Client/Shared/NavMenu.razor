@@ -12,7 +12,7 @@
         </button>
         <AuthorizeView>
             <div>
-                <h1 class="navbar-role">@Utils.capitalizeRole(context.User.Claims.Where(c => c.Type == ClaimTypes.Role).First().Value.ToString())</h1>
+                <h1 class="navbar-role">@Utils.capitalizeString(context.User.Claims.Where(c => c.Type == ClaimTypes.Role).First().Value.ToString())</h1>
             </div>
         </AuthorizeView>
     </div>
