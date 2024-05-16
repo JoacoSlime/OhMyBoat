@@ -44,19 +44,7 @@
 @code {
     private string contra = "";
     private string email = "";
-    static string HashWithSha256(string ActualData)
-    {
-        using (SHA256 s = SHA256.Create())
-        {
-            byte[] bytes = s.ComputeHash(Encoding.UTF8.GetBytes(ActualData));
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                b.Append(bytes[i].ToString("x2"));
-            }
-            return b.ToString();
-        }
-    }
+    
 
 
     public async Task iniciarSesion()
@@ -73,10 +61,10 @@
         }
         
         LoginDTO login = new LoginDTO();
-        login.Password = HashWithSha256(contra);
+        login.Password = Utils.HashWithSha256(contra);
         login.Email = email;
         
-        var loginRespones = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/Login", login);
+        var loginRespones = await HttpClient.PostAsJsonAsync<LoginDTO>("api/cuenta/Login", login);
         try
         {
             if (loginRespones.StatusCode == System.Net.HttpStatusCode.OK)
