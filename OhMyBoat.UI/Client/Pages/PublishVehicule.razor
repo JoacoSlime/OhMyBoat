@@ -1,12 +1,17 @@
 @page "/cargarAuto"
-@using OhMyBoat.UI.Shared.Entidades;
-@using OhMyBoat.UI.Shared;
-@using Microsoft.JSInterop;
-@using System;
-@inject IJSRuntime JsRuntime;
-@inject HttpClient HttpClient;
-@inject NavigationManager Navegador;
-@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider authStateProvider
+@using OhMyBoat.UI.Shared.Entidades
+@using OhMyBoat.UI.Shared
+@using Microsoft.JSInterop
+@using System
+@inject IJSRuntime JsRuntime
+@inject HttpClient HttpClient
+@inject NavigationManager Navegador
+@using System.ComponentModel.DataAnnotations
+
 
 <h3>Publicar Vehiculo terrestre</h3>
 <html>
@@ -55,7 +60,7 @@
     private TipoVehiculo tipoVec {get; set;}
 
 
-
+    private string Email { get; set; } = "";
     List<ImageFile> filesBase64 = new List<ImageFile>();
 	string message = "InputFile";
 	bool isDisabled = false;
@@ -88,21 +93,21 @@
                 filesBase64.Clear();
             }
         }
-    }
-
+    }    
 
      async private void cargaVehiculoterrrestre()
     {
-        
-        Terrestre vec= new Terrestre() {Matricula=this.matricula ,Antiguedad = this.antiguedad, descripcion = this.descripcion,Tipo =this.tipoVec };
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;   // me traigo el Email del cliente para usarlo como fk
+
+        Terrestre vec= new Terrestre() {Matricula=this.matricula ,Antiguedad = this.antiguedad, descripcion = this.descripcion,Tipo =this.tipoVec , IDCliente = this.Email};
 
         var RespuestaSv = await HttpClient.PostAsJsonAsync<Terrestre>("api/Vehiculos/CargarVehiculoTerrestre", vec);
 
         if (RespuestaSv.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            
+        {            
             await Upload();
-            await JsRuntime.InvokeVoidAsync("alert", "VehiculoRegistradoConExito");
+            await JsRuntime.InvokeVoidAsync("alert", "Vehiculo Registrado Con Exito");
         }
         else
         {
