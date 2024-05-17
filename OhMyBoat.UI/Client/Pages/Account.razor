@@ -1,0 +1,96 @@
+﻿@page "/account"
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@using OhMyBoat.UI.Client.Extensions;
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using System.Security.Claims
+@using System;
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager
+@inject IJSRuntime JsRuntime;
+@inject NavigationManager Navegador;
+@attribute [Authorize]
+
+
+<div class="d-flex flex-column justify-content-center">   
+    <div class="d-flex flex-column justify-content-center">
+        <div class="d-flex flex-row align-items-center mb-5">
+            <div class="image-div d-flex flex-row align-items-end">
+                <img src=@Imagen class="profile-image" alt="User Profile">
+                <p class="fs-1 mb-0"> Nombre: @Nombre</p>
+            </div>
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+            <h2> Email : @Email </h2>
+            <h2> Contacto : @Contacto</h2>
+            <h2> Rol : @Rol.ToString()</h2>
+        </div>
+    </div>
+    <div>
+        <button class="btn btn-primary" @onclick="VerPerfil">
+            <div class="d-flex flex-row align-items-center">
+                <Icon Name="IconName.Search" Size="IconSize.x4"></Icon>
+                <span class="ms-2">Ver Perfil</span>
+            </div>
+        </button>        
+        <button class="btn btn-primary" @onclick="EditarPerfil">
+            <div class="d-flex flex-row align-items-center">
+                <Icon Name="IconName.PencilFill" Size="IconSize.x4"></Icon>
+                <span class="ms-2">Editar Perfil</span>
+            </div>
+        </button>
+        <button class="btn btn-secondary" @onclick=CerrarSesión>
+            <div class="d-flex flex-row align-items-center">
+                <Icon Name="IconName.BoxArrowLeft" Size="IconSize.x4"></Icon>
+                <span class="ms-2">Cerrar Sesión</span>
+            </div>
+        </button>
+    </div>
+</div>
+
+@code {
+    private string Nombre = "";
+    private string Email = "";
+    private string Contacto = "";
+    private string Rol = "";
+    private string Imagen = "/user.png";
+    private Usuario user = new Usuario() { Email = "", Nombre = "", Contacto = "" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await traerUsuario();
+    }
+    private async Task traerUsuario()
+    {
+        var coso = await authStateProvider.GetAuthenticationStateAsync();
+        var emailDatos = coso.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        var log = new LoginDTO();
+        log.Email = emailDatos;
+        var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log); // ver ese coso
+        var mevoyamatar = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
+
+        if (mevoyamatar != null) { 
+
+            Nombre = mevoyamatar.Nombre;
+            Email = mevoyamatar.Email;
+            Contacto = mevoyamatar.Contacto == null ? "-" : mevoyamatar.Contacto;
+            Rol = Utils.capitalizeString(mevoyamatar.Rol.ToString());
+            StateHasChanged();
+
+            // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));
+
+        } else await JsRuntime.InvokeVoidAsync("alert", "Explote");
+    }
+    private async Task VerPerfil() => navManager.NavigateTo("account");
+    private async Task EditarPerfil() => await JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
+    private async Task CerrarSesión() {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Estás seguro de que quieres cerrar la sesión?"))
+            return;
+        var authState = (AuthenticationExtension) authStateProvider;
+        await authState.ActualizarEstadoAutenticacion(null);
+        navManager.NavigateTo("/", true);
+    }
+}

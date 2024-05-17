@@ -1,18 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using OhMyBoat.UI.Shared
+
 <div class="top-row navbar navbar-dark">
     <div class="container-fluid">
-        <a href="" class="navbar-logo">
+        <a href="" class="d-flex justify-content-center navbar-logo">
             <img src="Logo.jpg"/>
         </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span> Menu
         </button>
-        <AuthorizeView>
-            <div>
-                <h1>@context.User.Claims.Where(c => c.Type == ClaimTypes.Role).First().Value</h1>
-            </div>
-        </AuthorizeView>
     </div>
 </div>
 
@@ -20,22 +17,31 @@
     <nav class="flex-column">
         <AuthorizeView>
             <Authorized>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                            <span class="oi oi-home" aria-hidden="true"></span> Home
-                        </NavLink>
-                    </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="counter">
-                        <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.HouseFill" Size="IconSize.x3"></Icon> <span class="ms-2">Home</span></div>
                     </NavLink>
                 </div>
-
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="mis-ofertas">
+                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.CartFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Ofertas</span></div>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="mis-vehiculos">
+                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Vehiculos</span></div>
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="buscar-navios">
+                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Buscar Navios</span></div>
+                    </NavLink>
+                </div>
                 <AuthorizeView Roles="jefe" Context="innerContext">
                     <Authorized Context="innerContext">
                         <div class="nav-item px-3">
                             <NavLink class="nav-link" href="fetchData">
-                                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.ShieldLockFill" Size="IconSize.x3"></Icon> <span class="ms-2">Test Admin Permisos</span></div>
                             </NavLink>
                         </div>
                     </Authorized>

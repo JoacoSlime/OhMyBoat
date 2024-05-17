@@ -31,5 +31,9 @@ namespace OhMyBoat.UI.Shared
                 return b.ToString();
             }
         }
+
+        public static String capitalizeString(String role){
+            return Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(role);
+        }
     }
 }

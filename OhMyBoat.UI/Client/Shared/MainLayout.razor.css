@@ -14,10 +14,9 @@ main {
 }
 
 .account-button {
-    margin-top: 0.5rem;
-    margin-bottom: 0;
-    color: #000;
-    font-size: 1.5rem;
+    color: #fff;
+    margin-left: 15px;
+    background-color: #3a0647;
 }
 
 .top-row {
@@ -28,6 +27,22 @@ main {
     display: flex;
     align-items: center;
     text-decoration: none;
+}
+
+::deep .account-popup {
+    width: 35%;
+    background-color: #3a0647;
+    color: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin-top: 50px;
+    margin-right: 5px;
+    padding: 15px;
+    border-radius: 5px;
+    
 }
 
     .top-row ::deep a, .top-row ::deep .btn-link {
