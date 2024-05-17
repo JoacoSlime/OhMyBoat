@@ -8,6 +8,10 @@ namespace OhMyBoat.UI.Shared.Entidades
 {
     public enum TipoVehiculo
     {
-        Auto,Camioneta,Moto,Ciclomotor,Camion
+        Auto,
+        Camioneta,
+        Moto,
+        Ciclomotor,
+        Camion
     }
 }

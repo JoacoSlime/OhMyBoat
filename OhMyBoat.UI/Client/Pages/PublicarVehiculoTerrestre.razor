@@ -1,0 +1,112 @@
+@page "/cargarAuto"
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
+@using System.ComponentModel.DataAnnotations;
+
+<h3>Publicar Vehiculo terrestre</h3>
+<html>
+    <div class="form_field">
+        <label for="nombre"><b>Patente del Vehiculo</b></label>        
+        <input @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required/> 
+    </div>
+	<div class="input-group-append">
+		<button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
+	</div>
+    <div class="input-group">
+	<div class="custom-file">
+		<InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" />
+		<label class="custom-file-label" for="inputFile">Choose file</label>
+	</div>
+
+    @foreach (var item in filesBase64)
+{
+	<img src="data:@item.contentType;base64,@item.base64data" />
+}
+
+</div>
+    <div class="form_field">
+        <label for="fecha de nacimiento"><b>Antiguedad del Vehiculo</b></label>     
+        <input @bind="antiguedad" type="int"   />
+    </div>
+    <div class="form_field">
+        <label for="Descripcion"><b>Descripcion del vehiculo</b></label>
+        <input @bind="descripcion" type="String"   >
+    </div>
+    <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre">cargar vehiculo</button>
+</html>
+
+
+
+@code {
+    [Required]
+    private string matricula { get; set; } = "";
+   // [Required]
+    //private string? base64imagen { get; set; } = "";
+    [Required]
+    private int antiguedad { get; set; } = 0;
+    [Required]
+    private string? descripcion { get; set; } = "";
+    [Required]
+    private TipoVehiculo tipoVec {get; set;}
+
+
+
+    List<ImageFile> filesBase64 = new List<ImageFile>();
+	string message = "InputFile";
+	bool isDisabled = false;
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles();   // agarra las fotos
+        foreach (var file in files)
+        {
+            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
+            var buf = new byte[resizedFile.Size];   // buffer para llenar la data de la imagen
+            using (var stream = resizedFile.OpenReadStream())
+            {
+                await stream.ReadAsync(buf);    // copia el stream a el buffer
+            }
+            filesBase64.Add(new ImageFile { base64data = Convert.ToBase64String(buf), contentType = file.ContentType, fileName = file.Name , Patente = this.matricula }); // lo convierte a base64
+        }
+        message = "subi las img para continuar";
+    }
+
+    async Task Upload()
+    {
+        isDisabled= true;
+        var msg = await HttpClient.PostAsJsonAsync<List<ImageFile>>("/api/upload", filesBase64);
+        {
+            isDisabled = false;
+            if (msg.IsSuccessStatusCode)
+            {
+                message = $"{filesBase64.Count} files uploaded";
+                filesBase64.Clear();
+            }
+        }
+    }
+
+
+     async private void cargaVehiculoterrrestre()
+    {
+        
+        Terrestre vec= new Terrestre() {Matricula=this.matricula ,Antiguedad = this.antiguedad, descripcion = this.descripcion,Tipo =this.tipoVec };
+
+        var RespuestaSv = await HttpClient.PostAsJsonAsync<Terrestre>("api/Vehiculos/CargarVehiculoTerrestre", vec);
+
+        if (RespuestaSv.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            
+            await Upload();
+            await JsRuntime.InvokeVoidAsync("alert", "VehiculoRegistradoConExito");
+        }
+        else
+        {
+             await JsRuntime.InvokeVoidAsync("alert", "me rompi");
+        }
+    } 
+}

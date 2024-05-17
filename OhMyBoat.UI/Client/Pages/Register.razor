@@ -100,16 +100,13 @@
         }
         if (HasNum(Nombre))
         {
-             await JsRuntime.InvokeVoidAsync("alert", "Papu no podes ser perro volador34");
+             await JsRuntime.InvokeVoidAsync("alert", "Tu nombre no puede contener numeros");
             return;
         }
 
         passhashed = Utils.HashWithSha256(Password);
 
-        Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed};
-
-
-        await JsRuntime.InvokeVoidAsync("alert", "Instancie algo, mando coso a la api");
+        Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed}; 
 
 
         var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/cuenta/RegistrarCliente", cliente);
