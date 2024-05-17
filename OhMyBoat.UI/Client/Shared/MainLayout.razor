@@ -4,7 +4,7 @@
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager navManager;
 @inject IJSRuntime JsRuntime;
-@using OhMyBoat.UI.Client.Pages;
+@using OhMyBoat.UI.Client.Pages
 
 
 <div class="page">
@@ -17,12 +17,18 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        @if (showAccountButton) {
-                            <button class="btn account-button" @onclick=switchAccountComponent><Icon Name="IconName.PersonFill" Size="IconSize.x4"></Icon></button>
+                        <button class="btn btn-secondary ms-2" @onclick=switchNotificationsComponent><Icon Name="IconName.EnvelopeFill" Size="IconSize.x4"></Icon></button>
+                        @if (isOnAccountPage) {
+                            <button class="btn account-button ms-2" @onclick=switchAccountComponent><Icon Name="IconName.PersonFill" Size="IconSize.x4"></Icon></button>
                         }
                         @if(showAccount) {
                             <div class="account-popup">
                                 <Account/>
+                            </div>
+                        }
+                        @if(showNotifications) {
+                            <div class="account-popup">
+                                <Notifications/>
                             </div>
                         }
                     </Authorized>
@@ -39,16 +45,22 @@
 
 
 @code {
-    private bool showAccountButton { get; set; }
+    private bool isOnAccountPage { get; set; }
     
     protected override void OnParametersSet()
     {
-        showAccountButton = (this.Body.Target as RouteView)?.RouteData?.PageType?.ToString() != "OhMyBoat.UI.Client.Pages.VerPerfil";
+        isOnAccountPage = (this.Body.Target as RouteView)?.RouteData?.PageType?.ToString() != "OhMyBoat.UI.Client.Pages.Account";
         showAccount = false;
     }
 
     private bool showAccount = false;
     private void switchAccountComponent() {
         showAccount = !showAccount;
+    }
+
+
+    private bool showNotifications = false;
+    private void switchNotificationsComponent() {
+        showNotifications = !showNotifications;
     }
 }
