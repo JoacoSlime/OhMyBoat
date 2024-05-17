@@ -81,13 +81,13 @@ namespace OhMyBoat.UI.Server.Controllers
         }
         [HttpGet]
         [Route("ListarClientes")]
-        public async Task<IEnumerable<Cliente>> Get()
+        public async Task<IActionResult> Get()
         {
             using (var db = new OhMyBoatUIServerContext())
             {
-                 var mongos = await db.Clientes.OrderBy(c => c.Bloqueado).ToListAsync();
-                 mongos.ForEach(c => c.Password = "Me pican los cocos"); // asi no hay un vivo 
-                 return mongos;
+                 var listClientes = await db.Clientes.OrderBy(c => c.Nombre).ToListAsync();
+                 listClientes.ForEach(c => c.Password = "vivaracho"); // asi no hay un vivo 
+                 return StatusCode(StatusCodes.Status200OK, listClientes);
             }
         }
         /*

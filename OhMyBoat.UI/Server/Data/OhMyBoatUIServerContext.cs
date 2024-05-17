@@ -26,14 +26,14 @@ namespace OhMyBoat.UI.Server.Data
         public DbSet<Trueque> Trueques { get; set; }
         public DbSet<Turno> Turno { get; set; }
         public DbSet<Terrestre> Terrestres { get; set; }
-        public DbSet<Maritimo> Barquitos { get; set; }
+        public DbSet<Maritimo> Navios { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
 
 
 #nullable restore
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("data source=baseDeDatos.sqlite");
+            optionsBuilder.UseSqlite("data source=DataBase.sqlite");
         }
 
     }
