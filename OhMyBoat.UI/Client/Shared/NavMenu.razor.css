@@ -5,6 +5,7 @@
 
 .navbar-role {
     color: white;
+    margin-top: 1vh;
 }
 
 .navbar-toggler {
@@ -16,11 +17,15 @@
     background-color: rgba(0,0,0,0.4);
 }
 
+.navbar-logo {
+    height: auto;
+    width: 100%;
+}
 
 .navbar-logo > img {
     display: block;
-    max-height: 100%;
-    width: 100%;
+    height: auto;
+    width: 25%;
 }
 
 .oi {
@@ -76,5 +81,16 @@
         /* Allow sidebar to scroll for tall menus */
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
+    }
+
+    .navbar-logo > img {
+        display: block;
+        height: auto;
+        width: 100%;
+    }
+    
+    .navbar-role {
+        color: white;
+        margin: 0;
     }
 }

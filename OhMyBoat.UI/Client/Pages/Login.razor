@@ -14,31 +14,41 @@
 
 
 
-<div class="d-flex justify-content-center mt-5">
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <h1>No.</h1>
+            @{Navegador.NavigateTo("",true);}
+        </Authorized>
+        <NotAuthorized>
+            <div class="d-flex justify-content-center mt-5">
 
-    <div class="col-lg-4 p-5 border">
+                <div class="col-lg-4 p-5 border">
 
-        <div class="mb-3 text-center">
-            <img src="LogoColorTransp.jpg" width="300" height="400">
-        </div>
+                    <div class="mb-3 text-center">
+                        <img src="LogoColorTransp.jpg" width="300" height="400">
+                    </div>
 
-        <div class="mb-3">
-            <label>Correo</label>
-            <input @bind="email" class="form-control" />
-        </div>
+                    <div class="mb-3">
+                        <label>Correo</label>
+                        <input @bind="email" class="form-control" />
+                    </div>
 
-        <div class="mb-3">
-            <label>Contraseña</label>
-            <input @bind="contra" class="form-control" type="password"/>
-        </div>
+                    <div class="mb-3">
+                        <label>Contraseña</label>
+                        <input @bind="contra" class="form-control" type="password"/>
+                    </div>
 
-        <div class="mb-3">
-            <button @onclick="iniciarSesion" class="btn btn-primary">Login</button>
-        </div>
+                    <div class="mb-3">
+                        <button @onclick="iniciarSesion" class="btn btn-primary">Login</button>
+                    </div>
 
-    </div>
+                </div>
 
-</div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
 
 
 @code {

@@ -32,7 +32,7 @@ namespace OhMyBoat.UI.Shared
             }
         }
 
-        public static String capitalizeRole(String role){
+        public static String capitalizeString(String role){
             return Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(role);
         }
     }

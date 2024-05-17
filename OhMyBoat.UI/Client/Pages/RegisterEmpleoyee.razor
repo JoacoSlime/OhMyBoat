@@ -1,0 +1,14 @@
+﻿@page "/admin/register-empleoyee"
+
+@inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize(Roles = "jefe")]
+
+<h1>Registrar empleado</h1>
+
+Esta página la debería ver solo el jefe.
+
+@code {
+    
+}

@@ -10,32 +10,45 @@
 @inject IJSRuntime JsRuntime;
 @inject HttpClient HttpClient;
 @inject NavigationManager Navegador;
+@using Microsoft.AspNetCore.Components.Authorization;
+@inject NavigationManager navManager
 
-<html>
-    <h1>Crear cuenta</h1>
-    <p>Por favor complete sus datos.</p>
-    <hr>
-    <div class="form_field">
-        <label for="email"><b>E-mail</b></label>
-        <input @bind="Email" type="text" placeholder="email@example.com" name="email" required asp-for="Email"/>
-    </div>
-    <div class="form_field">
-        <label for="nombre"><b>Nombre Completo</b></label>
-        <div id="nombre-contains"> Ingrese su nombre y apellido completos.</div>
-        <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required/> 
-    </div>
-    <div class="form_field">
-        <div id="password-constraints"> La contraseña debe contener al menos 8 caracteres.</div>
-        <div id="password-constraints_2"> Además, debe contener al menos un caracter especial, una mayúscula y dos números.</div>
-        <label for="psw"><b>Contraseña</b></label>
-        <input @bind="Password" type="password" placeholder="*******" name="psw" required/>
-    </div>
-    <div class="form_field">
-        <label for="fecha de nacimiento"><b>Seleccione su fecha de nacimiento</b></label>
-        <input @bind="FechaNac" type="date"  max="@today" id="Test_Date"/>
-    </div>
-    <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>
-</html>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <h1>No.</h1>
+            @{navManager.NavigateTo("",true);}
+        </Authorized>
+        <NotAuthorized>
+            <div>
+                <h1>Crear cuenta</h1>
+                <p>Por favor complete sus datos.</p>
+                <hr>
+                <div class="form_field">
+                    <label for="email"><b>E-mail</b></label>
+                    <input @bind="Email" type="text" placeholder="email@example.com" name="email" required asp-for="Email"/>
+                </div>
+                <div class="form_field">
+                    <label for="nombre"><b>Nombre Completo</b></label>
+                    <div id="nombre-contains"> Ingrese su nombre y apellido completos.</div>
+                    <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required/> 
+                </div>
+                <div class="form_field">
+                    <div id="password-constraints"> La contraseña debe contener al menos 8 caracteres.</div>
+                    <div id="password-constraints_2"> Además, debe contener al menos un caracter especial, una mayúscula y dos números.</div>
+                    <label for="psw"><b>Contraseña</b></label>
+                    <input @bind="Password" type="password" placeholder="*******" name="psw" required/>
+                </div>
+                <div class="form_field">
+                    <label for="fecha de nacimiento"><b>Seleccione su fecha de nacimiento</b></label>
+                    <input @bind="FechaNac" type="date"  max="@today" id="Test_Date"/>
+                </div>
+                <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
 
 
 
