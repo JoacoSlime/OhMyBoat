@@ -1,0 +1,21 @@
+@page "/all-ships"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+<h3>Navios Disponibles para intercambio</h3>
+
+@code {
+    List<Maritimo> ListaMisNavios;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/ListarNaviosDisponibles");
+            if (ListaMisNavios.Count == 0)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado aún.");
+            }        
+        }
+    } 
+}
