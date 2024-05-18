@@ -1,7 +1,9 @@
-@page "/notifications"
-
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
 
 Aquí irían las notificiaciones.
+
+@code {
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+}

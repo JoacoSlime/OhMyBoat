@@ -16,53 +16,6 @@ namespace OhMyBoat.UI.Server.Controllers
     //          Esta api la usamos para login y usuarios en general
     public class UsuarioController : ControllerBase
     {
-
-
-        [HttpPost]
-        [Route("RegistrarEmpleado")]
-        public async Task<IActionResult> RegistrarEmple([FromBody] Usuario c)
-        {
-            if (!Utils.IsValidEmail(c.Email))
-            {
-                return StatusCode(StatusCodes.Status418ImATeapot, null);
-            }
-            using (var db = new OhMyBoatUIServerContext())
-            {
-                if (await db.Usuarios.Where(cli => cli.Email == c.Email).AnyAsync())
-                {
-                    c.Rol = Roles.empleado;
-                    // se tiene que mandar el email para recuperar la contraseña // <-------------------------------------------------------------//
-                    await db.Usuarios.AddAsync(c);
-                    await db.SaveChangesAsync();
-                    return StatusCode(StatusCodes.Status200OK, c);
-                }
-                return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
-            }
-        }
-
-
-
-
-            [HttpPost]
-        [Route("RegistrarCliente")]
-        public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
-        {
-            if (!Utils.IsValidEmail(c.Email)) {
-                return StatusCode(StatusCodes.Status418ImATeapot, null);
-            }
-            using (var db = new OhMyBoatUIServerContext())
-            {
-                if (db.Clientes.Where(cli => cli.Email == c.Email).IsNullOrEmpty())
-                {
-                    c.Rol = Roles.cliente;
-                    await db.Clientes.AddAsync(c);
-                    await db.SaveChangesAsync();
-                    return StatusCode(StatusCodes.Status200OK, c);
-                }
-                return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
-            }
-        }
-
         [HttpPost]
         [Route("ObtenerUsuario")]
         public async Task<IActionResult> ObtenerUsuario([FromBody] LoginDTO a)
