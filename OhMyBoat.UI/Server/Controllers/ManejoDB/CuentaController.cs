@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OhMyBoat.UI.Server.Data;
+using OhMyBoat.UI.Server.Services;
 using OhMyBoat.UI.Shared;
 using OhMyBoat.UI.Shared.Entidades;
 
@@ -12,6 +12,13 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     [ApiController]
     public class CuentaController : ControllerBase
     {
+        private readonly EmailService _emailService;
+
+        public CuentaController(EmailService emailService)
+        {
+            _emailService = emailService;
+        }
+
         [HttpPost]
         [Route("RegistrarEmpleado")]
         public async Task<IActionResult> RegistrarEmple([FromBody] Usuario c)
@@ -20,18 +27,16 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             {
                 return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
-            using (var db = new OhMyBoatUIServerContext())
+            using var db = new OhMyBoatUIServerContext();
+            if (await db.Usuarios.Where(cli => cli.Email == c.Email.ToLower()).AnyAsync())
             {
-                if (await db.Usuarios.Where(cli => cli.Email == c.Email.ToLower()).AnyAsync())
-                {
-                    c.Rol = Roles.empleado;
-                    // se tiene que mandar el email para recuperar la contraseña // <-------------------------------------------------------------//
-                    await db.Usuarios.AddAsync(c);
-                    await db.SaveChangesAsync();
-                    return StatusCode(StatusCodes.Status200OK, c);
-                }
-                return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+                c.Rol = Roles.empleado;
+                // se tiene que mandar el email para recuperar la contraseña // <-------------------------------------------------------------//
+                await db.Usuarios.AddAsync(c);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, c);
             }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
 
 
@@ -44,17 +49,15 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             if (!Utils.IsValidEmail(c.Email)) {
                 return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
-            using (var db = new OhMyBoatUIServerContext())
+            using var db = new OhMyBoatUIServerContext();
+            if (db.Clientes.Where(cli => cli.Email == c.Email.ToLower()).IsNullOrEmpty())
             {
-                if (db.Clientes.Where(cli => cli.Email == c.Email.ToLower()).IsNullOrEmpty())
-                {
-                    c.Rol = Roles.cliente;
-                    await db.Clientes.AddAsync(c);
-                    await db.SaveChangesAsync();
-                    return StatusCode(StatusCodes.Status200OK, c);
-                }
-                return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+                c.Rol = Roles.cliente;
+                await db.Clientes.AddAsync(c);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, c);
             }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
         
         [HttpPost]
@@ -125,7 +128,24 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 var existe = await db.Usuarios.Where(u => u.Email == log.Email).AnyAsync();
                 if (existe)
                 {
-                    //genera email y mando codigo
+                    // Generar el token
+                    TokenRecu Token = new()
+                    {
+                        Email = log.Email,
+                        StringAleatorioDelMomento = UniqueId.CreateRandomId(),
+                        FechaLimite = DateTime.Now.AddDays(14)                        
+                    };
+                    await db.TokenRecu.AddAsync(Token);
+                    await db.SaveChangesAsync();
+                    // Enviar Mail
+                    await _emailService.Send(
+                        to: log.Email,
+                        subject: "Aquí está tu clave de recuperación de cuenta", 
+                        html: $@"<h2>Verificación de cuenta</h2>
+                        <p>Tu token de verificación de cuenta es: {Token.StringAleatorioDelMomento}<p/>
+                        <p>Haz click <a href=""http://localhost:5047/recovery/{Token.StringAleatorioDelMomento}"">aquí</a> para ir directamente.<p/>
+                        <p>Si no has sido tu quien pidió esta clave, ignora este mensaje.</p>"
+                    );
                 }
                 return StatusCode(StatusCodes.Status200OK);
             }
