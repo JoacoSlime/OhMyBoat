@@ -23,8 +23,8 @@ public class uploadController : ControllerBase
     {
         foreach (var file in files)
         {
-            var buf = Convert.FromBase64String(file.base64data);
-            await System.IO.File.WriteAllBytesAsync(env.ContentRootPath + System.IO.Path.DirectorySeparatorChar + Guid.NewGuid().ToString("N") + "-" + file.fileName, buf);
+        var buf = Convert.FromBase64String(file.base64data);
+        await System.IO.File.WriteAllBytesAsync(env.ContentRootPath + System.IO.Path.DirectorySeparatorChar + Guid.NewGuid().ToString("N") + "-" + file.fileName, buf);
 
         }
     }

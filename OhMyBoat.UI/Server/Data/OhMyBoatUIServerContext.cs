@@ -26,7 +26,7 @@ namespace OhMyBoat.UI.Server.Data
         public DbSet<Trueque> Trueques { get; set; }
         public DbSet<Turno> Turno { get; set; }
         public DbSet<Terrestre> Terrestres { get; set; }
-        public DbSet<Maritimo> Navios { get; set; }
+        public DbSet<Maritimo> Maritimos { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
 
 

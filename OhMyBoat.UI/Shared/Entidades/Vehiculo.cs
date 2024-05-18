@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OhMyBoat.UI.Shared.Entidades
 {
-    public class Vehiculo
+    public class  Vehiculo
     {
         public int Id { get; set; }
         public string  IDCliente { get; set; } ="";
