@@ -3,6 +3,13 @@
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
 
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+
 <h3>Navios Disponibles para intercambio</h3>
 
 @code {

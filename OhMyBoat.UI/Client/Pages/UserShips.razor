@@ -3,18 +3,28 @@
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
 
+@inject AuthenticationStateProvider authStateProvider;
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@using System.Security.Claims
+
 <h3>Mis Navios</h3>
 
 @code {
     
     List<Maritimo> MisNavios;
 
-    var Aut = await authStateProvider.GetAuthenticationStateAsync();
-    String Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;  
+
 
     protected override async Task OnInitializedAsync()
     {
-        MisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/ListarVehiculosMaritimosCliente", Email);
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        String Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;  
+
+      //  MisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/ListarVehiculosMaritimosCliente", Email);
         if (MisNavios.Count == 0)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado aún.");

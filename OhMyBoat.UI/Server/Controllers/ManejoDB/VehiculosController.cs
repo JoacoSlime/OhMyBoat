@@ -48,6 +48,30 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
     }
 
+
+
+    [HttpPost]
+    [Route("ListarVehiculosTerrestresCliente")]
+    public async Task<IActionResult> GetTerrestresCliente([FromBody] string Email){
+        using (var bd = new OhMyBoatUIServerContext()){
+            List<Terrestre>  lista_Terrestre = await bd.Terrestres.Where(ter => ter.IDCliente == Email).ToListAsync();                                           
+            return StatusCode(StatusCodes.Status200OK,  lista_Terrestre); 
+        }
+
+    }
+       
+
+    [HttpPost]
+    [Route("ListarVehiculosMaritimosCliente")]
+    public async Task<IActionResult> GetMaritimosCliente([FromBody] string cliente){
+        using (var bd = new OhMyBoatUIServerContext()){
+            List<Maritimo>  lista_Maritimo = await bd.Maritimos.Where(ter => ter.IDCliente == cliente).ToListAsync();
+            var  listar_vec2 = await bd.Maritimos.Where(ter => ter.IDCliente == cliente).ToListAsync();                       
+            return StatusCode(StatusCodes.Status200OK,  lista_Maritimo); 
+        }
+    }
+
+
     [HttpGet]
     [Route("ListarNaviosDisponibles")]
     public async Task<IActionResult> GetMaritimos()
@@ -67,27 +91,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             return StatusCode(StatusCodes.Status200OK, listar_ter); 
         }
 
-    }
-
-    [HttpGet]
-    [Route("ListarVehiculosTerrestresCliente")]
-    public async Task<IActionResult> GetTerrestresCliente([FromBody] String cliente){
-        using (var bd = new OhMyBoatUIServerContext()){
-            List<Terrestre>  lista_Terrestre = await bd.Terrestres.Where(ter => ter.IDCliente == cliente).ToListAsync();                                           
-            return StatusCode(StatusCodes.Status200OK,  lista_Terrestre); 
-        }
-
-    }
-       
-
-    [HttpGet]
-    [Route("ListarVehiculosMaritimosCliente")]
-    public async Task<IActionResult> GetMaritimosCliente([FromBody] String cliente){
-        using (var bd = new OhMyBoatUIServerContext()){
-            List<Maritimo>  lista_Maritimo = await bd.Maritimos.Where(ter => ter.IDCliente == cliente).ToListAsync();
-            var  listar_vec2 = await bd.Maritimos.Where(ter => ter.IDCliente == cliente).ToListAsync();                       
-            return StatusCode(StatusCodes.Status200OK,  lista_Maritimo); 
-        }
     }
     }
 }

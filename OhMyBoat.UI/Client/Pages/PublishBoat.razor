@@ -45,7 +45,7 @@
         <label for="Descripcion"><b>Descripcion del vehiculo</b></label>
         <input @bind="descripcion" type="String"   >
     </div>
-    <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre" > cargar vehiculo</button>
+    <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre">cargar vehiculo</button>
 </html>
 
 
@@ -62,7 +62,7 @@
     [Required]
     private TipoVehiculo tipoVec {get; set;}
     
-    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    
     private string Email { get; set; } = "";
     string filesBase64 = "";
 	string message = "InputFile";
@@ -88,8 +88,9 @@
         Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;  
     }
 
-     async private  Task cargaVehiculoterrrestre(MouseEventArgs  args)
-    {          
+     async private Task cargaVehiculoterrrestre()
+    {
+          
 
         Terrestre vec= new Terrestre() {Matricula=this.matricula ,Antiguedad = this.antiguedad, descripcion = this.descripcion,Tipo =this.tipoVec , IDCliente = this.Email, base64imagen = this.filesBase64};
 
@@ -97,8 +98,7 @@
 
         if (RespuestaSv.StatusCode == System.Net.HttpStatusCode.OK)
         {                       
-            await JsRuntime.InvokeVoidAsync("alert", "Vehiculo Registrado Con Exito");           
-            await OnClickCallback.InvokeAsync(args); 
+            await JsRuntime.InvokeVoidAsync("alert", "Vehiculo Registrado Con Exito");
         }
         else
         {

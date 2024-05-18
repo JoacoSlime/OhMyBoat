@@ -43,7 +43,7 @@ namespace OhMyBoat.UI.Server.Controllers
 
 
 
-            [HttpPost]
+        [HttpPost]
         [Route("RegistrarCliente")]
         public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
         {
