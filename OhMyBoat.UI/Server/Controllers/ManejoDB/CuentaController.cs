@@ -120,16 +120,15 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [Route("Recuperacion")]
         public async Task<IActionResult> EnviarCodigo([FromBody] LoginDTO log)
         {
-            if (Utils.IsValidEmail(log.Email))
-                using (var db = new OhMyBoatUIServerContext())
+            if (Utils.IsValidEmail(log.Email)){
+                using var db = new OhMyBoatUIServerContext();
+                var existe = await db.Usuarios.Where(u => u.Email == log.Email).AnyAsync();
+                if (existe)
                 {
-                    var existe = await db.Usuarios.Where(u => u.Email == log.Email).AnyAsync();
-                    if (existe)
-                    {
-                        //genera email y mando codigo
-                    }
-                    return StatusCode(StatusCodes.Status200OK);
+                    //genera email y mando codigo
                 }
+                return StatusCode(StatusCodes.Status200OK);
+            }
             else return StatusCode(StatusCodes.Status406NotAcceptable);
         }
     }
