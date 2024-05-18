@@ -12,13 +12,37 @@
 
 <h3>Navios Disponibles para intercambio</h3>
 
+
+<AuthorizeView>
+    <Authorized>
+
+        @if (ListaMisNavios.Count == 0)
+        {
+            <p>No hay Navios en el sistema</p>
+        }
+        else
+        {
+            @foreach (var Nav in ListaMisNavios)
+            {
+                <div class="container-navio">
+                    <div>
+                        <p>@Nav.Matricula</p>
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+
 @code {
-    List<Maritimo> ListaMisNavios;
+    List<Maritimo> ListaMisNavios = new();
 
 
     protected override async Task OnInitializedAsync()
     {
-            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/ListarNaviosDisponibles");
+            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");
             if (ListaMisNavios.Count == 0)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado aún.");

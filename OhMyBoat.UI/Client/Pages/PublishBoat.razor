@@ -141,7 +141,7 @@
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Eslora de su navio");
             return;
         }
-        if (Puntal == 0 )
+        if (Puntal == 0 || Puntal < 0.3)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Puntal de su navio");
             return;
