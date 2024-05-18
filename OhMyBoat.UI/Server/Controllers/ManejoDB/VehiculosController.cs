@@ -70,7 +70,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     }
 
     [HttpGet]
-    [Route("ListarVehiculosCliente")]
+    [Route("ListarVehiculosTerrestresCliente")]
     public async Task<IActionResult> GetTerrestresCliente([FromBody] String cliente){
         using (var bd = new OhMyBoatUIServerContext()){
             List<Terrestre>  lista_Terrestre = await bd.Terrestres.Where(ter => ter.IDCliente == cliente).ToListAsync();                                           
@@ -81,7 +81,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
        
 
     [HttpGet]
-    [Route("ListarVehiculosCliente")]
+    [Route("ListarVehiculosMaritimosCliente")]
     public async Task<IActionResult> GetMaritimosCliente([FromBody] String cliente){
         using (var bd = new OhMyBoatUIServerContext()){
             List<Maritimo>  lista_Maritimo = await bd.Maritimos.Where(ter => ter.IDCliente == cliente).ToListAsync();

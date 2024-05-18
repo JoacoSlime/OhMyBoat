@@ -8,4 +8,18 @@
 
 @code {
 
-}
+    List<Terrestre> MisRodados;
+
+    var Aut = await authStateProvider.GetAuthenticationStateAsync();
+    String Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;  
+
+    protected override async Task OnInitializedAsync()
+    {
+        MisRodados = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/ListarVehiculosMaritimosCliente", Email);
+        if (MisRodados.Count == 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún vehículo terrestre registrado aún.");
+        }     
+    }
+} 
+

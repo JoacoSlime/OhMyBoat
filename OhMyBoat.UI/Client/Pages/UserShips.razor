@@ -10,18 +10,14 @@
     List<Maritimo> MisNavios;
 
     var Aut = await authStateProvider.GetAuthenticationStateAsync();
-    Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;  
+    String Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;  
 
     protected override async Task OnInitializedAsync()
     {
-            MisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/ListarNaviosDisponibles");
-            if (MisNavios.Count == 0)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado aún.");
-            }else{
-
-            }        
-        }
-    } 
+        MisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/ListarVehiculosMaritimosCliente", Email);
+        if (MisNavios.Count == 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado aún.");
+        }        
+    }
 }
-
