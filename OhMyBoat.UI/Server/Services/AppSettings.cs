@@ -1,6 +1,6 @@
 namespace OhMyBoat.UI.Server.Helpers;
 
-public class AppSettings
+public class EmailSettings
 {
 
     // refresh token time to live (in days), inactive tokens are

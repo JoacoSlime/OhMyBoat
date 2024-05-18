@@ -16,7 +16,8 @@ builder.Services.AddRazorPages();
 //options.UseSqlServer(builder.Configuration.GetConnectionString("OhMyBoatUIServerContext") ?? throw new InvalidOperationException("Connection string 'OhMyBoatUIServerContext' not found.")));
 builder.Services.AddDbContext<OhMyBoatUIServerContext>();
 
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Configuration.AddJsonFile("emailsettings.json", optional: false, reloadOnChange: true);
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<EmailService>();
 
 
