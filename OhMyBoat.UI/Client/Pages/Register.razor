@@ -121,7 +121,7 @@
         Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed}; 
 
 
-        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/cuenta/RegistrarCliente", cliente);
+        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/Usuario/RegistrarCliente", cliente);
 
         //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK){

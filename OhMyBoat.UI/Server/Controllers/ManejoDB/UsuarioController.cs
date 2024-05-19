@@ -47,7 +47,8 @@ namespace OhMyBoat.UI.Server.Controllers
         [Route("RegistrarCliente")]
         public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
         {
-            if (!Utils.IsValidEmail(c.Email)) {
+            if (!Utils.IsValidEmail(c.Email))
+            {
                 return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
             using (var db = new OhMyBoatUIServerContext())
@@ -79,15 +80,37 @@ namespace OhMyBoat.UI.Server.Controllers
 
             }
         }
+
+        [HttpPost]
+        [Route("ActualizarUsuario")]
+        public async Task<IActionResult> PostActualizarUsuario([FromBody] ActualizarUsuario parm)
+        {
+            using (var db = new OhMyBoatUIServerContext())
+            {
+                
+                var clie = await db.Usuarios.Where(user => user.Email == parm.Email).FirstOrDefaultAsync();
+                if (clie != null)
+                {
+                    clie.Nombre = parm.Nombre;
+                    clie.Contacto = parm.Contacto;
+                    clie.base64imagen = parm.base64imagen;
+                    db.Usuarios.Update(clie);
+                    await db.SaveChangesAsync();
+                    return StatusCode(StatusCodes.Status200OK, clie);
+                }
+                else return StatusCode(StatusCodes.Status403Forbidden, null);
+
+            }
+        }
         [HttpGet]
         [Route("ListarClientes")]
         public async Task<IActionResult> Get()
         {
             using (var db = new OhMyBoatUIServerContext())
             {
-                 var listClientes = await db.Clientes.OrderBy(c => c.Nombre).ToListAsync();
-                 listClientes.ForEach(c => c.Password = "vivaracho"); // asi no hay un vivo 
-                 return StatusCode(StatusCodes.Status200OK, listClientes);
+                var listClientes = await db.Clientes.OrderBy(c => c.Nombre).ToListAsync();
+                listClientes.ForEach(c => c.Password = "vivaracho"); // asi no hay un vivo 
+                return StatusCode(StatusCodes.Status200OK, listClientes);
             }
         }
         /*
