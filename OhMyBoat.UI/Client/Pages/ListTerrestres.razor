@@ -1,0 +1,30 @@
+@page "/all-landships"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;  
+
+<h3>Navios Disponibles para intercambio</h3>
+
+@code {
+    List<Terrestre> ListaTerrestres;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarTerrestresDisponibles");
+            if (ListaTerrestres.Count == 0)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún vehículo terrestre registrado aún.");
+            }        
+        }
+    } 
+}

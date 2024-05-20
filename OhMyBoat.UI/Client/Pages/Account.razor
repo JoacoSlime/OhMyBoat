@@ -62,6 +62,8 @@
     }
     private async Task traerUsuario()
     {
+        // TODO: Falta cursar CADP
+
         var coso = await authStateProvider.GetAuthenticationStateAsync();
         var emailDatos = coso.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
         var log = new LoginDTO();

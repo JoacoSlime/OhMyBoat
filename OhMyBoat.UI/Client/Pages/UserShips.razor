@@ -2,9 +2,78 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
+@inject AuthenticationStateProvider authStateProvider;
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@using System.Security.Claims
 
 <h3>Mis Navios</h3>
 
-@code {
+<Modal @ref="modal" />
 
+@if (MisBarcos.Count == 0)
+{
+    <h1> no hay Navios</h1>
+}
+else
+{
+    @foreach (var nav in MisBarcos)
+    {
+        <div class="container-navio">
+            <div>
+                <img src="@nav.base64imagen" />
+            </div>
+            <div>
+                <p>@nav.Matricula</p>
+                <p>@nav.Tipo</p>
+                <p>@nav.descripcion</p>
+                <p>@nav.Antiguedad</p>
+                <p>@nav.Eslora</p>
+                <p>@nav.Puntal</p>
+                <p>@nav.Deuda</p>
+
+            </div>
+            <div>
+                Boton detalle
+            </div>
+        </div>
+    }
+}
+
+
+<Button Color="ButtonColor.Primary" @onclick="CargarNavio">Cargar Navio</Button>
+
+
+@code {
+    private Modal modal = default!;
+    List<Maritimo> MisBarcos = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RecargarLista();
+    }
+
+
+    private async Task RecargarLista()
+    {
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+
+        var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosMaritimosCliente", Email);
+        MisBarcos = await respSV.Content.ReadFromJsonAsync<List<Maritimo>>();
+        StateHasChanged();
+        await modal.HideAsync();
+    }
+
+
+    private async Task CargarNavio()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, RecargarLista));
+        await modal.ShowAsync<PublishBoat>(title: "Employee Details", parameters: parameters);
+    }
 }
