@@ -54,7 +54,7 @@
         esValido = peticion.IsSuccessStatusCode;
         if (!esValido)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "El token no es valido o expiro");
+            await JsRuntime.InvokeVoidAsync("alert", "El token ya fue usado o expiro");
         }
 
 
