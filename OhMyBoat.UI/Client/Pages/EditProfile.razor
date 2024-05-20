@@ -81,13 +81,13 @@
     }
 
     private async Task GuardarCambios()
-    {
-        await JsRuntime.InvokeVoidAsync("alert", this.Email);
+    {       
         ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto , base64imagen = this.filesBase64};
         var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ActualizarUsuario", user  );       
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
         {
              await JsRuntime.InvokeVoidAsync("alert", "Cambios Realizados Con Exito");
+             navManager.NavigateTo("account");
         }
     }
 

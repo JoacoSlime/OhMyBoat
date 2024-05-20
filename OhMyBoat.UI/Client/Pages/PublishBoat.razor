@@ -22,7 +22,7 @@
 
 <div class="input-group">
     <div class="custom-file">
-        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" />
+        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" required/>
         <label class="custom-file-label" for="inputFile">Choose file</label>
     </div>
     @if (filesBase64 != "")
@@ -92,18 +92,42 @@
     string message = "InputFile";
     bool isDisabled = false;
 
-    async Task OnChange(InputFileChangeEventArgs e)
-    {
-        var file = e.File; // agarra las fotos
-        var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
-        var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
-        using (var stream = resizedFile.OpenReadStream())
-        {
-            await stream.ReadAsync(buf); // copia el stream a el buffer
-        }
-        filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
 
-        message = "subi las img para continuar";
+
+    private bool containsValidFormat(string nameImg)
+    {
+        string extension = Path.GetExtension(nameImg);
+        if (extension != null)
+        {
+            string ext = extension.ToLower();
+            return ext == ".jpg" || ext == ".png";
+        }
+        return false;
+    }
+
+
+
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {       
+        if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
+        if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
+        {
+            var file = e.File; // agarra las fotos            
+            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
+            var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
+            using (var stream = resizedFile.OpenReadStream())
+            {
+                await stream.ReadAsync(buf); // copia el stream a el buffer
+            }
+            filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+
+            message = "subi las img para continuar";
+        }
+        else{
+        await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+        this.filesBase64 = "formato";
+        }
     }
     AuthenticationState Auth;
     protected override async Task OnInitializedAsync()
@@ -136,7 +160,7 @@
             await JsRuntime.InvokeVoidAsync("alert", "El Navio necesita una imagen para ser cargado");
             return;
         }         
-        if (Eslora == 0 || Eslora < 0.99)
+        if (Eslora == 0 || Eslora <= 0.99)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Eslora de su navio");
             return;
@@ -149,6 +173,11 @@
         if (Manga == 0 || Manga < 0.99)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Manga de su navio");
+            return;
+        }
+        if (filesBase64 == "formato")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La imagen que cargo tiene un formato no soportado, asegurese que el formato sea \".png\" o \".jpg\"  ");
             return;
         }
 

@@ -16,8 +16,8 @@
 <AuthorizeView>
     <Authorized>
         <div>
-            <h1>Crear cuenta</h1>
-            <p>Por favor complete sus datos.</p>
+            <h1>Registrar un empleado</h1>
+            <p>Complete los datos del empleado.</p>
             <hr>
             <div class="form_field">
                 <label for="email"><b>E-mail</b></label>
@@ -26,7 +26,7 @@
             </div>
             <div class="form_field">
                 <label for="nombre"><b>Nombre Completo</b></label>
-                <div id="nombre-contains"> Ingrese su nombre y apellido completos.</div>
+                <div id="nombre-contains"> Ingrese  nombre y apellido completos del empleado.</div>
                 <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required />
             </div>
             <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>

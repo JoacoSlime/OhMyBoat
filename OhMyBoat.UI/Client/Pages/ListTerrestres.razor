@@ -16,7 +16,7 @@
 
         @if (ListaTerrestres.Count == 0)
         {
-            <p>No hay Vehiculos en el sistema</p>
+            <p>No hay vehículos terrestres disponibles para intercambio</p>
         }
         else
         {
@@ -43,7 +43,7 @@
             ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles");
             if (ListaTerrestres.Count == 0)
             {
-                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún vehículo terrestre registrado .");
+                await JsRuntime.InvokeVoidAsync("alert", "No hay vehículos terrestres disponibles para intercambio");
             }        
         }
     } 
