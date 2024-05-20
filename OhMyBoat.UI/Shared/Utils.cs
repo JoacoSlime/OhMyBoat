@@ -1,9 +1,14 @@
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace OhMyBoat.UI.Shared
 {
     public static class Utils {
+        public static String CapitalizeString(String role)
+        {
+            return Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(role);
+        }
         public static bool IsValidEmail(String email) {
                 var trimmedEmail = email.Trim();
 
@@ -36,11 +41,6 @@ namespace OhMyBoat.UI.Shared
             }
             return b.ToString();
         }
-
-        public static String CapitalizeString(String role){
-            return Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(role);
-        }
-
         public static bool IsMayusc(char c){
             return (c >= 'A' && c <= 'Z');
         }
