@@ -43,11 +43,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");
-            if (ListaMisNavios.Count == 0)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", "no hay navíos disponibles para intercambio");
-            }        
+            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");    
         }
     } 
-}
+

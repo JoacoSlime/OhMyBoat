@@ -36,9 +36,6 @@ namespace OhMyBoat.UI.Server.Controllers
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
 
-
-
-
         [HttpPost]
         [Route("RegistrarCliente")]
         public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
@@ -77,7 +74,6 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> PostActualizarUsuario([FromBody] ActualizarUsuario parm)
         {
             using var db = new OhMyBoatUIServerContext();
-
             var clie = await db.Usuarios.Where(user => user.Email == parm.Email).FirstOrDefaultAsync();
             if (clie != null)
             {
@@ -90,6 +86,7 @@ namespace OhMyBoat.UI.Server.Controllers
             }
             else return StatusCode(StatusCodes.Status403Forbidden, null);
         }
+        
         [HttpGet]
         [Route("ListarClientes")]
         public async Task<IActionResult> Get()
@@ -99,26 +96,6 @@ namespace OhMyBoat.UI.Server.Controllers
             listClientes.ForEach(c => c.Password = "vivaracho"); // asi no hay un vivo 
             return StatusCode(StatusCodes.Status200OK, listClientes);
         }
-        /*
-        public async Task<IActionResult> Details(String? email)
-        {
-            using (var db = new OhMyBoatUIServerContext())
-            {
-                if (db.Usuarios == null)
-                {
-                    return NotFound();
-                }
-                var usuario = await db.Usuarios
-                    .FirstOrDefaultAsync(m => m.Email == email);
-                if (usuario == null)
-                {
-                    return NotFound();
-                }
-
-            }
-            
-        }
-        */
     }
 }
 
