@@ -16,8 +16,6 @@ namespace OhMyBoat.UI.Server.Controllers
     //          Esta api la usamos para login y usuarios en general
     public class UsuarioController : ControllerBase
     {
-
-
         [HttpPost]
         [Route("RegistrarEmpleado")]
         public async Task<IActionResult> RegistrarEmple([FromBody] Usuario emp)

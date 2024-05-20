@@ -1,0 +1,19 @@
+@page "/recovery/{Token}"
+
+@using Microsoft.JSInterop;
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider authStateProvider;
+@using System.Security.Claims
+
+@Token
+
+@code {
+    [Parameter]
+    public string Token {get; set;}
+    
+}
