@@ -16,15 +16,16 @@
 
         @if (ListaTerrestres.Count == 0)
         {
-            <p>No hay Navios en el sistema</p>
+            <p>No hay Vehiculos en el sistema</p>
         }
         else
         {
-            @foreach (var Nav in ListaTerrestres)
+            @foreach (var Vec in ListaTerrestres)
             {
-                <div class="container-navio">
+                <div class="container-Vehiculo">
                     <div>
-                        <p>@Nav.Matricula</p>
+                        <p>@Vec.Matricula</p>
+                        <img src="@Vec.base64imagen" />  
                     </div>
                 </div>
             }
@@ -34,7 +35,7 @@
 
 
 @code {
-    List<Terrestre> ListaTerrestres;
+    List<Terrestre> ListaTerrestres= new();
 
 
     protected override async Task OnInitializedAsync()

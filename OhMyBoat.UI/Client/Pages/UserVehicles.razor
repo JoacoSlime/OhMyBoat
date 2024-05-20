@@ -1,4 +1,4 @@
-﻿@page "/my-vehicles"
+﻿@page "/my-landships"
 
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
@@ -11,8 +11,8 @@
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
 @using System.Security.Claims
-
-
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles = "cliente")]
 
 <AuthorizeView>
     <Authorized>
@@ -44,11 +44,16 @@
                 </div>
             }
         }
+
+        <Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Cargar Vehiculo</Button>
     </Authorized>
+    <NotAuthorized>
+       @{NavManager.NavigateTo("/",true);} 
+    </NotAuthorized>
 </AuthorizeView>
 
 
-<Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Cargar Vehiculo</Button>
+
 
 
 @code {
@@ -67,7 +72,7 @@
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosTerrestresCliente", Email);
+        var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosCliente", Email);
         MisRodados = await respSV.Content.ReadFromJsonAsync<List<Terrestre>>();
         StateHasChanged();
         await modal.HideAsync();
