@@ -77,15 +77,15 @@
             Email = mevoyamatar.Email;
             Contacto = mevoyamatar.Contacto == null ? "-" : mevoyamatar.Contacto;
             Rol = Utils.CapitalizeString(mevoyamatar.Rol.ToString());
-            StateHasChanged();
             Imagen = mevoyamatar.Base64imagen ?? "/user.png";
+            StateHasChanged();
 
             // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));
 
         } else await JsRuntime.InvokeVoidAsync("alert", "Explote");
     }
     private async Task ViewProfile() => navManager.NavigateTo("account");
-    private async Task EditAccount() => navManager.NavigateTo("editProfile");
+    private async Task EditAccount() => navManager.NavigateTo("edit-profile");
     private async Task ChangePassword() {
         var parameters = new Dictionary<string, object>();
         parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));

@@ -1,4 +1,4 @@
-@page "/editProfile"
+@page "/edit-profile"
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @using OhMyBoat.UI.Client.Extensions;
@@ -57,7 +57,7 @@
     async Task OnChange(InputFileChangeEventArgs e)
     {
         var file = e.File; // agarra las fotos
-        var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
+        var resizedFile = await file.RequestImageFileAsync(file.ContentType, 512, 512); // le hace un resize
         var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
         using (var stream = resizedFile.OpenReadStream())
         {
