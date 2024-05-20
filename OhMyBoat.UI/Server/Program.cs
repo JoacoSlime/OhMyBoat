@@ -59,10 +59,9 @@ using (var context = new OhMyBoatUIServerContext()) // ESTO ES PARA QUE NO EXPLO
     }
     var connection = context.Database.GetDbConnection();
     connection.Open();
-    using (var command = connection.CreateCommand())
-    {
-        command.CommandText = "PRAGMA journal_mode=DELETE;";
-        command.ExecuteNonQuery(); }
+    using var command = connection.CreateCommand();
+    command.CommandText = "PRAGMA journal_mode=DELETE;";
+    command.ExecuteNonQuery();
 }
     
 

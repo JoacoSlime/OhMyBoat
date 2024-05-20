@@ -40,11 +40,13 @@
                     <input @bind="Password" class="form-control mb-2" type="password" placeholder="*******" name="psw" required/>
                     <div class="ms-4" id="password-constraints"> La contraseña debe contener al menos 8 caracteres un caracter especial, una mayúscula y dos números.</div>
                 </div>
-                <div class="mb-3">
+                <div class="mb-5">
                     <label for="fecha de nacimiento"><h3>Seleccione su fecha de nacimiento</h3></label>
                     <input @bind="FechaNac" class="form-control" type="date"  max="@today" id="Test_Date"/>
                 </div>
-                <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary btn-lg" type="submit" @onclick="Registrarse">Registrarse</button>
+                </div>
             </div>
         </NotAuthorized>
     </AuthorizeView>
