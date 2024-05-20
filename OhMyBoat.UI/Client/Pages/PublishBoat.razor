@@ -22,7 +22,7 @@
 
 <div class="input-group">
     <div class="custom-file">
-        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" />
+        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" required/>
         <label class="custom-file-label" for="inputFile">Choose file</label>
     </div>
     @if (filesBase64 != "")
@@ -94,7 +94,7 @@
 
 
 
-            private bool containsValidFormat(string nameImg)
+    private bool containsValidFormat(string nameImg)
     {
         string extension = Path.GetExtension(nameImg);
         if (extension != null)
@@ -109,13 +109,11 @@
 
 
     async Task OnChange(InputFileChangeEventArgs e)
-    {
-        
+    {       
         if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
         if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
-            var file = e.File; // agarra las fotos
-            await JsRuntime.InvokeVoidAsync("alert", e.GetType());
+            var file = e.File; // agarra las fotos            
             var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
             var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
             using (var stream = resizedFile.OpenReadStream())
@@ -127,9 +125,9 @@
             message = "subi las img para continuar";
         }
         else{
-         await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
-         this.filesBase64 = "formato";        
-         }
+        await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+        this.filesBase64 = "formato";
+        }
     }
     AuthenticationState Auth;
     protected override async Task OnInitializedAsync()
