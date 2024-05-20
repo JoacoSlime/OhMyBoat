@@ -19,7 +19,7 @@
 <div>
     <label for="nombre"><b>Nombre Completo</b></label>
     <div id="nombre-contains"> su nombre y apellido completos.</div>
-    <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required />
+    <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre"  />
 </div>
 <div class="mb-3">
     <label for="contacto"><b>Contacto</b></label>
@@ -42,7 +42,7 @@
 
 @code {
     private string Nombre = "";
-    private string Contacto = "";
+    private string Contacto = " ";
     private string Email = ""; 
     private string filesBase64 = "";
     string message = "InputFile";
@@ -82,12 +82,17 @@
 
     private async Task GuardarCambios()
     {       
+        await JsRuntime.InvokeVoidAsync("alert", this.Email);
         ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto , base64imagen = this.filesBase64};
         var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ActualizarUsuario", user  );       
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
         {
              await JsRuntime.InvokeVoidAsync("alert", "Cambios Realizados Con Exito");
              navManager.NavigateTo("account");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "explote");
         }
     }
 

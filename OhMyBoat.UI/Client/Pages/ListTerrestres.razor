@@ -40,11 +40,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles");
-            if (ListaTerrestres.Count == 0)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", "No hay vehículos terrestres disponibles para intercambio");
-            }        
+            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles");      
         }
     } 
-}
