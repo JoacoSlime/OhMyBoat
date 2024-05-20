@@ -48,6 +48,10 @@ using (var context = new OhMyBoatUIServerContext()) // ESTO ES PARA QUE NO EXPLO
         context.Clientes.Add(new OhMyBoat.UI.Shared.Entidades.Cliente() { Email = "clientebloq1@cliente.com", Bloqueado = true, Nombre = "Pedro", Password = "0eb6f152d72087e15b6d61aa17ddafdce855f96330d56f004f129e4504d60c5d", Rol = OhMyBoat.UI.Shared.Entidades.Roles.cliente }) ;// contra Agua1234.
         context.Clientes.Add(new OhMyBoat.UI.Shared.Entidades.Cliente() { Email = "clientebloq2@cliente.com", Bloqueado = true, Nombre ="silvia", Password = "0eb6f152d72087e15b6d61aa17ddafdce855f96330d56f004f129e4504d60c5d", Rol = OhMyBoat.UI.Shared.Entidades.Roles.cliente });// contra Agua1234.
         context.Clientes.Add(new OhMyBoat.UI.Shared.Entidades.Cliente() { Email = "cliente2@cliente.com", Nombre="tom", Password = "0eb6f152d72087e15b6d61aa17ddafdce855f96330d56f004f129e4504d60c5d", Rol = OhMyBoat.UI.Shared.Entidades.Roles.cliente });// contra Agua1234.
+        context.Tokens.Add(new OhMyBoat.UI.Shared.Entidades.TokenRecu() { Email = "admin@admin.com" ,StringAleatorioDelMomento = "papaya", Usado=false, FechaLimite= DateTime.Now.AddDays(3)}); // token valido que vence en 3 dias
+        context.Tokens.Add(new OhMyBoat.UI.Shared.Entidades.TokenRecu() { Email = "empleado@empleado.com", StringAleatorioDelMomento = "papayavencida", Usado=false, FechaLimite= DateTime.Now}); // token valido vencido
+        context.Tokens.Add(new OhMyBoat.UI.Shared.Entidades.TokenRecu() { Email = "cliente@cliente.com", StringAleatorioDelMomento = "papayausada", Usado=true, FechaLimite= DateTime.Now.AddDays(3)}); // token usado que vence en 3 dias
+        context.Tokens.Add(new OhMyBoat.UI.Shared.Entidades.TokenRecu() { Email = "cliente2@cliente.com", StringAleatorioDelMomento = "papayausadayvencida", Usado=true, FechaLimite= DateTime.Now}); // token vencido usado
         context.SaveChanges();
     }
     var connection = context.Database.GetDbConnection();
