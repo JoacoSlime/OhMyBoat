@@ -34,12 +34,7 @@
                 <span class="ms-2">Ver Perfil</span>
             </div>
         </button>
-        <button class="btn btn-secondary" @onclick=LogOut>
-            <div class="d-flex flex-row align-items-center">
-                <Icon Name="IconName.BoxArrowLeft" Size="IconSize.x4"></Icon>
-                <span class="ms-2">Cerrar Sesión</span>
-            </div>
-        </button>
+        <LogOut/>
     </div>
 </div>
 
@@ -91,12 +86,5 @@
     }
     private async Task hideModal(){
         await AccountModal.HideAsync();
-    }
-    private async Task LogOut() {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Estás seguro de que quieres cerrar la sesión?"))
-            return;
-        var authState = (AuthenticationExtension) authStateProvider;
-        await authState.ActualizarEstadoAutenticacion(null);
-        navManager.NavigateTo("/", true);
     }
 }
