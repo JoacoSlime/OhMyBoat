@@ -77,8 +77,8 @@
             Email = mevoyamatar.Email;
             Contacto = mevoyamatar.Contacto == null ? "-" : mevoyamatar.Contacto;
             Rol = Utils.CapitalizeString(mevoyamatar.Rol.ToString());
-            StateHasChanged();
             Imagen = mevoyamatar.Base64imagen ?? "/user.png";
+            StateHasChanged();
 
             // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));
 
