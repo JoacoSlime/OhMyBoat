@@ -64,34 +64,6 @@
 
     private bool MayorDeEdad { get ; set ; } = true; 
     private TimeSpan EighteenYearSpan = new TimeSpan(6574,5, 0, 0, 0);
-    
-    private bool IsMayusc(char c){
-        return (c >= 'A' && c <= 'Z');
-    }
-    private bool HasNum(string password){
-        char[] characters = password.ToCharArray();
-        int numCounter = 0;
-        foreach (char c in characters){
-            if (char.IsNumber(c)){
-                numCounter ++;
-            }
-        }
-        return numCounter > 1;
-    }
-    private bool IsSymbol(char c){
-        String specials = "!?¿¡#$%&/=+-*_@.,";
-        return specials.Contains(c);
-    }
-    private bool IsLong(string password){
-        return password.Length >= 8;
-    }
-    private bool IsValidPassword(string password){
-        return
-        IsLong(password) && 
-        HasNum(password) &&
-        password.Any(c => IsMayusc(c)) && 
-        password.Any(c => IsSymbol(c));
-    }
 
     
     private string passhashed = "";
@@ -106,11 +78,11 @@
             await JsRuntime.InvokeVoidAsync("alert", "Debes ser mayor de edad para crear una cuenta");
             return;
         }   
-        if (!IsValidPassword(Password)) {
+        if (!Utils.IsValidPassword(Password)) {
             await JsRuntime.InvokeVoidAsync("alert", "Tu contraseña no es lo suficientemente segura.\nComo mínimo debe tener 8 caracteres, y contener al menos un caracter especial, una mayúscula y dos números");
             return;
         }
-        if (HasNum(Nombre))
+        if (Utils.HasNum(Nombre))
         {
              await JsRuntime.InvokeVoidAsync("alert", "Tu nombre no puede contener numeros");
             return;
