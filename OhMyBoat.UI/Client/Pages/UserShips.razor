@@ -10,39 +10,43 @@
 @inject IJSRuntime JsRuntime
 @using System.Security.Claims
 
-<h3>Mis Navios</h3>
+<AuthorizeView>
+    <Authorized>
 
-<Modal @ref="modal" />
+        <h3>Mis Navios</h3>
 
-@if (MisBarcos.Count == 0)
-{
-    <h1> no hay Navios</h1>
-}
-else
-{
-    @foreach (var nav in MisBarcos)
-    {
-        <div class="container-navio">
-            <div>
-                <img src="@nav.base64imagen" />
-            </div>
-            <div>
-                <p>@nav.Matricula</p>
-                <p>@nav.Tipo</p>
-                <p>@nav.descripcion</p>
-                <p>@nav.Antiguedad</p>
-                <p>@nav.Eslora</p>
-                <p>@nav.Puntal</p>
-                <p>@nav.Deuda</p>
+        <Modal @ref="modal" />
 
-            </div>
-            <div>
-                Boton detalle
-            </div>
-        </div>
-    }
-}
+        @if (MisBarcos.Count == 0)
+        {
+            <h1> no hay Navios</h1>
+        }
+        else
+        {
+            @foreach (var nav in MisBarcos)
+            {
+                <div class="container-navio">
+                    <div>
+                        <img src="@nav.base64imagen" />
+                    </div>
+                    <div>
+                        <p>@nav.Matricula</p>
+                        <p>@nav.Tipo</p>
+                        <p>@nav.descripcion</p>
+                        <p>@nav.Antiguedad</p>
+                        <p>@nav.Eslora</p>
+                        <p>@nav.Puntal</p>
+                        <p>@nav.Deuda</p>
 
+                    </div>
+                    <div>
+                        Boton detalle
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
 
 <Button Color="ButtonColor.Primary" @onclick="CargarNavio">Cargar Navio</Button>
 
