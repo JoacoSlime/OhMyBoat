@@ -12,34 +12,40 @@
 @inject IJSRuntime JsRuntime
 @using System.Security.Claims
 
-<h3>Mis Vehiculos</h3>
 
-<Modal @ref="modal" />
 
-@if (MisRodados.Count == 0)
-{
-    <h1> no hay vehiculos</h1>
-}
-else
-{
-    @foreach (var vec in MisRodados)
-    {
-        <div class="container-navio">
-            <div>
-                <img src="@vec.base64imagen" />
-            </div>
-            <div>
-                <p>@vec.Matricula</p>
-                <p>@vec.Tipo</p>
-                <p>@vec.descripcion</p>
-                <p>@vec.Antiguedad</p>
-            </div>
-            <div>
-                Boton detalle
-            </div>
-        </div>
-    }
-}
+<AuthorizeView>
+    <Authorized>
+        <h3>Mis Vehiculos</h3>
+
+        <Modal @ref="modal" />
+
+        @if (MisRodados.Count == 0)
+        {
+            <h1> no hay vehiculos</h1>
+        }
+        else
+        {
+            @foreach (var vec in MisRodados)
+            {
+                <div class="container-navio">
+                    <div>
+                        <img src="@vec.base64imagen" />
+                    </div>
+                    <div>
+                        <p>@vec.Matricula</p>
+                        <p>@vec.Tipo</p>
+                        <p>@vec.descripcion</p>
+                        <p>@vec.Antiguedad</p>
+                    </div>
+                    <div>
+                        Boton detalle
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
 
 
 <Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Cargar Vehiculo</Button>
@@ -68,7 +74,7 @@ else
     }
 
 
-    private async Task CargarVehiculo() 
+    private async Task CargarVehiculo()
     {
         var parameters = new Dictionary<string, object>();
         parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, RecargarLista));

@@ -10,7 +10,7 @@
 @inject IJSRuntime JsRuntime
 
 
-<h3>Navios Disponibles para intercambio</h3>
+<h3>Navios disponibles para intercambio </h3>
 
 
 <AuthorizeView>
@@ -45,7 +45,7 @@
             ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");
             if (ListaMisNavios.Count == 0)
             {
-                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado aún.");
+                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado .");
             }        
         }
     } 

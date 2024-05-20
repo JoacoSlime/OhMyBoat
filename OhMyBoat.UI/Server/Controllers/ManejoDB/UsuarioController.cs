@@ -20,21 +20,21 @@ namespace OhMyBoat.UI.Server.Controllers
 
         [HttpPost]
         [Route("RegistrarEmpleado")]
-        public async Task<IActionResult> RegistrarEmple([FromBody] Usuario c)
+        public async Task<IActionResult> RegistrarEmple([FromBody] Usuario emp)
         {
-            if (!Utils.IsValidEmail(c.Email))
+            if (!Utils.IsValidEmail(emp.Email))
             {
                 return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
             using (var db = new OhMyBoatUIServerContext())
             {
-                if (await db.Usuarios.Where(cli => cli.Email == c.Email).AnyAsync())
+                if (db.Usuarios.Where(cli => cli.Email == emp.Email).IsNullOrEmpty())
                 {
-                    c.Rol = Roles.empleado;
+                    emp.Rol = Roles.empleado;
                     // se tiene que mandar el email para recuperar la contraseña // <-------------------------------------------------------------//
-                    await db.Usuarios.AddAsync(c);
+                    await db.Usuarios.AddAsync(emp);
                     await db.SaveChangesAsync();
-                    return StatusCode(StatusCodes.Status200OK, c);
+                    return StatusCode(StatusCodes.Status200OK, emp);
                 }
                 return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
             }

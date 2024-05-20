@@ -9,10 +9,29 @@
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
 
-@using Microsoft.AspNetCore.Components.Authorization;
-@using Microsoft.AspNetCore.Authorization;  
+<h3>Vehiculos disponibles para intercambio</h3>
 
-<h3>Navios Disponibles para intercambio</h3>
+<AuthorizeView>
+    <Authorized>
+
+        @if (ListaTerrestres.Count == 0)
+        {
+            <p>No hay Navios en el sistema</p>
+        }
+        else
+        {
+            @foreach (var Nav in ListaTerrestres)
+            {
+                <div class="container-navio">
+                    <div>
+                        <p>@Nav.Matricula</p>
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+
 
 @code {
     List<Terrestre> ListaTerrestres;
@@ -20,10 +39,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarTerrestresDisponibles");
+            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles");
             if (ListaTerrestres.Count == 0)
             {
-                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún vehículo terrestre registrado aún.");
+                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún vehículo terrestre registrado .");
             }        
         }
     } 
