@@ -20,6 +20,8 @@
                         <button class="btn btn-secondary ms-2" @onclick=ShowNotifications><Icon Name="IconName.EnvelopeFill" Size="IconSize.x4"></Icon></button>
                         @if (isOnAccountPage) {
                             <button class="btn account-button ms-2" @onclick=ShowAccount><Icon Name="IconName.PersonFill" Size="IconSize.x4"></Icon></button>
+                        } else {
+                            <LogOut class="ms-2"/>
                         }
                     </Authorized>
                 </AuthorizeView>

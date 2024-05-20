@@ -1,0 +1,39 @@
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@using OhMyBoat.UI.Client.Extensions;
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using System.Security.Claims
+@using System;
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navManager
+@inject IJSRuntime JsRuntime
+
+<button @attributes="ButtonAttributes" @onclick=OnClick>
+    <div class="d-flex flex-row align-items-center">
+        <Icon Name="IconName.BoxArrowLeft" Size="IconSize.x4"></Icon>
+        <span class="ms-2">Cerrar Sesión</span>
+    </div>
+</button>
+
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? ButtonAttributes { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        string added_classes = ButtonAttributes.GetValueOrDefault("class")?.ToString() ?? string.Empty;
+        added_classes = "btn btn-secondary " + added_classes;
+        ButtonAttributes.Remove("class");
+        ButtonAttributes.Add("class",added_classes);
+    }
+
+    private async Task OnClick()
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Estás seguro de que quieres cerrar la sesión?"))
+            return;
+        var authState = (AuthenticationExtension) authStateProvider;
+        await authState.ActualizarEstadoAutenticacion(null);
+        navManager.NavigateTo("/", true);
+    }
+}
