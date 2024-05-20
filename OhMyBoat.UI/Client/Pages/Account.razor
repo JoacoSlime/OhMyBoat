@@ -51,7 +51,7 @@
     private string Email = "";
     private string Contacto = "";
     private string Rol = "";
-    private string Imagen = "/user.png";
+    private string Imagen = "";
     private Usuario user = new Usuario() { Email = "", Nombre = "", Contacto = "" };
 
     private Modal AccountModal = default!;
@@ -78,6 +78,7 @@
             Contacto = mevoyamatar.Contacto == null ? "-" : mevoyamatar.Contacto;
             Rol = Utils.CapitalizeString(mevoyamatar.Rol.ToString());
             StateHasChanged();
+            Imagen = mevoyamatar.Base64imagen ?? "/user.png";
 
             // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));
 

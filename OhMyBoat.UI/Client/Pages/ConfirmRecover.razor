@@ -1,19 +1,92 @@
-@page "/recovery/{Token}"
+@page "/recovery/{codigo}"  
 
-@using Microsoft.JSInterop;
 @using OhMyBoat.UI.Shared.Entidades;
 @using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@using System.Security.Cryptography
+@using System.Text
+@using System.ComponentModel.DataAnnotations;
 @inject IJSRuntime JsRuntime;
 @inject HttpClient HttpClient;
 @inject NavigationManager Navegador;
-@using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider authStateProvider;
-@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization;
+@inject NavigationManager navManager
 
-@Token
+<h1>Recuperacion de cuenta</h1>
+
+@if(esValido){
+    <div class="row mt-5">
+
+        <div class="col-lg-4 offset-lg-4 border">
+            <div class="mb-3">
+                <label>Ingrese la contraseña nueva</label>
+                <input @bind="contraNueva1" class="form-control" type="password" />
+            </div>
+
+            <div class="mb-3">
+                <label>Repita su contraseña</label>
+                <input @bind="contraNueva2" class="form-control" type="password" />
+            </div>
+
+            <div class="mb-3">
+                <button @onclick="OnClick" class="btn btn-primary">Aceptar</button>
+            </div>
+        </div>
+
+    </div>
+}
 
 @code {
     [Parameter]
-    public string Token {get; set;}
-    
+    public string codigo { get; set; } = "";
+    private bool esValido = false;
+    private RecuCuentaDTO mesi = new();
+
+    private string contraNueva1 { get; set; } = "";
+    private string contraNueva2 { get; set; } = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        mesi.Hash = codigo;
+        var peticion = await HttpClient.PostAsJsonAsync<RecuCuentaDTO>("api/cuenta/CheckearToken", mesi);
+        esValido = peticion.IsSuccessStatusCode;
+        if (!esValido)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El token ya fue usado o expiro");
+        }
+
+
+    }
+    private async Task OnClick()
+    {
+        if (contraNueva1.CompareTo(contraNueva2) != 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Las contraseñas no coinciden");
+            return;
+        }
+        if (!Utils.IsValidPassword(contraNueva1))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Tu contraseña no es lo suficientemente segura.\nComo mínimo debe tener 8 caracteres, y contener al menos un caracter especial, una mayúscula y dos números");
+            return;
+        }       
+
+        var hashnuevo = Utils.HashWithSha256(contraNueva1);
+        mesi.ContraNueva = hashnuevo;        
+
+        var RespuestaSV = await HttpClient.PostAsJsonAsync<RecuCuentaDTO>("api/cuenta/RecuperarContrasenia", mesi);
+
+        if (RespuestaSV.IsSuccessStatusCode)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Se ha cambiado la contraseña con exito");
+            Navegador.NavigateTo("/");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"{RespuestaSV.StatusCode}");
+            Navegador.NavigateTo("/");
+        }
+
+    }
 }
