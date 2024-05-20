@@ -31,9 +31,9 @@
         <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" />
         <label class="custom-file-label" for="inputFile">Choose file</label>
     </div>
-    @if (filesBase64 != "")
+    @if (fileBase64 != "")
     {
-        <img src="@filesBase64" />
+        <img src="@fileBase64" />
     }
 </div>
 
@@ -44,7 +44,7 @@
     private string Nombre = "";
     private string Contacto = "";
     private string Email = ""; 
-    private string filesBase64 = "";
+    private string fileBase64 = "";
     string message = "InputFile";
     AuthenticationState Auth;
     protected override async Task OnInitializedAsync()
@@ -63,7 +63,7 @@
         {
             await stream.ReadAsync(buf); // copia el stream a el buffer
         }
-        filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+        fileBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
 
         message = "subi las img para continuar";
     }
@@ -77,12 +77,13 @@
         var cliendeTraido = await respuestaSV.Content.ReadFromJsonAsync<Usuario>(); 
         this.Nombre = cliendeTraido.Nombre;
         this.Contacto = cliendeTraido.Contacto;
-        this.filesBase64 = cliendeTraido.base64imagen;
+        this.fileBase64 = cliendeTraido.Base64imagen;
     }
 
     private async Task GuardarCambios()
-    {       
-        ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto , base64imagen = this.filesBase64};
+    {
+        await JsRuntime.InvokeVoidAsync("alert", this.Email);
+        ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto , Base64imagen = this.fileBase64};
         var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ActualizarUsuario", user  );       
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
         {
