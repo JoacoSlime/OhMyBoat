@@ -88,6 +88,7 @@
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
         {
              await JsRuntime.InvokeVoidAsync("alert", "Cambios Realizados Con Exito");
+             navManager.NavigateTo("account");
         }
     }
 

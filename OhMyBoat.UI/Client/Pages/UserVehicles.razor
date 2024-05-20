@@ -74,15 +74,19 @@
 
         var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosCliente", Email);
         MisRodados = await respSV.Content.ReadFromJsonAsync<List<Terrestre>>();
-        StateHasChanged();
-        await modal.HideAsync();
+        StateHasChanged();        
     }
 
-
+    private async Task closeModal()
+    {
+        await modal.ShowAsync();      // https://github.com/vikramlearning/blazorbootstrap/issues/393
+        await modal.HideAsync();
+        await RecargarLista();
+    }
     private async Task CargarVehiculo()
     {
         var parameters = new Dictionary<string, object>();
-        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, RecargarLista));
-        await modal.ShowAsync<PublishVehicule>(title: "Employee Details", parameters: parameters);
+        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, closeModal));
+        await modal.ShowAsync<PublishVehicule>(title: "Cargar Vehiculo", parameters: parameters);
     }
 }
