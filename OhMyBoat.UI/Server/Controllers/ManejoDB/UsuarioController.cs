@@ -83,7 +83,7 @@ namespace OhMyBoat.UI.Server.Controllers
             {
                 clie.Nombre = parm.Nombre;
                 clie.Contacto = parm.Contacto;
-                clie.base64imagen = parm.base64imagen;
+                clie.Base64imagen = parm.Base64imagen;
                 db.Usuarios.Update(clie);
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK, clie);
