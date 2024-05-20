@@ -1,47 +1,48 @@
 @page "/register"
+@layout LoginLayout
 
-@using OhMyBoat.UI.Shared.Entidades;
-@using OhMyBoat.UI.Shared;
-@using Microsoft.JSInterop;
-@using System;
+@using OhMyBoat.UI.Shared.Entidades
+@using OhMyBoat.UI.Shared
+@using Microsoft.JSInterop
+@using System
 @using System.Security.Cryptography
 @using System.Text
-@using System.ComponentModel.DataAnnotations;
-@inject IJSRuntime JsRuntime;
-@inject HttpClient HttpClient;
-@inject NavigationManager Navegador;
-@using Microsoft.AspNetCore.Components.Authorization;
-@inject NavigationManager NavManager;
+@using System.ComponentModel.DataAnnotations
+@inject IJSRuntime JsRuntime
+@inject HttpClient HttpClient
+@inject NavigationManager Navegador
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavManager
 
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            <h1>No.</h1>
             @{NavManager.NavigateTo("",true);}
+            <h1>No.</h1>
         </Authorized>
         <NotAuthorized>
-            <div>
-                <h1>Crear cuenta</h1>
-                <p>Por favor complete sus datos.</p>
-                <hr>
-                <div class="form_field">
-                    <label for="email"><b>E-mail</b></label>
-                    <input @bind="Email" type="text" placeholder="email@example.com" name="email" required asp-for="Email"/>
+            <div class="d-flex flex-column justify-content-center m-5 p-5 border">
+                <div class="mb-3 text-center">
+                    <img src="LogoColorTransp.jpg" width="300" height="400">
+                    <h1>Crear cuenta</h1>
                 </div>
-                <div class="form_field">
-                    <label for="nombre"><b>Nombre Completo</b></label>
-                    <div id="nombre-contains"> Ingrese su nombre y apellido completos.</div>
-                    <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required/> 
+                <div class="mb-3">
+                    <label for="email"><h3>E-mail</h3></label>
+                    <input @bind="Email" class="form-control" type="text" placeholder="email@example.com" name="email" required asp-for="Email"/>
                 </div>
-                <div class="form_field">
-                    <div id="password-constraints"> La contraseña debe contener al menos 8 caracteres.</div>
-                    <div id="password-constraints_2"> Además, debe contener al menos un caracter especial, una mayúscula y dos números.</div>
-                    <label for="psw"><b>Contraseña</b></label>
-                    <input @bind="Password" type="password" placeholder="*******" name="psw" required/>
+                <div class="mb-3">
+                    <label for="nombre"><h3>Nombre Completo</h3></label>
+                    <input @bind="Nombre" class="form-control mb-2" type="text" placeholder="John Doe" name="nombre" required/> 
+                    <div class="ms-4" id="nombre-contains"> Ingrese su nombre y apellido completos.</div>
                 </div>
-                <div class="form_field">
-                    <label for="fecha de nacimiento"><b>Seleccione su fecha de nacimiento</b></label>
-                    <input @bind="FechaNac" type="date"  max="@today" id="Test_Date"/>
+                <div class="mb-3">
+                    <label for="psw"><h3>Contraseña</h3></label>
+                    <input @bind="Password" class="form-control mb-2" type="password" placeholder="*******" name="psw" required/>
+                    <div class="ms-4" id="password-constraints"> La contraseña debe contener al menos 8 caracteres un caracter especial, una mayúscula y dos números.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="fecha de nacimiento"><h3>Seleccione su fecha de nacimiento</h3></label>
+                    <input @bind="FechaNac" class="form-control" type="date"  max="@today" id="Test_Date"/>
                 </div>
                 <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>
             </div>
