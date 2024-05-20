@@ -84,7 +84,7 @@
             await JsRuntime.InvokeVoidAsync("alert", "Tu contraseña no es lo suficientemente segura.\nComo mínimo debe tener 8 caracteres, y contener al menos un caracter especial, una mayúscula y dos números");
             return;
         }
-        if (this.Nombre == "")) {
+        if (this.Nombre == "") {
             await JsRuntime.InvokeVoidAsync("alert", "Ingrese su nombre");
         return;
         }
