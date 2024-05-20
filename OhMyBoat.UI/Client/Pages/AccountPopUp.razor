@@ -1,6 +1,4 @@
-﻿@page "/account"
-
-@using Microsoft.AspNetCore.Components.Authorization;
+﻿@using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @using OhMyBoat.UI.Client.Extensions;
 @using OhMyBoat.UI.Shared.Entidades;
@@ -12,7 +10,6 @@
 @inject NavigationManager navManager
 @inject IJSRuntime JsRuntime;
 @inject NavigationManager Navegador;
-@attribute [Authorize]
 
 <Modal @ref="AccountModal" />
 
@@ -30,17 +27,17 @@
             <h2> Rol : @Rol.ToString()</h2>
         </div>
     </div>
-    <div>       
-        <button class="btn btn-primary" @onclick="EditAccount">
+    <div>
+        <button class="btn btn-primary" @onclick="ViewProfile">
             <div class="d-flex flex-row align-items-center">
-                <Icon Name="IconName.PencilFill" Size="IconSize.x4"></Icon>
-                <span class="ms-2">Editar Perfil</span>
+                <Icon Name="IconName.Search" Size="IconSize.x4"></Icon>
+                <span class="ms-2">Ver Perfil</span>
             </div>
-        </button>        
-        <button class="btn btn-primary" @onclick="ChangePassword">
+        </button>
+        <button class="btn btn-secondary" @onclick=LogOut>
             <div class="d-flex flex-row align-items-center">
-                <Icon Name="IconName.LockFill" Size="IconSize.x4"></Icon>
-                <span class="ms-2">Cambiar Contraseña</span>
+                <Icon Name="IconName.BoxArrowLeft" Size="IconSize.x4"></Icon>
+                <span class="ms-2">Cerrar Sesión</span>
             </div>
         </button>
     </div>
@@ -55,6 +52,7 @@
     private Usuario user = new Usuario() { Email = "", Nombre = "", Contacto = "" };
 
     private Modal AccountModal = default!;
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
@@ -81,7 +79,10 @@
 
         } else await JsRuntime.InvokeVoidAsync("alert", "Explote");
     }
-    private async Task ViewProfile() => navManager.NavigateTo("account");
+    private async Task ViewProfile(MouseEventArgs e) {
+        navManager.NavigateTo("account");
+        await OnClickCallback.InvokeAsync(e);
+    }
     private async Task EditAccount() => await JsRuntime.InvokeVoidAsync("alert", "Sin implementar");
     private async Task ChangePassword() {
         var parameters = new Dictionary<string, object>();

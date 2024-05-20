@@ -3,16 +3,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using OhMyBoat.UI.Server.Data;
+using OhMyBoat.UI.Server.Services;
+using Microsoft.Extensions.Configuration;
+using OhMyBoat.UI.Server.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 //builder.Services.AddDbContext<OhMyBoatUIServerContext>(options =>
 //options.UseSqlServer(builder.Configuration.GetConnectionString("OhMyBoatUIServerContext") ?? throw new InvalidOperationException("Connection string 'OhMyBoatUIServerContext' not found.")));
 builder.Services.AddDbContext<OhMyBoatUIServerContext>();
+
+builder.Configuration.AddJsonFile("emailsettings.json", optional: false, reloadOnChange: true);
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<EmailService>();
+
 
 var app = builder.Build();
 
