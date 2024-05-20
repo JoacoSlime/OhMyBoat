@@ -1,0 +1,50 @@
+﻿@page "/list-clients"
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization; // esto va en todas las fucking paginas que se requiera un rol
+@attribute [Authorize(Roles = "jefe,empleado")]
+
+
+<h3>Lista de clientes</h3>
+
+<AuthorizeView>
+    <Authorized>
+
+        @if (ListaDeClientes.Count == 0)
+        {
+            <p>No hay Clientes en el sistema</p>
+        }
+        else
+        {
+            @foreach (var Cli in ListaDeClientes)
+            {
+                <div class="container-navio">
+                    <div>
+                        <p>@Cli.Nombre</p>
+                        <p>@Cli.Email</p>
+                        <p>@Cli.Bloqueado </p>
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    List<Cliente> ListaDeClientes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaDeClientes = await ((HttpClient)HttpClient).GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes");
+        if (ListaDeClientes.Count == 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Aun no hay clientes registrados.");
+        }
+    }
+}

@@ -1,11 +1,88 @@
-﻿@page "/my-vehicles"
+﻿@page "/my-landships"
 
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
 
-<h3>Mis Vehiculos</h3>
+@inject AuthenticationStateProvider authStateProvider;
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@using System.Security.Claims
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles = "cliente")]
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Mis Vehiculos</h3>
+
+        <Modal @ref="modal" />
+
+        @if (MisRodados.Count == 0)
+        {
+            <h1> no hay vehiculos</h1>
+        }
+        else
+        {
+            @foreach (var vec in MisRodados)
+            {
+                <div class="container-navio">
+                    <div>
+                        <img src="@vec.base64imagen" />
+                    </div>
+                    <div>
+                        <p>@vec.Matricula</p>
+                        <p>@vec.Tipo</p>
+                        <p>@vec.descripcion</p>
+                        <p>@vec.Antiguedad</p>
+                    </div>
+                    <div>
+                        Boton detalle
+                    </div>
+                </div>
+            }
+        }
+
+        <Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Cargar Vehiculo</Button>
+    </Authorized>
+    <NotAuthorized>
+       @{NavManager.NavigateTo("/",true);} 
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+
 
 @code {
+    private Modal modal = default!;
+    List<Terrestre> MisRodados = new();
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RecargarLista();
+    }
+
+
+    private async Task RecargarLista()
+    {
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+
+        var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosCliente", Email);
+        MisRodados = await respSV.Content.ReadFromJsonAsync<List<Terrestre>>();
+        StateHasChanged();
+        await modal.HideAsync();
+    }
+
+
+    private async Task CargarVehiculo()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, RecargarLista));
+        await modal.ShowAsync<PublishVehicule>(title: "Employee Details", parameters: parameters);
+    }
 }

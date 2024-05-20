@@ -10,8 +10,7 @@ namespace OhMyBoat.UI.Shared.Entidades
     {
         Auto,
         Camioneta,
-        Moto,
-        Ciclomotor,
-        Camion
+        Moto,       
+     
     }
 }

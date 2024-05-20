@@ -1,0 +1,53 @@
+@page "/all-ships"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+
+<h3>Navios disponibles para intercambio </h3>
+
+
+<AuthorizeView>
+    <Authorized>
+
+        @if (ListaMisNavios.Count == 0)
+        {
+            <p>No hay Navios en el sistema</p>
+        }
+        else
+        {
+            @foreach (var Nav in ListaMisNavios)
+            {
+                <div class="container-navio">
+                    <div>
+                        <p>@Nav.Matricula</p>                                      
+                        <img src="@Nav.base64imagen" />                   
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+
+@code {
+    List<Maritimo> ListaMisNavios = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");
+            if (ListaMisNavios.Count == 0)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado .");
+            }        
+        }
+    } 
+}

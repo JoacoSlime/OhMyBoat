@@ -1,0 +1,94 @@
+@page "/editProfile"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@using OhMyBoat.UI.Client.Extensions;
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using System.Security.Claims
+@using System;
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager
+@inject IJSRuntime JsRuntime;
+@inject NavigationManager Navegador;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization; // esto va en todas las fucking paginas que se requiera un rol
+@attribute [Authorize]
+
+<div>
+<div>
+    <label for="nombre"><b>Nombre Completo</b></label>
+    <div id="nombre-contains"> su nombre y apellido completos.</div>
+    <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required />
+</div>
+<div class="mb-3">
+    <label for="contacto"><b>Contacto</b></label>
+    <input @bind="Contacto" class="form-control" />
+</div>
+
+<div class="input-group">
+    <div class="custom-file">
+        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" />
+        <label class="custom-file-label" for="inputFile">Choose file</label>
+    </div>
+    @if (filesBase64 != "")
+    {
+        <img src="@filesBase64" />
+    }
+</div>
+
+    <button class="btn btn-primary" type="submit" @onclick="GuardarCambios">Guardar Cambios</button>
+</div>
+
+@code {
+    private string Nombre = "";
+    private string Contacto = "";
+    private string Email = ""; 
+    private string filesBase64 = "";
+    string message = "InputFile";
+    AuthenticationState Auth;
+    protected override async Task OnInitializedAsync()
+    {
+        Auth = await authStateProvider.GetAuthenticationStateAsync();
+        this.Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;        
+        await traerUsuario();
+
+    }      
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File; // agarra las fotos
+        var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
+        var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
+        using (var stream = resizedFile.OpenReadStream())
+        {
+            await stream.ReadAsync(buf); // copia el stream a el buffer
+        }
+        filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+
+        message = "subi las img para continuar";
+    }
+    
+    private async Task traerUsuario()
+    {
+        
+        LoginDTO auxSession = new LoginDTO();
+        auxSession.Email = Email;       // es por que recibe una mierda de loginDTO
+        var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ObtenerUsuario", auxSession);
+        var cliendeTraido = await respuestaSV.Content.ReadFromJsonAsync<Usuario>(); 
+        this.Nombre = cliendeTraido.Nombre;
+        this.Contacto = cliendeTraido.Contacto;
+        this.filesBase64 = cliendeTraido.base64imagen;
+    }
+
+    private async Task GuardarCambios()
+    {
+        await JsRuntime.InvokeVoidAsync("alert", this.Email);
+        ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto , base64imagen = this.filesBase64};
+        var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ActualizarUsuario", user  );       
+        if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+             await JsRuntime.InvokeVoidAsync("alert", "Cambios Realizados Con Exito");
+        }
+    }
+
+}

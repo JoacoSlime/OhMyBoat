@@ -1,43 +1,53 @@
-@page "/cargarAuto"
-@using OhMyBoat.UI.Shared.Entidades;
-@using OhMyBoat.UI.Shared;
-@using Microsoft.JSInterop;
-@using System;
-@inject IJSRuntime JsRuntime;
-@inject HttpClient HttpClient;
-@inject NavigationManager Navegador;
-@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider authStateProvider
+@using OhMyBoat.UI.Shared.Entidades
+@using OhMyBoat.UI.Shared
+@using Microsoft.JSInterop
+@using System
+@inject IJSRuntime JsRuntime
+@inject HttpClient HttpClient
+@inject NavigationManager Navegador
+@using System.ComponentModel.DataAnnotations
+
+
 
 <h3>Publicar Vehiculo terrestre</h3>
 <html>
-    <div class="form_field">
-        <label for="nombre"><b>Patente del Vehiculo</b></label>        
-        <input @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required/> 
-    </div>
-	<div class="input-group-append">
-		<button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
-	</div>
-    <div class="input-group">
-	<div class="custom-file">
-		<InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" />
-		<label class="custom-file-label" for="inputFile">Choose file</label>
-	</div>
-
-    @foreach (var item in filesBase64)
-{
-	<img src="data:@item.contentType;base64,@item.base64data" />
-}
-
+<div class="form_field">
+    <label for="nombre"><b>Patente del Vehiculo</b></label>
+    <input @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
 </div>
-    <div class="form_field">
-        <label for="fecha de nacimiento"><b>Antiguedad del Vehiculo</b></label>     
-        <input @bind="antiguedad" type="int"   />
+
+<div class="input-group">
+    <div class="custom-file">
+        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile"
+            required />
+        <label class="custom-file-label" for="inputFile">Choose file</label>
     </div>
-    <div class="form_field">
-        <label for="Descripcion"><b>Descripcion del vehiculo</b></label>
-        <input @bind="descripcion" type="String"   >
-    </div>
-    <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre">cargar vehiculo</button>
+    @if (filesBase64 != "")
+    {
+        <img src="@filesBase64" />
+    }
+</div>
+
+<select @bind="tipoVec" name="select">
+    <option selected> Auto</option>
+    <option>Camioneta</option>
+    <option>Moto</option>
+</select>
+
+<div class="form_field">
+    <label for="fecha de nacimiento"><b>Antiguedad del Vehiculo</b></label>
+    <input @bind="antiguedad" type="int" required />
+</div>
+<div class="form_field">
+    <label for="Descripcion"><b>Descripcion del vehiculo(opcional)</b></label>
+    <input @bind="descripcion" type="String" required>
+</div>
+<button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre"> cargar vehiculo</button>
+
 </html>
 
 
@@ -45,68 +55,87 @@
 @code {
     [Required]
     private string matricula { get; set; } = "";
-   // [Required]
-    //private string? base64imagen { get; set; } = "";
     [Required]
     private int antiguedad { get; set; } = 0;
-    [Required]
+    
     private string? descripcion { get; set; } = "";
     [Required]
-    private TipoVehiculo tipoVec {get; set;}
+    private TipoVehiculo tipoVec { get; set; }
 
-
-
-    List<ImageFile> filesBase64 = new List<ImageFile>();
-	string message = "InputFile";
-	bool isDisabled = false;
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    private string Email { get; set; } = "";
+    string filesBase64 = "";
+    string message = "InputFile";
+    bool isDisabled = false;
 
     async Task OnChange(InputFileChangeEventArgs e)
     {
-        var files = e.GetMultipleFiles();   // agarra las fotos
-        foreach (var file in files)
+        var file = e.File; // agarra las fotos
+        var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
+        var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
+        using (var stream = resizedFile.OpenReadStream())
         {
-            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
-            var buf = new byte[resizedFile.Size];   // buffer para llenar la data de la imagen
-            using (var stream = resizedFile.OpenReadStream())
-            {
-                await stream.ReadAsync(buf);    // copia el stream a el buffer
-            }
-            filesBase64.Add(new ImageFile { base64data = Convert.ToBase64String(buf), contentType = file.ContentType, fileName = file.Name , Patente = this.matricula }); // lo convierte a base64
+            await stream.ReadAsync(buf); // copia el stream a el buffer
         }
+        filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+
         message = "subi las img para continuar";
     }
-
-    async Task Upload()
+    AuthenticationState Auth;
+    protected override async Task OnInitializedAsync()
     {
-        isDisabled= true;
-        var msg = await HttpClient.PostAsJsonAsync<List<ImageFile>>("/api/upload", filesBase64);
-        {
-            isDisabled = false;
-            if (msg.IsSuccessStatusCode)
-            {
-                message = $"{filesBase64.Count} files uploaded";
-                filesBase64.Clear();
-            }
-        }
+        Auth = await authStateProvider.GetAuthenticationStateAsync();
+        Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
     }
 
 
-     async private void cargaVehiculoterrrestre()
+    private bool IsLong(string Patente)
     {
-        
-        Terrestre vec= new Terrestre() {Matricula=this.matricula ,Antiguedad = this.antiguedad, descripcion = this.descripcion,Tipo =this.tipoVec };
+        return Patente.Length >= 8;
+    }
+    async private Task cargaVehiculoterrrestre(MouseEventArgs args)
+    {
+        if (IsLong(matricula))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Tu patente es muy larga");
+            return;
+        }
+        if (matricula == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese una patente ");
+            return;
+        }
+        if (filesBase64 == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El Vehiculo necesita una imagen para ser cargado");
+            return;
+        }
+        if (antiguedad >= 100)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Tu Vehiculo es muy viejo 👴");
+            return;
+        }
+        Terrestre vec = new Terrestre()
+            {
+                Matricula = this.matricula,
+                Antiguedad = this.antiguedad,
+                descripcion =
+            this.descripcion,
+                Tipo = this.tipoVec,
+                IDCliente = this.Email,
+                base64imagen = this.filesBase64
+            };
 
         var RespuestaSv = await HttpClient.PostAsJsonAsync<Terrestre>("api/Vehiculos/CargarVehiculoTerrestre", vec);
 
         if (RespuestaSv.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            
-            await Upload();
-            await JsRuntime.InvokeVoidAsync("alert", "VehiculoRegistradoConExito");
+            await JsRuntime.InvokeVoidAsync("alert", "Vehiculo Registrado Con Exito");
+            await OnClickCallback.InvokeAsync(args);
         }
         else
         {
-             await JsRuntime.InvokeVoidAsync("alert", "me rompi");
+            await JsRuntime.InvokeVoidAsync("alert", "La patente ya esta registrada");
         }
-    } 
+    }
 }

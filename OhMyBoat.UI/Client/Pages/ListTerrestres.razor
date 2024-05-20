@@ -1,0 +1,50 @@
+@page "/all-landships"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+<h3>Vehiculos disponibles para intercambio</h3>
+
+<AuthorizeView>
+    <Authorized>
+
+        @if (ListaTerrestres.Count == 0)
+        {
+            <p>No hay Vehiculos en el sistema</p>
+        }
+        else
+        {
+            @foreach (var Vec in ListaTerrestres)
+            {
+                <div class="container-Vehiculo">
+                    <div>
+                        <p>@Vec.Matricula</p>
+                        <img src="@Vec.base64imagen" />  
+                    </div>
+                </div>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    List<Terrestre> ListaTerrestres= new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles");
+            if (ListaTerrestres.Count == 0)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún vehículo terrestre registrado .");
+            }        
+        }
+    } 
+}

@@ -23,25 +23,30 @@
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="mis-ofertas">
-                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.CartFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Ofertas</span></div>
+                    <NavLink class="nav-link" href="all-ships">
+                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Buscar Navios</span></div>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="mis-vehiculos">
+                    <NavLink class="nav-link" href="all-landships">
+                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Buscar Vehiculos</span></div>
+                    </NavLink>
+                </div>
+                 <AuthorizeView Roles= "cliente" Context= "cliente" >
+                    <Authorized Context="cliente">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="my-landships">
                         <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Vehiculos</span></div>
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="buscar-navios">
-                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Buscar Navios</span></div>
-                    </NavLink>
+                    <NavLink class="nav-link" href="my-ships">
+                    <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Navios</span></div>
+                </NavLink>
                 </div>
-                 <AuthorizeView Roles= "Cliente" Context= "cliente" >
-                    <Authorized Context="cliente">
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="counter">
-                        <span class="oi oi-plus" aria-hidden="true"></span> cargar auto
+                    <NavLink class="nav-link" href="mis-ofertas">
+                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.CartFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Ofertas</span></div>
                     </NavLink>
                 </div>
                       </Authorized>
@@ -52,7 +57,7 @@
                           <NavLink class="nav-link" href="ListadoClientes">
                                <span class="oi oi-list-rich" aria-hidden="true"></span> Listar Clientes
                            </NavLink>
-                     </div>
+                        </div>
                      </Authorized>
                   </AuthorizeView>
                 <AuthorizeView Roles="jefe" Context="innerContext">
