@@ -22,7 +22,7 @@
 
 <div class="input-group">
     <div class="custom-file">
-        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile"
+        <InputFile class="custom-file-input"  OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile"
             required />
         <label class="custom-file-label" for="inputFile">Choose file</label>
     </div>
@@ -57,7 +57,7 @@
     private string matricula { get; set; } = "";
     [Required]
     private int antiguedad { get; set; } = 0;
-    
+
     private string? descripcion { get; set; } = "";
     [Required]
     private TipoVehiculo tipoVec { get; set; }
@@ -67,20 +67,42 @@
     string filesBase64 = "";
     string message = "InputFile";
     bool isDisabled = false;
+  
+    private bool containsValidFormat(string nameImg)
+    {
+        string extension = Path.GetExtension(nameImg);
+        if (extension != null)
+        {
+            string ext = extension.ToLower();
+            return ext == ".jpg" || ext == ".png";
+        }
+        return false;
+    }
+
 
     async Task OnChange(InputFileChangeEventArgs e)
-    {
-        var file = e.File; // agarra las fotos
-        var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
-        var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
-        using (var stream = resizedFile.OpenReadStream())
+    {       
+        if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
+        if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
-            await stream.ReadAsync(buf); // copia el stream a el buffer
-        }
-        filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+            var file = e.File; // agarra las fotos            
+            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
+            var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
+            using (var stream = resizedFile.OpenReadStream())
+            {
+                await stream.ReadAsync(buf); // copia el stream a el buffer
+            }
+            filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
 
-        message = "subi las img para continuar";
+            message = "subi las img para continuar";
+        }
+        else
+        {
+        await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+        this.filesBase64 = "formato";
+        }
     }
+
     AuthenticationState Auth;
     protected override async Task OnInitializedAsync()
     {
@@ -91,7 +113,7 @@
 
     private bool IsLong(string Patente)
     {
-        return Patente.Length >= 8;
+        return Patente.Length >= 13;
     }
     async private Task cargaVehiculoterrrestre(MouseEventArgs args)
     {
@@ -110,11 +132,16 @@
             await JsRuntime.InvokeVoidAsync("alert", "El Vehiculo necesita una imagen para ser cargado");
             return;
         }
-        if (antiguedad >= 100)
+        if (filesBase64 == "formato")
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Tu Vehiculo es muy viejo 👴");
+            await JsRuntime.InvokeVoidAsync("alert", "La imagen que cargo tiene un formato no soportado, asegurese que el formato sea \".png\" o \".jpg\"  ");
             return;
         }
+        /* if (antiguedad >= 100)
+        {
+        await JsRuntime.InvokeVoidAsync("alert", "Tu Vehiculo es muy viejo 👴");
+        return;
+        } */
         Terrestre vec = new Terrestre()
             {
                 Matricula = this.matricula,

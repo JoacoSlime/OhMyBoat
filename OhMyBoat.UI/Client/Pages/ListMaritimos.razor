@@ -18,7 +18,7 @@
 
         @if (ListaMisNavios.Count == 0)
         {
-            <p>No hay Navios en el sistema</p>
+            <p>no hay navíos disponibles para intercambio</p>
         }
         else
         {
@@ -46,7 +46,7 @@
             ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");
             if (ListaMisNavios.Count == 0)
             {
-                await JsRuntime.InvokeVoidAsync("alert", "Aun no hay ningún navío registrado .");
+                await JsRuntime.InvokeVoidAsync("alert", "no hay navíos disponibles para intercambio");
             }        
         }
     } 
