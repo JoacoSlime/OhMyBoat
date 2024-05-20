@@ -9,7 +9,6 @@
 @using System.ComponentModel.DataAnnotations;
 @inject IJSRuntime JsRuntime;
 @inject HttpClient HttpClient;
-@inject NavigationManager Navegador;
 @using Microsoft.AspNetCore.Components.Authorization;
 @inject NavigationManager NavManager;
 
@@ -98,7 +97,7 @@
         //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK){
             await JsRuntime.InvokeVoidAsync("alert", "Usuario registrado con exito");
-            Navegador.NavigateTo("/");
+            NavManager.NavigateTo("/");
         }
         
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired) // ya registrado
