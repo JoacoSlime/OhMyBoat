@@ -16,6 +16,7 @@
                 <div class="d-flex p-4 margin-auto flex-column justify-content-center align-items-center index_button_group">
                     <button class="btn w-75 m-2 btn-lg btn-primary login_button" @onclick="routeLogIn">Iniciar Sesión</button>
                     <button class="btn w-75 m-2 btn-lg btn-secondary register_button" @onclick="routeRegister">Registrarse</button>
+                    <button class="btn w-75 m-2 btn-lg btn-secondary" @onclick="routeRecu">Olvide mi contraseña</button>
                 </div>
             </div>
         </NotAuthorized>
@@ -27,5 +28,9 @@
     }
     private void routeRegister() {
         navManager.NavigateTo("/register");
+    }
+    private void routeRecu()
+    {
+        navManager.NavigateTo("/recover-password");
     }
 }

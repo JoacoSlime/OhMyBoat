@@ -10,5 +10,13 @@ namespace OhMyBoat.UI.Shared.Entidades
     {
         public TipoVehiculo Tipo {  get; set; }
 
+        public string? Marca { get; set; } = "";
+   
+        public string? Modelo { get; set; } = "";
+   
+        public int Kilometraje { get; set; } = 0;
+   
+        public int Anio { get; set; } = 0;
+   
     }
 }

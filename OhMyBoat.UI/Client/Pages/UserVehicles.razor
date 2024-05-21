@@ -1,11 +1,95 @@
-﻿@page "/my-vehicles"
+﻿@page "/my-landships"
 
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
 
-<h3>Mis Vehiculos</h3>
+@inject AuthenticationStateProvider authStateProvider;
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@using System.Security.Claims
+@inject NavigationManager NavManager
+
+<AuthorizeView Roles="cliente">
+    <Authorized>
+        <h1>Mis Vehiculos</h1>
+
+        <Modal @ref="modal" />
+
+        @if (MisRodados.Count == 0)
+        {
+            <h1>No tiene vehículos registrados</h1>
+        }
+        else
+        {
+            <div class="d-flex flex-row flex-wrap">
+            @foreach (var vec in MisRodados)
+            {
+                <Card Class="me-4 mb-4" Style="width:auto;">
+                    <img class="rounded-top p-3" src="@vec.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
+                    <CardBody>
+                        <CardTitle>Matrícula:</CardTitle>
+                        <CardText>@vec.Matricula</CardText>
+                        <CardTitle>Descripción:</CardTitle>
+                        <CardText>@(vec.descripcion != "" ? vec.descripcion : "-")</CardText>
+                        <CardTitle>Tipo:</CardTitle>
+                        <CardText>@vec.Tipo</CardText>
+                        <CardTitle>Antiguedad:</CardTitle>
+                        <CardText>@vec.Antiguedad</CardText>
+                    </CardBody>
+                    <CardFooter class="text-end">
+                        <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                    </CardFooter>
+                </Card>
+            }
+            </div>
+        }
+
+        <Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Publicar Vehiculo</Button>
+    </Authorized>
+    <NotAuthorized>
+       @{NavManager.NavigateTo("/",true);} 
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+
 
 @code {
+    private Modal modal = default!;
+    List<Terrestre> MisRodados = new();
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RecargarLista();
+    }
+
+
+    private async Task RecargarLista()
+    {
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+
+        var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosCliente", Email);
+        MisRodados = await respSV.Content.ReadFromJsonAsync<List<Terrestre>>();
+        StateHasChanged();        
+    }
+
+    private async Task closeModal()
+    {
+        await modal.ShowAsync();      // https://github.com/vikramlearning/blazorbootstrap/issues/393
+        await modal.HideAsync();
+        await RecargarLista();
+    }
+    private async Task CargarVehiculo()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, closeModal));
+        await modal.ShowAsync<PublishVehicule>(title: "Cargar Vehiculo", parameters: parameters);
+    }
 }

@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace OhMyBoat.UI.Shared.Entidades
 {
-    public enum TipoVehiculo
+    public class RecuCuentaDTO
     {
-        Auto,
-        Camioneta,
-        Moto,       
-     
+        public string Hash { get; set; } = "";
+        public string ContraNueva { get; set; } = "";
+
     }
 }

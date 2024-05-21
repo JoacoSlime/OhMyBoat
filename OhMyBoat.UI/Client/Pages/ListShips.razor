@@ -1,0 +1,55 @@
+@page "/all-ships"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+
+
+
+<AuthorizeView>
+    <Authorized>
+
+        <h1>Navios disponibles para intercambio </h1>
+        @if (ListaMisNavios.Count == 0)
+        {
+            <p>no hay navíos disponibles para intercambio</p>
+        }
+        else
+        {
+            <div class="d-flex flex-row flex-wrap">
+            @foreach (var Nav in ListaMisNavios)
+            {
+                <Card Class="me-4 mb-4" Style="width:auto;">
+                    <img class="rounded-top p-3" src="@Nav.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
+                    <CardBody>
+                        <CardTitle>Matrícula:</CardTitle>
+                        <CardText>@Nav.Matricula</CardText>
+                    </CardBody>
+                    <CardFooter class="text-end">
+                        <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                    </CardFooter>
+                </Card>
+            }
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+
+@code {
+    List<Maritimo> ListaMisNavios = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");    
+        }
+    } 
+

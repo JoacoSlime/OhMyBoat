@@ -33,14 +33,14 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     }
 
     [HttpPost]
-    [Route("CargarNavio")]
+    [Route("CargarVehiculoMaritimo")]
     public async Task<IActionResult> cargarNavio([FromBody] Maritimo m)
     {               
             using (var db = new OhMyBoatUIServerContext())
             {
-                if ( db.Navios.Where(nav => nav.Matricula == m.Matricula).IsNullOrEmpty())
+                if ( db.Maritimos.Where(nav => nav.Matricula == m.Matricula).IsNullOrEmpty())
                 {                    
-                    await db.Navios.AddAsync(m);
+                    await db.Maritimos.AddAsync(m);
                     await db.SaveChangesAsync();
                     return StatusCode(StatusCodes.Status200OK, m);
                 }
@@ -48,22 +48,45 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
     }
 
+
+
+    [HttpPost]
+    [Route("ListarVehiculosCliente")]
+    public async Task<IActionResult> GetTerrestresCliente([FromBody] string Email){
+        using (var bd = new OhMyBoatUIServerContext()){
+            List<Terrestre>  lista_Terrestre = await bd.Terrestres.Where(ter => ter.IDCliente == Email).ToListAsync();                                           
+            return StatusCode(StatusCodes.Status200OK,  lista_Terrestre); 
+        }
+
+    }
+       
+
+    [HttpPost]
+    [Route("ListarNaviosCliente")]
+    public async Task<IActionResult> GetMaritimosCliente([FromBody] string cliente){
+        using (var bd = new OhMyBoatUIServerContext()){
+            List<Maritimo>  lista_Maritimo = await bd.Maritimos.Where(nav => nav.IDCliente == cliente).ToListAsync();                          
+            return StatusCode(StatusCodes.Status200OK,  lista_Maritimo); 
+        }
+    }
+
+
     [HttpGet]
     [Route("ListarNaviosDisponibles")]
     public async Task<IActionResult> GetMaritimos()
     {
         using (var db = new OhMyBoatUIServerContext())
         {
-            var listar_nav = await db.Navios.OrderBy(bar => bar.Matricula).ToListAsync();
+            var listar_nav = await db.Maritimos.ToListAsync();
             return StatusCode(StatusCodes.Status200OK, listar_nav);
         }
     }
 
     [HttpGet]
-    [Route("ListarTerrestresDisponibles")]
+    [Route("ListarVehiculosDisponibles")]
     public async Task<IActionResult> GetTerrestres(){
         using (var bd = new OhMyBoatUIServerContext()){
-            var listar_ter = await bd.Terrestres.OrderBy(terr => terr.Matricula).ToListAsync();
+            var listar_ter = await bd.Terrestres.ToListAsync();
             return StatusCode(StatusCodes.Status200OK, listar_ter); 
         }
 

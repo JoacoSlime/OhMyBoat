@@ -1,0 +1,224 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider authStateProvider
+@using OhMyBoat.UI.Shared.Entidades
+@using OhMyBoat.UI.Shared
+@using Microsoft.JSInterop
+@using System
+@inject IJSRuntime JsRuntime
+@inject HttpClient HttpClient
+@inject NavigationManager Navegador
+@using System.ComponentModel.DataAnnotations
+
+
+<div class="d-flex flex-column justify-content-center p-5">
+    <div class="mb-3">
+        <h1>Publicar Navío</h1>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="nombre"><h3>Matricula del navío</h3></label>
+        <input class="form-control" @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
+    </div>
+
+    <div class="input-group mb-3">
+        <div class="custom-file">
+            <label class="form-label" for="inputFile"><h3>Foto del navío</h3></label>
+            <InputFile class="form-control" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" required/>
+            @if (filesBase64 != "")
+            {
+                <div class="d-flex justify-content-center">
+                    <img class="mt-3 border rounded p-5 bg-grey" style="width:100%;height:max-content;" src="@filesBase64" />
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="select"><h3>Elegir tipo de navío</h3></label>
+        <select class="form-select" @bind="tipoNav" name="select">
+            <option selected> Crucero</option>
+            <option>Catamaran</option>
+            <option>Velero</option>
+            <option>Lancha</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Antiguedad del navío (Años)</h3></label>
+        <input class="form-control" @bind="antiguedad" type="int" placeholder="15"/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="Descripcion"><h3>Descripcion del navío (Opcional)</h3></label>
+        <input class="form-control" @bind="descripcion" placeholder="Como nuevo, sin uso." type="Descipcion">
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Eslora del navío (Metros)</h3></label>
+        <input class="form-control" @bind="Eslora" type="float" placeholder="7.5"/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Puntal del navío (Metros)</h3></label>
+        <input class="form-control" @bind="Puntal" type="float" placeholder="12.12" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Manga del navío (Metros)</h3></label>
+        <input class="form-control" @bind="Manga" type="float" placeholder="12.12" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Deuda del navío (Si es que posee)</h3></label>
+        <input class="form-control" @bind="Deuda" type="float"placeholder="12050"/>
+    </div>
+    <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoMaritimo">Publicar navío</button>
+</div>
+
+
+
+@code {
+    [Required]
+    private string matricula { get; set; } = "";
+    [Required]
+    private string? base64imagen { get; set; } = "";
+    [Required]
+    public int? antiguedad { get; set; }
+    [Required]
+    public float? Eslora { get; set; }
+    [Required]
+    public float? Puntal { get; set; }
+    [Required]
+    public float? Manga { get; set; }   
+    public float? Deuda { get; set; } 
+    
+    private string descripcion { get; set; } = "";
+    [Required]
+    private TipoEmbarcacion tipoNav { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    private string Email { get; set; } = "";
+    string filesBase64 = "";
+    string message = "InputFile";
+    bool isDisabled = false;
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {       
+        if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
+        if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
+        {
+            filesBase64 = await Utils.GetImageBase64(e.File);
+
+            message = "subi las img para continuar";
+        }
+        else{
+            await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+            this.filesBase64 = "formato";
+        }
+    }
+    AuthenticationState Auth;
+    protected override async Task OnInitializedAsync()
+    {
+        Auth = await authStateProvider.GetAuthenticationStateAsync();
+        Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+    }
+
+    private bool IsLong(string Patente)
+    {
+        return Patente.Length >= 10;
+    }
+    async private Task cargaVehiculoMaritimo(MouseEventArgs args)
+    {
+
+
+
+        if (IsLong(matricula))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Tu matricula es muy larga");
+            return;
+        }        
+        if (matricula == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese una matricula ");
+            return;
+        }         
+        if (antiguedad == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Antiguedad de su navio");
+            return;
+        }
+        if (filesBase64 == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El Navio necesita una imagen para ser cargado");
+            return;
+        }         
+        if (Eslora == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Eslora de su navio");
+            return;
+        }
+        if (Eslora <= 0.99)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La eslora es demasiado pequeña");
+            return;
+        }
+        if (Puntal == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Puntal de su navio");
+            return;
+        }
+        if (Puntal < 0.3)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El puntal es demasiado pequeño");
+            return;
+        }
+        if (Manga == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Manga de su navio");
+            return;
+        }
+        if (Manga < 0.99)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La manga es demasiado pequeña");
+            return;
+        }
+        if (Deuda == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la deuda de su navio");
+            return;
+        }
+        if (Deuda < 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La deuda no puede ser negativa");
+            return;
+        }
+        if (filesBase64 == "formato")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La imagen que cargo tiene un formato no soportado, asegurese que el formato sea \".png\" o \".jpg\"  ");
+            return;
+        }
+
+
+
+        Maritimo nav = new Maritimo()
+            {
+                Matricula = this.matricula,
+                Antiguedad = this.antiguedad??0,
+                descripcion = this.descripcion,
+                Tipo = this.tipoNav,
+                IDCliente = this.Email,
+                base64imagen = this.filesBase64,
+                Eslora= this.Eslora??0,
+                Puntal= this.Puntal??0,
+                Deuda= this.Deuda??0,
+                Manga = this.Manga??0
+            };
+
+        var RespuestaSv = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/CargarVehiculoMaritimo", nav);
+
+        if (RespuestaSv.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Navio Registrado Con Exito");
+            await OnClickCallback.InvokeAsync(args);
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La patente del navia ya esta registrada");
+        }
+    }
+}

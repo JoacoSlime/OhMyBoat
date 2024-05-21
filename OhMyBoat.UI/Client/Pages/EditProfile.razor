@@ -1,0 +1,109 @@
+@page "/edit-profile"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@using OhMyBoat.UI.Client.Extensions;
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using System.Security.Claims
+@using System;
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider authStateProvider;
+@inject NavigationManager navManager
+@inject IJSRuntime JsRuntime;
+@inject NavigationManager Navegador;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+<div class="d-flex flex-column justify-content-center m-5 p-5 border">
+    <div class="mb-3 text-center">
+        <h1>Editar perfil</h1>
+    </div>
+    <div class="mb-3">
+        <label for="nombre"><h3>Nombre Completo</h3></label>
+        <input class="form-control" @bind="Nombre" type="text" placeholder="John Doe" name="nombre"  />
+    </div>
+    <div class="mb-3">
+        <label for="contacto"><h3>Contacto</h3></label>
+        <input class="form-control" @bind="Contacto" type="text" placeholder="114052345" name="contacto"/>
+    </div>
+
+    <div class="mb-3">
+        <div class="custom-file">
+            <label for="inputFile">Choose file</label>
+            <InputFile class="form-control" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" />
+        </div>
+        @if (fileBase64 != "")
+        {
+            <div class="d-flex justify-content-center">
+                <img class="mt-3 border rounded p-5 bg-grey" style="width:50vh; height:auto;" src="@fileBase64" />
+            </div>
+        }
+    </div>
+    <div class="d-flex justify-content-center">
+        <button class="btn btn-primary btn-lg" type="submit" @onclick="GuardarCambios">Guardar Cambios</button>
+    </div>
+</div>
+
+@code {
+    private string Nombre {get; set;} = "";
+    private string Contacto {get; set;}= "";
+    private string Email = ""; 
+    private string fileBase64 = "";
+    string message = "InputFile";
+    AuthenticationState Auth;
+    protected override async Task OnInitializedAsync()
+    {
+        Auth = await authStateProvider.GetAuthenticationStateAsync();
+        this.Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;        
+        await traerUsuario();
+
+    }      
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {       
+        if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
+        if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
+        {
+            fileBase64 = await Utils.GetIconBase64(e.File);
+
+            message = "subi las img para continuar";
+        }
+        else{
+            await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+            this.fileBase64 = "formato";
+        }
+    }
+    
+    private async Task traerUsuario()
+    {
+        
+        LoginDTO auxSession = new LoginDTO();
+        auxSession.Email = Email;       // es por que recibe una mierda de loginDTO
+        var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ObtenerUsuario", auxSession);
+        var cliendeTraido = await respuestaSV.Content.ReadFromJsonAsync<Usuario>(); 
+        this.Nombre = cliendeTraido.Nombre;
+        this.Contacto = cliendeTraido.Contacto;
+        this.fileBase64 = cliendeTraido.Base64imagen;
+    }
+
+    private async Task GuardarCambios()
+    {
+        if(Utils.HasNum(Nombre)){
+            await JsRuntime.InvokeVoidAsync("alert", "Tu nombre no puede contener números.");
+            return;
+        }
+        ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto, Base64imagen = this.fileBase64};
+        var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ActualizarUsuario", user  );       
+        if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+             await JsRuntime.InvokeVoidAsync("alert", "Cambios Realizados Con Exito");
+             navManager.NavigateTo("account");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "explote");
+        }
+    }
+
+}

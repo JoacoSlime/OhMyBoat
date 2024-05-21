@@ -6,7 +6,7 @@
 @inject IJSRuntime JsRuntime;
 @using OhMyBoat.UI.Client.Pages
 
-
+<Offcanvas @ref="offcanvas" />
 <div class="page">
     <div class="d-flex flex-column sidebar">
         <NavMenu />
@@ -17,19 +17,11 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        <button class="btn btn-secondary ms-2" @onclick=switchNotificationsComponent><Icon Name="IconName.EnvelopeFill" Size="IconSize.x4"></Icon></button>
+                        <button class="btn btn-secondary ms-2" @onclick=ShowNotifications><Icon Name="IconName.EnvelopeFill" Size="IconSize.x4"></Icon></button>
                         @if (isOnAccountPage) {
-                            <button class="btn account-button ms-2" @onclick=switchAccountComponent><Icon Name="IconName.PersonFill" Size="IconSize.x4"></Icon></button>
-                        }
-                        @if(showAccount) {
-                            <div class="account-popup">
-                                <Account/>
-                            </div>
-                        }
-                        @if(showNotifications) {
-                            <div class="account-popup">
-                                <Notifications/>
-                            </div>
+                            <button class="btn account-button ms-2" @onclick=ShowAccount><Icon Name="IconName.PersonFill" Size="IconSize.x4"></Icon></button>
+                        } else {
+                            <LogOut class="ms-2"/>
                         }
                     </Authorized>
                 </AuthorizeView>
@@ -45,22 +37,31 @@
 
 
 @code {
+    private Offcanvas offcanvas = default!;
     private bool isOnAccountPage { get; set; }
+    private bool showAccount { get; set; }
     
     protected override void OnParametersSet()
     {
         isOnAccountPage = (this.Body.Target as RouteView)?.RouteData?.PageType?.ToString() != "OhMyBoat.UI.Client.Pages.Account";
         showAccount = false;
     }
-
-    private bool showAccount = false;
-    private void switchAccountComponent() {
-        showAccount = !showAccount;
+    private async Task HideOffcanvas() {
+        await offcanvas.ShowAsync();
+        await offcanvas.HideAsync();
     }
 
+    private async Task ShowAccount()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, HideOffcanvas));
+        await offcanvas.ShowAsync<AccountPopUp>(title: "Mi Cuenta", parameters: parameters);
+    }
 
-    private bool showNotifications = false;
-    private void switchNotificationsComponent() {
-        showNotifications = !showNotifications;
+    private async Task ShowNotifications()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, HideOffcanvas));
+        await offcanvas.ShowAsync<Notifications>(title: "Notificaciones", parameters: parameters);
     }
 }

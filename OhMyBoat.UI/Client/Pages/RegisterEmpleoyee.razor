@@ -1,14 +1,104 @@
-﻿@page "/admin/register-empleoyee"
-
-@inject HttpClient Http
+@page "/admin/register-empleoyee"
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@using System.Security.Cryptography
+@using System.Text
+@using System.ComponentModel.DataAnnotations;
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
 @attribute [Authorize(Roles = "jefe")]
 
-<h1>Registrar empleado</h1>
+<AuthorizeView>
+    <Authorized>
+        <div class="d-flex flex-column justify-content-center m-5 p-5 border">
+            <div class="mb-3 text-center">
+                <h1>Registrar un empleado</h1>
+            </div>
+            <div class="mb-3">
+                <label for="email"><h3>E-mail</h3></label>
+                <input class="form-control" @bind="Email" type="text" placeholder="email@example.com" name="email" required
+                    asp-for="Email" />
+            </div>
+            <div class="mb-3">
+                <label for="nombre"><h3>Nombre Completo</h3></label>
+                <input class="form-control mb-2" @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required />
+            </div>
+            <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <p>no.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
-Esta página la debería ver solo el jefe.
+
+
 
 @code {
-    
+    private string Email { get; set; } = "";
+    [Required]
+    private string Nombre { get; set; } = "";
+    private bool HasNum(string password)
+    {
+        char[] characters = password.ToCharArray();
+        int numCounter = 0;
+        foreach (char c in characters)
+        {
+            if (char.IsNumber(c))
+            {
+                numCounter++;
+            }
+        }
+        return numCounter > 1;
+    }
+    private bool IsValidEmail(string a) => true;
+    async private void Registrarse()
+    {
+
+        if (!Utils.IsValidEmail(Email))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Ingrese un correo electrónico válido.");
+            return;
+        }
+        if (Nombre == "") {
+            await JsRuntime.InvokeVoidAsync("alert", "Ingrese el nombre del empleado.");
+            return;
+        }
+        if (HasNum(Nombre))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El nombre del empleado no puede contener numeros.");
+            return;
+        }
+
+        Usuario empleado = new Usuario() { Nombre = this.Nombre, Email = this.Email, };
+
+        var respuestaSV = await HttpClient.PostAsJsonAsync<Usuario>("api/cuenta/RegistrarEmpleado", empleado);
+
+        //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
+        if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Empleado registrado con exito.\nSe le ha mandado un mail al empleado para registrar su contraseña");
+            Navegador.NavigateTo("/admin/register-empleoyee");
+        }
+
+        if (respuestaSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired) // ya registrado
+
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El email ya esta registrado, ingrese otro email");
+        }
+
+        if (respuestaSV.StatusCode == (System.Net.HttpStatusCode)418) // email taba mal
+
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Email inválido");
+        }
+
+        //mandar el cliente a registro
+
+    }
 }

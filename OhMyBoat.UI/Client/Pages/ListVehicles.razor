@@ -1,0 +1,51 @@
+@page "/all-landships"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+
+<AuthorizeView>
+    <Authorized>
+
+        <h1>Vehiculos disponibles para intercambio</h1>
+        @if (ListaTerrestres.Count == 0)
+        {
+            <p>No hay vehículos terrestres disponibles para intercambio</p>
+        }
+        else
+        {
+            <div class="d-flex flex-row flex-wrap">
+                @foreach (var Vec in ListaTerrestres)
+                {
+                    <Card Class="me-4 mb-4" Style="width:auto;">
+                        <img class="rounded-top p-3" src="@Vec.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
+                        <CardBody>
+                        <CardTitle>Matrícula:</CardTitle>
+                        <CardText>@Vec.Matricula</CardText>
+                        </CardBody>
+                        <CardFooter class="text-end">
+                            <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                        </CardFooter>
+                    </Card>
+                }
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    List<Terrestre> ListaTerrestres= new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles");      
+        }
+    } 
