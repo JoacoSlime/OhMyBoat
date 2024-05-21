@@ -22,15 +22,21 @@
         }
         else
         {
+            <div class="d-flex flex-row flex-wrap">
             @foreach (var Nav in ListaMisNavios)
             {
-                <div class="container-navio">
-                    <div>
-                        <p>@Nav.Matricula</p>                                      
-                        <img src="@Nav.base64imagen" />                   
-                    </div>
-                </div>
+                <Card Class="me-4 mb-4" Style="width:auto;">
+                    <img class="rounded-top p-3" src="@Nav.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
+                    <CardBody>
+                        <CardTitle>Matrícula:</CardTitle>
+                        <CardText>@Nav.Matricula</CardText>
+                    </CardBody>
+                    <CardFooter class="text-end">
+                        <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                    </CardFooter>
+                </Card>
             }
+            </div>
         }
     </Authorized>
 </AuthorizeView>

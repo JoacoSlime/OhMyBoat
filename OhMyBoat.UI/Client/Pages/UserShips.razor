@@ -28,15 +28,26 @@
             <div class="d-flex flex-row flex-wrap">
             @foreach (var nav in MisBarcos)
             {
-                <Card Class="me-4 mb-4" Style="width:18rem;">
-                    <img class="rounded-top p-3" src="@nav.base64imagen" alt="Imagen del vehículo" style="width:25vh;"/>
+                <Card Class="me-4 mb-4" Style="width:auto;">
+                    <img class="rounded-top p-3" src="@nav.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
                     <CardBody>
-                        <CardTitle>@nav.Matricula</CardTitle>
-                        <CardText>@nav.descripcion</CardText>
+                        <CardTitle>Matrícula:</CardTitle>
+                        <CardText>@nav.Matricula</CardText>
+                        <CardTitle>Descripción:</CardTitle>
+                        <CardText>@(nav.descripcion != "" ? nav.descripcion : "-")</CardText>
+                        <CardTitle>Tipo:</CardTitle>
                         <CardText>@nav.Tipo</CardText>
-                        <CardText>@nav.Eslora</CardText>
-                        <CardText>@nav.Puntal</CardText>
+                        <CardTitle>Dimensiones:</CardTitle>
+                    </CardBody>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Eslora: @nav.Eslora</li>
+                        <li class="list-group-item">Puntal: @nav.Puntal</li>
+                        <li class="list-group-item">Deuda: @nav.Deuda</li>
+                    </ul>
+                    <CardBody>
+                        <CardTitle>Deuda:</CardTitle>
                         <CardText>@nav.Deuda</CardText>
+                        <CardTitle>Antiguedad:</CardTitle>
                         <CardText>@nav.Antiguedad</CardText>
                     </CardBody>
                     <CardFooter class="text-end">

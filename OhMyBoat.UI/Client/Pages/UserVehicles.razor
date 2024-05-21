@@ -29,12 +29,16 @@
             <div class="d-flex flex-row flex-wrap">
             @foreach (var vec in MisRodados)
             {
-                <Card Class="me-4 mb-4" Style="width:18rem;">
-                    <img class="rounded-top p-3" src="@vec.base64imagen" alt="Imagen del vehículo" style="width:25vh;"/>
+                <Card Class="me-4 mb-4" Style="width:auto;">
+                    <img class="rounded-top p-3" src="@vec.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
                     <CardBody>
-                        <CardTitle>@vec.Matricula</CardTitle>
-                        <CardText>@vec.descripcion</CardText>
+                        <CardTitle>Matrícula:</CardTitle>
+                        <CardText>@vec.Matricula</CardText>
+                        <CardTitle>Descripción:</CardTitle>
+                        <CardText>@(vec.descripcion != "" ? vec.descripcion : "-")</CardText>
+                        <CardTitle>Tipo:</CardTitle>
                         <CardText>@vec.Tipo</CardText>
+                        <CardTitle>Antiguedad:</CardTitle>
                         <CardText>@vec.Antiguedad</CardText>
                     </CardBody>
                     <CardFooter class="text-end">

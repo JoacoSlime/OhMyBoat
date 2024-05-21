@@ -20,13 +20,19 @@
         }
         else
         {
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-row flex-wrap">
                 @foreach (var Vec in ListaTerrestres)
                 {
-                    <div class="d-flex flex-row">
-                        <p>@Vec.Matricula</p>
-                        <img src="@Vec.base64imagen" style="width: max-content; height=25vh" />  
-                    </div>
+                    <Card Class="me-4 mb-4" Style="width:auto;">
+                        <img class="rounded-top p-3" src="@Vec.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
+                        <CardBody>
+                        <CardTitle>Matrícula:</CardTitle>
+                        <CardText>@Vec.Matricula</CardText>
+                        </CardBody>
+                        <CardFooter class="text-end">
+                            <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                        </CardFooter>
+                    </Card>
                 }
             </div>
         }
