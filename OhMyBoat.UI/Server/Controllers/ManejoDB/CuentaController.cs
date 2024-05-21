@@ -148,13 +148,13 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
         [HttpPost]
         [Route("SwitchUserBlock")]
-        public async Task<IActionResult> BloaquearUsuario([FromBody] LoginDTO log)
+        public async Task<IActionResult> BloaquearUsuario([FromBody] Cliente client)
         {
             using var db = new OhMyBoatUIServerContext();
-            var user = await db.Usuarios.Where(u => u.Email == log.Email).FirstOrDefaultAsync();
-            if (user != null){
-                user.Bloqueado = user.Bloqueado;
-                db.Usuarios.Update(user);
+            var existe = await db.Usuarios.Where(u => u.Email == client.Email).AnyAsync();
+            if (existe){
+                client.Bloqueado = client.Bloqueado;
+                db.Usuarios.Update(client);
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK);
             }
