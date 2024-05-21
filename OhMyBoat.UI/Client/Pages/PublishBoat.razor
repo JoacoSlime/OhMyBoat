@@ -25,11 +25,13 @@
         <div class="custom-file">
             <label class="form-label" for="inputFile"><h3>Foto del navío</h3></label>
             <InputFile class="form-control" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" required/>
+            @if (filesBase64 != "")
+            {
+                <div class="d-flex justify-content-center">
+                    <img class="mt-3 border rounded p-5 bg-grey" style="width:100%;height:max-content;" src="@filesBase64" />
+                </div>
+            }
         </div>
-        @if (filesBase64 != "")
-        {
-            <img class="mt-3 border rounded p-5 bg-grey" style="width:100%;height:max-content;" src="@filesBase64" />
-        }
     </div>
 
     <div class="mb-3">
