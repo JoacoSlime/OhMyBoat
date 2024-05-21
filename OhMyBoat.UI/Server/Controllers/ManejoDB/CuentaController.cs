@@ -154,6 +154,8 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             var user = await db.Usuarios.Where(u => u.Email == log.Email).FirstOrDefaultAsync();
             if (user != null){
                 user.Bloqueado = user.Bloqueado;
+                db.Usuarios.Update(user);
+                await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK);
             }
             else return StatusCode(StatusCodes.Status406NotAcceptable);
