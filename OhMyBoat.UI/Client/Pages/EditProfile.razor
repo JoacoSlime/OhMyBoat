@@ -41,8 +41,8 @@
 </div>
 
 @code {
-    private string Nombre = "";
-    private string Contacto = " ";
+    private string Nombre {get; set;} = "";
+    private string Contacto {get; set;}= "";
     private string Email = ""; 
     private string fileBase64 = "";
     string message = "InputFile";
@@ -77,7 +77,9 @@
 
     {
         await JsRuntime.InvokeVoidAsync("alert", this.Email);
-        ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto , Base64imagen = this.fileBase64};
+        await JsRuntime.InvokeVoidAsync("alert", this.Contacto);
+        await JsRuntime.InvokeVoidAsync("alert", this.fileBase64);
+        ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto, Base64imagen = this.fileBase64};
         var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ActualizarUsuario", user  );       
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
         {
