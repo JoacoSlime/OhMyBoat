@@ -22,27 +22,27 @@
 
         @if (MisRodados.Count == 0)
         {
-            <h1> no hay vehiculos</h1>
+            <h1>No hay vehiculos</h1>
         }
         else
         {
+            <div class="d-flex flex-row flex-wrap">
             @foreach (var vec in MisRodados)
             {
-                <div class="container-navio">
-                    <div>
-                        <img src="@vec.base64imagen" />
-                    </div>
-                    <div>
-                        <p>@vec.Matricula</p>
-                        <p>@vec.Tipo</p>
-                        <p>@vec.descripcion</p>
-                        <p>@vec.Antiguedad</p>
-                    </div>
-                    <div>
-                        Boton detalle
-                    </div>
-                </div>
+                <Card Class="me-4 mb-4" Style="width:18rem;">
+                    <img class="rounded-top p-3" src="@vec.base64imagen" alt="Imagen del vehículo" style="width:25vh;"/>
+                    <CardBody>
+                        <CardTitle>@vec.Matricula</CardTitle>
+                        <CardText>@vec.descripcion</CardText>
+                        <CardText>@vec.Tipo</CardText>
+                        <CardText>@vec.Antiguedad</CardText>
+                    </CardBody>
+                    <CardFooter class="text-end">
+                        <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                    </CardFooter>
+                </Card>
             }
+            </div>
         }
 
         <Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Cargar Vehiculo</Button>
