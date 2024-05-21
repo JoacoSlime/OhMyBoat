@@ -82,6 +82,11 @@
             await JsRuntime.InvokeVoidAsync("alert", "Debes ser mayor de edad para crear una cuenta");
             return;
         }   
+        if (Utils.HasNum(Nombre))
+        {
+             await JsRuntime.InvokeVoidAsync("alert", "Tu nombre no puede contener numeros");
+            return;
+        }
         if (!Utils.IsValidPassword(Password)) {
             await JsRuntime.InvokeVoidAsync("alert", "Tu contraseña no es lo suficientemente segura.\nComo mínimo debe tener 8 caracteres, y contener al menos un caracter especial, una mayúscula y dos números");
             return;
@@ -89,11 +94,6 @@
         if (this.Nombre == "") {
             await JsRuntime.InvokeVoidAsync("alert", "Ingrese su nombre");
         return;
-        }
-        if (Utils.HasNum(Nombre))
-        {
-             await JsRuntime.InvokeVoidAsync("alert", "Tu nombre no puede contener numeros");
-            return;
         }
 
         passhashed = Utils.HashWithSha256(Password);

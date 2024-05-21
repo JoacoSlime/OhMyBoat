@@ -9,11 +9,11 @@
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
 
-<h1>Vehiculos disponibles para intercambio</h1>
 
 <AuthorizeView>
     <Authorized>
 
+        <h1>Vehiculos disponibles para intercambio</h1>
         @if (ListaTerrestres.Count == 0)
         {
             <p>No hay vehículos terrestres disponibles para intercambio</p>

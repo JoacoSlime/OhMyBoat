@@ -12,9 +12,8 @@
 @inject IJSRuntime JsRuntime
 @using System.Security.Claims
 @inject NavigationManager NavManager
-@attribute [Authorize(Roles = "cliente")]
 
-<AuthorizeView>
+<AuthorizeView Roles="cliente">
     <Authorized>
         <h1>Mis Vehiculos</h1>
 

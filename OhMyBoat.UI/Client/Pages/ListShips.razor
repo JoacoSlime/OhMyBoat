@@ -10,12 +10,12 @@
 @inject IJSRuntime JsRuntime
 
 
-<h1>Navios disponibles para intercambio </h1>
 
 
 <AuthorizeView>
     <Authorized>
 
+        <h1>Navios disponibles para intercambio </h1>
         @if (ListaMisNavios.Count == 0)
         {
             <p>no hay navíos disponibles para intercambio</p>

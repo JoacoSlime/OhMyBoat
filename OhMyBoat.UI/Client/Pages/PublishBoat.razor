@@ -97,34 +97,18 @@
     string message = "InputFile";
     bool isDisabled = false;
 
-
-
-    private bool containsValidFormat(string nameImg)
-    {
-        string extension = Path.GetExtension(nameImg);
-        if (extension != null)
-        {
-            string ext = extension.ToLower();
-            return ext == ".jpg" || ext == ".png";
-        }
-        return false;
-    }
-
-
-
-
     async Task OnChange(InputFileChangeEventArgs e)
     {       
         if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
-        if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
+        if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
             filesBase64 = await Utils.GetImageBase64(e.File);
 
             message = "subi las img para continuar";
         }
         else{
-        await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
-        this.filesBase64 = "formato";
+            await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+            this.filesBase64 = "formato";
         }
     }
     AuthenticationState Auth;
@@ -163,19 +147,44 @@
             await JsRuntime.InvokeVoidAsync("alert", "El Navio necesita una imagen para ser cargado");
             return;
         }         
-        if (Eslora == null || Eslora <= 0.99)
+        if (Eslora == null)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Eslora de su navio");
             return;
         }
-        if (Puntal == null || Puntal < 0.3)
+        if (Eslora <= 0.99)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La eslora es demasiado pequeña");
+            return;
+        }
+        if (Puntal == null)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Puntal de su navio");
             return;
         }
-        if (Manga == null || Manga < 0.99)
+        if (Puntal < 0.3)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El puntal es demasiado pequeño");
+            return;
+        }
+        if (Manga == null)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Manga de su navio");
+            return;
+        }
+        if (Manga < 0.99)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La manga es demasiado pequeña");
+            return;
+        }
+        if (Deuda == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la deuda de su navio");
+            return;
+        }
+        if (Deuda < 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La deuda no puede ser negativa");
             return;
         }
         if (filesBase64 == "formato")

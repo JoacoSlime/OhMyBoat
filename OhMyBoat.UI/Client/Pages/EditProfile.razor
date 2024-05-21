@@ -36,7 +36,7 @@
         @if (fileBase64 != "")
         {
             <div class="d-flex justify-content-center">
-                <img class="mt-3 border rounded p-5 bg-grey" style="width:50vh; height:50vh;height:max-content;" src="@fileBase64" />
+                <img class="mt-3 border rounded p-5 bg-grey" style="width:50vh; height:auto;" src="@fileBase64" />
             </div>
         }
     </div>
@@ -59,11 +59,20 @@
         await traerUsuario();
 
     }      
-    async Task OnChange(InputFileChangeEventArgs e)
-    {
-        fileBase64 = await Utils.GetImageBase64(e.File);
 
-        message = "subi las img para continuar";
+    async Task OnChange(InputFileChangeEventArgs e)
+    {       
+        if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
+        if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
+        {
+            fileBase64 = await Utils.GetIconBase64(e.File);
+
+            message = "subi las img para continuar";
+        }
+        else{
+            await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+            this.fileBase64 = "formato";
+        }
     }
     
     private async Task traerUsuario()
@@ -79,11 +88,11 @@
     }
 
     private async Task GuardarCambios()
-
     {
-        await JsRuntime.InvokeVoidAsync("alert", this.Email);
-        await JsRuntime.InvokeVoidAsync("alert", this.Contacto);
-        await JsRuntime.InvokeVoidAsync("alert", this.fileBase64);
+        if(Utils.HasNum(Nombre)){
+            await JsRuntime.InvokeVoidAsync("alert", "Tu nombre no puede contener números.");
+            return;
+        }
         ActualizarUsuario  user = new ActualizarUsuario {Email = this.Email , Nombre = this.Nombre , Contacto = this.Contacto, Base64imagen = this.fileBase64};
         var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ActualizarUsuario", user  );       
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)

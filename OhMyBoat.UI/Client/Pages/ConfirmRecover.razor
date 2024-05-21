@@ -13,29 +13,37 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @inject NavigationManager navManager
 
-<h1>Recuperacion de cuenta</h1>
+<AuthorizeView>
+    <NotAuthorized>
+        @(async () => CheckToken())
+        <h1>Recuperacion de cuenta</h1>
 
-@if(esValido){
-    <div class="row mt-5">
+        @if(esValido){
+            <div class="row mt-5">
 
-        <div class="col-lg-4 offset-lg-4 border">
-            <div class="mb-3">
-                <label>Ingrese la contraseña nueva</label>
-                <input @bind="contraNueva1" class="form-control" type="password" />
+                <div class="col-lg-4 offset-lg-4 border">
+                    <div class="mb-3">
+                        <label>Ingrese la contraseña nueva</label>
+                        <input @bind="contraNueva1" class="form-control" type="password" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Repita su contraseña</label>
+                        <input @bind="contraNueva2" class="form-control" type="password" />
+                    </div>
+
+                    <div class="mb-3">
+                        <button @onclick="OnClick" class="btn btn-primary">Aceptar</button>
+                    </div>
+                </div>
+
             </div>
-
-            <div class="mb-3">
-                <label>Repita su contraseña</label>
-                <input @bind="contraNueva2" class="form-control" type="password" />
-            </div>
-
-            <div class="mb-3">
-                <button @onclick="OnClick" class="btn btn-primary">Aceptar</button>
-            </div>
-        </div>
-
-    </div>
-}
+        }
+    </NotAuthorized>
+    <Authorized>
+        @{navManager.NavigateTo("",true);}
+    </Authorized>
+</AuthorizeView>
 
 @code {
     [Parameter]
@@ -50,14 +58,16 @@
     protected override async Task OnInitializedAsync()
     {
         mesi.Hash = codigo;
+    }
+
+    private async Task CheckToken() {
         var peticion = await HttpClient.PostAsJsonAsync<RecuCuentaDTO>("api/cuenta/CheckearToken", mesi);
         esValido = peticion.IsSuccessStatusCode;
         if (!esValido)
         {
             await JsRuntime.InvokeVoidAsync("alert", "El token ya fue usado o expiro");
+            navManager.NavigateTo("/");
         }
-
-
     }
     private async Task OnClick()
     {

@@ -7,41 +7,51 @@
 
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
-@attribute [Authorize(Roles = "jefe,empleado")]
+@inject NavigationManager Navegador
 
+    <AuthorizeView Roles="jefe,empleado" Context="pretexto">
+        <Authorized Context="pretexto">
+            <h1>Lista de clientes</h1>
+            <Grid @ref="grid"
+                TItem="Cliente"
+                Class="table table-hover table-bordered table-striped"
+                Data="clientes"
+                AllowFiltering="true"
+                PageSize="10"
+                Responsive="true"
+                AllowSorting="true">
 
-<h1>Lista de clientes</h1>
+                <GridColumn TItem="Cliente" HeaderText="Id" PropertyName="Id" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Ascending" SortKeySelector="@(item => item.Id)">
+                    @context.Id
+                </GridColumn>
+                <GridColumn TItem="Cliente" HeaderText="Nombre" PropertyName="Nombre" SortKeySelector="@(item => item.Nombre)">
+                    @context.Nombre
+                </GridColumn>
+                <GridColumn TItem="Cliente" HeaderText="Email" PropertyName="Email" SortKeySelector="@(item => item.Email)">
+                    @context.Email
+                </GridColumn>
+                <GridColumn TItem="Cliente" HeaderText="Contacto" PropertyName="Contacto" SortKeySelector="@(item => item.Contacto)">
+                    @context.Contacto
+                </GridColumn>
 
-<Grid @ref="grid"
-    TItem="Cliente"
-    Class="table table-hover table-bordered table-striped"
-    Data="clientes"
-    AllowFiltering="true"
-    PageSize="10"
-    Responsive="true"
-    AllowSorting="true">
-
-    <GridColumn TItem="Cliente" HeaderText="Id" PropertyName="Id" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Ascending" SortKeySelector="@(item => item.Id)">
-        @context.Id
-    </GridColumn>
-    <GridColumn TItem="Cliente" HeaderText="Nombre" PropertyName="Nombre" SortKeySelector="@(item => item.Nombre)">
-        @context.Nombre
-    </GridColumn>
-    <GridColumn TItem="Cliente" HeaderText="Email" PropertyName="Email" SortKeySelector="@(item => item.Email)">
-        @context.Email
-    </GridColumn>
-    <GridColumn TItem="Cliente" HeaderText="Contacto" PropertyName="Contacto" SortKeySelector="@(item => item.Contacto)">
-        @context.Contacto
-    </GridColumn>
-    <GridColumn TItem="Cliente" HeaderText="Bloqueado" PropertyName="Bloqueado" SortKeySelector="@(item => item.Bloqueado)">
-        @if(context.Bloqueado) {
-            <Button Color="ButtonColor.Danger" @onclick="(async () =>await SwitchUserBlock(context))">Bloqueado</Button>
-        } else {
-            <Button Color="ButtonColor.Success" @onclick="(async () =>await SwitchUserBlock(context))">Desbloqueado</Button>
-        }
-    </GridColumn>
-
-</Grid>
+                <AuthorizeView Roles="jefe" Context="innerContext">
+                    <Authorized Context="innerContext">
+                        <GridColumn TItem="Cliente" HeaderText="Bloqueado" PropertyName="Bloqueado" SortKeySelector="@(item => item.Bloqueado)">
+                            @if(context.Bloqueado) {
+                                <Button Color="ButtonColor.Danger" @onclick="(async () =>await SwitchUserBlock(context))">Bloqueado</Button>
+                            } else {
+                                <Button Color="ButtonColor.Success" @onclick="(async () =>await SwitchUserBlock(context))">Desbloqueado</Button>
+                            }
+                        </GridColumn>
+                    </Authorized>
+                </AuthorizeView>
+            </Grid>
+        </Authorized>
+        <NotAuthorized Context="pretexto">
+            @{Navegador.NavigateTo("",true);}
+            <h1>No.</h1>
+        </NotAuthorized>
+    </AuthorizeView>
 
 @code {
     private BlazorBootstrap.Grid<Cliente> grid = default!;

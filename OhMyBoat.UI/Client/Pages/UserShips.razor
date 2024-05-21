@@ -12,7 +12,7 @@
 @inject NavigationManager NavManager
 @attribute [Authorize(Roles = "cliente")]
 
-<AuthorizeView>
+<AuthorizeView Roles="cliente">
     <Authorized>
 
         <h1>Mis Navios</h1>

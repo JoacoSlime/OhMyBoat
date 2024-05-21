@@ -73,7 +73,7 @@
     [Required]
     private string matricula { get; set; } = "";
     [Required]
-    private int anio { get; set; } = 0;
+    private int? anio { get; set; }
     [Required]
     private string? descripcion { get; set; } = "";
     [Required] 
@@ -81,9 +81,9 @@
     [Required] 
     private string? modelo { get; set; } = "";
     [Required]
-    private int kilometraje { get; set; } = 0;
+    private int? kilometraje { get; set; }
     [Required] 
-    private int antiguedad { get; set; } = 0;    
+    private int? antiguedad { get; set; }
     [Required]
     private TipoVehiculo tipoVec { get; set; }
 
@@ -92,23 +92,10 @@
     string filesBase64 = "";
     string message = "InputFile";
     bool isDisabled = false;
-  
-    private bool containsValidFormat(string nameImg)
-    {
-        string extension = Path.GetExtension(nameImg);
-        if (extension != null)
-        {
-            string ext = extension.ToLower();
-            return ext == ".jpg" || ext == ".png";
-        }
-        return false;
-    }
-
-
     async Task OnChange(InputFileChangeEventArgs e)
     {
         if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
-        if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
+        if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
             var file = e.File; // agarra las fotos            
             var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
@@ -143,53 +130,73 @@
     {
         if (IsLong(matricula))
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Tu patente es muy larga");
+            await JsRuntime.InvokeVoidAsync("alert", "Tu patente es demasiado grande.");
             return;
         }
         if (matricula == "")
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese una patente ");
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese una patente.");
             return;
         }
         if (filesBase64 == "")
         {
-            await JsRuntime.InvokeVoidAsync("alert", "El Vehiculo necesita una imagen para ser cargado");
+            await JsRuntime.InvokeVoidAsync("alert", "El Vehiculo necesita una imagen para ser cargado.");
             return;
         }
         if (filesBase64 == "formato")
         {
-            await JsRuntime.InvokeVoidAsync("alert", "La imagen que cargo tiene un formato no soportado, asegurese que el formato sea \".png\" o \".jpg\"  ");
+            await JsRuntime.InvokeVoidAsync("alert", "La imagen que cargo tiene un formato no soportado.\nAsegurese que el formato sea \".png\" o \".jpg\"  ");
             return;
         }
         if (marca == "")
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la marca del vehiculo");
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la marca del vehiculo.");
             return;
         }
         if (modelo == "")
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la modelo del vehiculo  ");
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la modelo del vehiculo.");
             return;
         }
-        if (anio == 0)
+        if (anio == null)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese el año del vehiculo ");
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese el año del vehiculo.");
             return;
-        }        
-        if (antiguedad == 0)
+        }
+        if (antiguedad == null)
         {
-        await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la antiguedad del vehiculo");
-        return;
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la antiguedad del vehiculo.");
+            return;
         } 
+        if (kilometraje == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese el kilometraje del vehiculo.");
+            return;
+        }
+        if (anio < 500)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "El año del vehículo es demasiado antiguo.");
+            return;
+        }
+        if (antiguedad < 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La antiguedad del vehículo no puede ser negativa.");
+            return;
+        } 
+        if (kilometraje < 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "La antiguedad del vehículo no puede ser negativa.");
+            return;
+        }
         Terrestre vec = new Terrestre()
             {
                 Matricula = this.matricula,
-                Antiguedad = this.antiguedad,
+                Antiguedad = this.antiguedad??0,
                 descripcion = this.descripcion,
                 Tipo = this.tipoVec,
                 IDCliente = this.Email,
                 base64imagen = this.filesBase64,
-                Kilometraje = this.kilometraje,
+                Kilometraje = this.kilometraje??0,
                 Marca = this.marca,
                 Modelo = this.modelo
             };

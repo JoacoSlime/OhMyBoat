@@ -4,7 +4,9 @@ using System.Text;
 using Microsoft.AspNetCore.Components.Forms;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats;
 
 namespace OhMyBoat.UI.Shared
 {
@@ -28,11 +30,10 @@ namespace OhMyBoat.UI.Shared
                 }
         }
         public static bool IsValidPassword(string password){
-            return
-            IsLong(password) && 
-            HasNum(password) &&
-            password.Any(c => IsMayusc(c)) && 
-            password.Any(c => IsSymbol(c));
+            return IsLong(password) && 
+            HasTwoNum(password) &&
+            password.Any(IsMayusc) && 
+            password.Any(IsSymbol);
         }
 
         public static string HashWithSha256(string ActualData)
@@ -45,25 +46,20 @@ namespace OhMyBoat.UI.Shared
             }
             return b.ToString();
         }
-        public static bool IsMayusc(char c){
-            return (c >= 'A' && c <= 'Z');
-        }
-        public static bool HasNum(string password){
-            char[] characters = password.ToCharArray();
-            int numCounter = 0;
-            foreach (char c in characters){
-                if (char.IsNumber(c)){
-                    numCounter ++;
-                }
-            }
-            return numCounter > 1;
-        }
-        public static bool IsSymbol(char c){
-            String specials = "!?¿¡#$%&/=+-*_@.,";
-            return specials.Contains(c);
-        }
         private static bool IsLong(string password){
             return password.Length >= 8;
+        }
+        public static bool HasTwoNum(string nombre){
+            return nombre.Count(char.IsDigit) >= 2;
+        }
+        public static bool HasNum(string nombre){
+            return nombre.Any(char.IsDigit);
+        }
+        public static bool IsMayusc(char c){
+            return char.IsAsciiLetterUpper(c);
+        }
+        public static bool IsSymbol(char c){
+            return !char.IsLetterOrDigit(c);
         }
 
         public static async Task<string> GetImageBase64(IBrowserFile file) {        
@@ -78,12 +74,46 @@ namespace OhMyBoat.UI.Shared
                 
         public static async Task<string> GetIconBase64(IBrowserFile file) {        
             var resizedFile = await file.RequestImageFileAsync(file.ContentType, 512, 512); // le hace un resize
-            var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
-            using (var stream = resizedFile.OpenReadStream())
+            using var image = await Image.LoadAsync(resizedFile.OpenReadStream());
+            image.Mutate(x => x.Resize(512, 512)); // Resize a un cuadrado de 512x512
+            using var ms = new MemoryStream();
+            await image.SaveAsPngAsync(ms); // Guarda la imagen en formato PNG
+            return $"data:image/png;base64,{Convert.ToBase64String(ms.ToArray())}";
+        }
+
+        public static async Task<bool> IsValidImageFormat(IBrowserFile file)
+        {
+            try
             {
-                await stream.ReadAsync(buf); // copia el stream a el buffer
+                // Ensure the file is not null
+                if (file == null)
+                {
+                    return false;
+                }
+
+                // Read the file into a memory stream
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.OpenReadStream().CopyToAsync(memoryStream);
+                    memoryStream.Position = 0; // Reset stream position to the beginning
+
+                    // Detect the image format
+                    IImageFormat format = Image.DetectFormat(memoryStream);
+
+                    // Check if the format is either PNG or JPG
+                    if (format == PngFormat.Instance || format == JpegFormat.Instance)
+                    {
+                        return true;
+                    }
+                }
             }
-            return $"data:image;base64,{Convert.ToBase64String(buf)}";
+            catch
+            {
+                // Catch any exception and return false
+                return false;
+            }
+
+            return false;
         }
     }
 }
