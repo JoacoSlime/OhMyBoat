@@ -22,7 +22,7 @@
 
         @if (MisRodados.Count == 0)
         {
-            <h1>No hay vehiculos</h1>
+            <h1>No tiene vehículos registrados</h1>
         }
         else
         {
@@ -49,7 +49,7 @@
             </div>
         }
 
-        <Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Cargar Vehiculo</Button>
+        <Button Color="ButtonColor.Primary" @onclick="CargarVehiculo"> Publicar Vehiculo</Button>
     </Authorized>
     <NotAuthorized>
        @{NavManager.NavigateTo("/",true);} 
