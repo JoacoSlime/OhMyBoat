@@ -21,7 +21,7 @@
 
         @if (MisBarcos.Count == 0)
         {
-            <h1> no hay Navios</h1>
+            <h1> No tiene navíos registrados</h1>
         }
         else
         {
@@ -47,7 +47,7 @@
             </div>
         }
 
-        <Button Color="ButtonColor.Primary" @onclick="CargarNavio">Cargar Navio</Button>
+        <Button Color="ButtonColor.Primary" @onclick="CargarNavio">Publicar Navio</Button>
     </Authorized>
     <NotAuthorized>
        @{NavManager.NavigateTo("/",true);}
