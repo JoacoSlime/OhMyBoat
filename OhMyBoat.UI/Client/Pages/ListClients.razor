@@ -15,7 +15,7 @@
 <Grid @ref="grid"
     TItem="Cliente"
     Class="table table-hover table-bordered table-striped"
-    DataProvider="ClienteDataProvider"
+    Data="clientes"
     AllowFiltering="true"
     PageSize="10"
     Responsive="true"
@@ -35,9 +35,9 @@
     </GridColumn>
     <GridColumn TItem="Cliente" HeaderText="Bloqueado" PropertyName="Bloqueado" SortKeySelector="@(item => item.Bloqueado)">
         @if(context.Bloqueado) {
-            <Button Color="ButtonColor.Danger">Bloqueado</Button>
+            <Button Color="ButtonColor.Danger" @onclick="(async () =>await SwitchUserBlock(context))">Bloqueado</Button>
         } else {
-            <Button Color="ButtonColor.Success">Desbloqueado</Button>
+            <Button Color="ButtonColor.Success" @onclick="(async () =>await SwitchUserBlock(context))">Desbloqueado</Button>
         }
     </GridColumn>
 
@@ -45,18 +45,26 @@
 
 @code {
     private BlazorBootstrap.Grid<Cliente> grid = default!;
-    private IEnumerable<Cliente> clientes = default!;
-
-    private async Task<GridDataProviderResult<Cliente>> ClienteDataProvider(GridDataProviderRequest<Cliente> request)
-    {
-        if (clientes==null) {
-            await OnInitializedAsync();
-        }
-        return await Task.FromResult(request.ApplyTo(clientes));
-    }
+    private List<Cliente> clientes = new();
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadClientsAsync();
+    }
+
+    private async Task LoadClientsAsync() {
         clientes = await ((HttpClient)HttpClient).GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes");
     }
+
+    private async Task SwitchUserBlock(Cliente cliente) {
+        var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", cliente);
+        
+        if (RespuestaSV.IsSuccessStatusCode)
+        {
+            await LoadClientsAsync();
+            StateHasChanged();
+        } else {
+            await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
+        }
+    } 
 }
