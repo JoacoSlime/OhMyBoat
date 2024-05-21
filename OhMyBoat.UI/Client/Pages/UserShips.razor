@@ -15,7 +15,7 @@
 <AuthorizeView>
     <Authorized>
 
-        <h3>Mis Navios</h3>
+        <h1>Mis Navios</h1>
 
         <Modal @ref="modal" />
 
@@ -91,6 +91,6 @@
     {
         var parameters = new Dictionary<string, object>();
         parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, closeModal));
-        await modal.ShowAsync<PublishBoat>(title: "cargar Navio", parameters: parameters);
+        await modal.ShowAsync<PublishBoat>(title: "Cargar Navio", parameters: parameters);
     }
 }

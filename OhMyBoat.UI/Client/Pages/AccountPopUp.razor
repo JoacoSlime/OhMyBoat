@@ -15,16 +15,17 @@
 
 <div class="d-flex flex-column justify-content-center">   
     <div class="d-flex flex-column justify-content-center">
-        <div class="d-flex flex-row align-items-center mb-5">
-            <div class="image-div d-flex flex-row align-items-end">
+        <div class="d-flex flex-row align-items-center mb-5 justify-content-center">
+            <div class="image-div d-flex flex-row align-items-center justify-content-center">
                 <img src=@Imagen class="profile-image me-5" style="border-radius: 100%;" alt="User Profile">
-                <p class="fs-1 mb-0"> Nombre: @Nombre</p>
+                <h1 class="mb-0"> @Nombre</h1>
             </div>
         </div>
-        <div class="d-flex flex-column justify-content-center">
-            <h2> Email : @Email </h2>
-            <h2> Contacto : @Contacto</h2>
-            <h2> Rol : @Rol.ToString()</h2>
+        <div class="d-flex flex-column mb-5 justify-content-center border p-4">
+            <div>
+                <h2>Rol:</h2>
+                <h3 class="border rounded p-2 mb-3">@Rol</h3>
+            </div>
         </div>
     </div>
     <div>
@@ -66,7 +67,7 @@
 
             Nombre = mevoyamatar.Nombre;
             Email = mevoyamatar.Email;
-            Contacto = mevoyamatar.Contacto == null ? "-" : mevoyamatar.Contacto;
+            Contacto = mevoyamatar.Contacto == "" ? "-" : mevoyamatar.Contacto;
             Rol = Utils.CapitalizeString(mevoyamatar.Rol.ToString());
             Imagen = mevoyamatar.Base64imagen != "" ? mevoyamatar.Base64imagen : "./user.png";
             StateHasChanged();
@@ -86,6 +87,7 @@
         await AccountModal.ShowAsync<ChangePassword>(title: "Cambiar Contraseña", parameters: parameters);
     }
     private async Task hideModal(){
+        await AccountModal.ShowAsync();
         await AccountModal.HideAsync();
     }
 }

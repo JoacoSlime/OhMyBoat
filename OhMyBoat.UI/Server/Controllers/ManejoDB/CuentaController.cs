@@ -35,7 +35,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 {
                     Email = c.Email.ToLower(),
                     StringAleatorioDelMomento = UniqueId.CreateRandomId(),
-                    FechaLimite = DateTime.Now.AddDays(14)                        
+                    FechaLimite = DateTime.Now.AddDays(7)                        
                 };
                 await db.TokenRecu.AddAsync(Token);
                 await db.SaveChangesAsync();
@@ -197,7 +197,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     {
                         Email = log.Email.ToLower(),
                         StringAleatorioDelMomento = UniqueId.CreateRandomId(),
-                        FechaLimite = DateTime.Now.AddDays(14)                        
+                        FechaLimite = DateTime.Now.AddDays(7)                        
                     };
                     await db.TokenRecu.AddAsync(Token);
                     await db.SaveChangesAsync();

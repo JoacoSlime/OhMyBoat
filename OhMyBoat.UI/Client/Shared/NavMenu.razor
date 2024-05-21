@@ -22,54 +22,59 @@
                         <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.HouseFill" Size="IconSize.x3"></Icon> <span class="ms-2">Home</span></div>
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="all-ships">
-                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Ver ofertas de navios </span></div>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="all-landships">
-                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Ver ofertas de vehículos </span></div>
-                    </NavLink>
-                </div>
-                 <AuthorizeView Roles= "cliente" Context= "cliente" >
+                <AuthorizeView Roles= "cliente" Context= "cliente" >
                     <Authorized Context="cliente">
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="my-landships">
-                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Vehiculos</span></div>
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="my-ships">
-                    <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Navios</span></div>
-                </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="mis-ofertas">
-                        <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.CartFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Ofertas</span></div>
-                    </NavLink>
-                </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="all-ships">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.SearchHeart" Size="IconSize.x3"></Icon> <span class="ms-2">Ver ofertas de navios </span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="all-landships">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.Search" Size="IconSize.x3"></Icon> <span class="ms-2">Ver ofertas de vehículos </span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="my-landships">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Vehiculos</span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="my-ships">
+                            <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.TrainFreightFrontFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Navios</span></div>
+                        </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="mis-ofertas">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.CartFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Ofertas</span></div>
+                            </NavLink>
+                        </div>
                       </Authorized>
                   </AuthorizeView>
                 <AuthorizeView Roles= "jefe,empleado" Context= "EmpladoOjefe" >
                     <Authorized Context="EmpladoOjefe">
-                       <div class="nav-item px-3">
-                          <NavLink class="nav-link" href="ListadoClientes">
-                               <span class="oi oi-list-rich" aria-hidden="true"></span> Listar Clientes
-                           </NavLink>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="all-landships">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.ListUl" Size="IconSize.x3"></Icon> <span class="ms-2">Listar Vehiculos</span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="all-ships">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.ListUl" Size="IconSize.x3"></Icon> <span class="ms-2">Listar Navios</span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="list-clients">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.FileEarmarkPersonFill" Size="IconSize.x3"></Icon> <span class="ms-2">Listar Clientes</span></div>
+                            </NavLink>
                         </div>
                      </Authorized>
                   </AuthorizeView>
                 <AuthorizeView Roles="jefe" Context="innerContext">
                     <Authorized Context="innerContext">
                         <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="fetchData">
-                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.ShieldLockFill" Size="IconSize.x3"></Icon> <span class="ms-2">Test Admin Permisos</span></div>
-                            </NavLink>
-                        </div>
-                        <div class="nav-item px-3">
                             <NavLink class="nav-link" href="admin/register-empleoyee">
-                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.ShieldLockFill" Size="IconSize.x3"></Icon> <span class="ms-2">Registar Empleado</span></div>
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.PersonAdd" Size="IconSize.x3"></Icon> <span class="ms-2">Registar Empleado</span></div>
                             </NavLink>
                         </div>
                     </Authorized>
