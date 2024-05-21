@@ -11,45 +11,59 @@
 @inject NavigationManager Navegador
 @using System.ComponentModel.DataAnnotations
 
-<div class="d-flex flex-column justify-content-center p-5">
-    <div class="mb-3">
-        <h1>Publicar Vehiculo</h1>
-    </div>
-    <div class="mb-3">
-        <label class="form-label" for="nombre"><h3>Patente del vehículo</h3></label>
-        <input class="form-control" @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
-    </div>
 
-    <div class="mb-3">
-        <div class="custom-file">
-            <label class="form-label" for="inputFile"><h3>Foto del vehículo</h3></label>
-            <InputFile class="form-control" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" required />
-        </div>
-        @if (filesBase64 != "")
-        {
-            <img class="mt-3 border rounded p-5 bg-grey" style="width:100%;height:max-content;" src="@filesBase64" />
-        }
-    </div>
-    <div class="mb-3">
-        <label class="form-label" for="select"><h3>Elegir tipo de vehículo</h3></label>
-        <select class="form-select" @bind="tipoVec" name="select">
-            <option selected> Auto</option>
-            <option>Camioneta</option>
-            <option>Moto</option>
-        </select>
-    </div>
 
-    <div class="mb-3">
-        <label class="form-label" for="fecha de nacimiento"><h3>Antiguedad del vehículo (Años)</h3></label>
-        <input class="form-control" @bind="antiguedad" placeholder="15" type="int" required />
-    </div>
-    <div class="mb-3">
-        <label class="form-label" for="Descripcion"><h3>Descripcion del vehículo (Opcional)</h3></label>
-        <input class="form-control" @bind="descripcion" placeholder="Como nuevo, sin uso." type="String" required>
-    </div>
-    <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre">Cargar vehículo</button>
-
+<h3>Publicar Vehiculo terrestre</h3>
+<html>
+<div class="form_field">
+    <label for="nombre"><b>Patente del Vehiculo</b></label>
+    <input @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
 </div>
+
+<div class="input-group">
+    <div class="custom-file">
+        <InputFile class="custom-file-input"  OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile"
+            required />
+        <label class="custom-file-label" for="inputFile">Choose file</label>
+    </div>
+    @if (filesBase64 != "")
+    {
+        <img src="@filesBase64" />
+    }
+</div>
+
+<select @bind="tipoVec" name="select">
+    <option selected> Auto</option>
+    <option>Camioneta</option>
+    <option>Moto</option>
+</select>
+<div class="form_field">
+    <label for="fecha de nacimiento"><b>Marca del vehiculo</b></label>
+    <input @bind="marca" type="int" placeholder="Toyota" required />
+</div>
+<div class="form_field">
+    <label for="fecha de nacimiento"><b>Modelo del vehiculo</b></label>
+    <input @bind="modelo" type="text" placeholder="Hilux" required />
+</div>
+<div class="form_field">
+    <label for="fecha de nacimiento"><b>Año del modelo  </b></label>
+    <input @bind="anio" type="int" required />
+</div>
+<div class="form_field">
+    <label for="fecha de nacimiento"><b>Kilometraje</b></label>
+    <input @bind="kilometraje" type="int" required />
+</div>
+<div class="form_field">
+    <label for="fecha de nacimiento"><b>Antiguedad del Vehiculo</b></label>
+    <input @bind="antiguedad" type="int" required />
+</div>
+<div class="form_field">
+    <label for="Descripcion"><b>Descripcion del vehiculo(opcional)</b></label>
+    <input @bind="descripcion" type="String" required>
+</div>
+<button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre"> cargar vehiculo</button>
+
+</html>
 
 
 
@@ -57,9 +71,17 @@
     [Required]
     private string matricula { get; set; } = "";
     [Required]
-    private int? antiguedad { get; set; }
-
-    private string descripcion { get; set; } = "";
+    private int anio { get; set; } = 0;
+    [Required]
+    private string? descripcion { get; set; } = "";
+    [Required] 
+    private string? marca { get; set; } = "";
+    [Required] 
+    private string? modelo { get; set; } = "";
+    [Required]
+    private int kilometraje { get; set; } = 0;
+    [Required] 
+    private int antiguedad { get; set; } = 0;    
     [Required]
     private TipoVehiculo tipoVec { get; set; }
 
@@ -86,7 +108,15 @@
         if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
         if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
-            filesBase64 = await Utils.GetImageBase64(e.File);
+            var file = e.File; // agarra las fotos            
+            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
+            var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
+            using (var stream = resizedFile.OpenReadStream())
+            {
+                await stream.ReadAsync(buf); // copia el stream a el buffer
+            }
+            filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+
             message = "subi las img para continuar";
         }
         else{
@@ -99,7 +129,7 @@
     protected override async Task OnInitializedAsync()
     {
         Auth = await authStateProvider.GetAuthenticationStateAsync();
-        Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        this.Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
     }
 
 
@@ -129,20 +159,37 @@
             await JsRuntime.InvokeVoidAsync("alert", "La imagen que cargo tiene un formato no soportado, asegurese que el formato sea \".png\" o \".jpg\"  ");
             return;
         }
-        if (antiguedad == null)
+        if (marca == "")
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la antiguedad de su vehículo.");
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la marca del vehiculo");
             return;
         }
+        if (modelo == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la modelo del vehiculo  ");
+            return;
+        }
+        if (anio == 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese el año del vehiculo ");
+            return;
+        }        
+        if (antiguedad == 0)
+        {
+        await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese la antiguedad del vehiculo");
+        return;
+        } 
         Terrestre vec = new Terrestre()
             {
                 Matricula = this.matricula,
-                Antiguedad = this.antiguedad??0,
-                descripcion =
-            this.descripcion,
+                Antiguedad = this.antiguedad,
+                descripcion = this.descripcion,
                 Tipo = this.tipoVec,
                 IDCliente = this.Email,
-                base64imagen = this.filesBase64
+                base64imagen = this.filesBase64,
+                Kilometraje = this.kilometraje,
+                Marca = this.marca,
+                Modelo = this.modelo
             };
 
         var RespuestaSv = await HttpClient.PostAsJsonAsync<Terrestre>("api/Vehiculos/CargarVehiculoTerrestre", vec);
