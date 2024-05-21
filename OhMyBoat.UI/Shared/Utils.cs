@@ -75,28 +75,7 @@ namespace OhMyBoat.UI.Shared
             }
             return $"data:image;base64,{Convert.ToBase64String(buf)}";
         }
-
-        public static async Task<string> GetImageBase64(string relativePath)
-        {
-            string fullPath = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
-            if (!File.Exists(fullPath))
-            {
-                throw new FileNotFoundException("File not found.", fullPath);
-            }
-
-            using var image = await Image.LoadAsync(fullPath);
-            image.Mutate(x => x.Resize(new ResizeOptions
-            {
-                Size = new Size(640, 480),
-                Mode = ResizeMode.Max
-            }));
-
-            using var ms = new MemoryStream();
-            await image.SaveAsync(ms, new PngEncoder());
-            var imageBytes = ms.ToArray();
-            return $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
-        }
-        
+                
         public static async Task<string> GetIconBase64(IBrowserFile file) {        
             var resizedFile = await file.RequestImageFileAsync(file.ContentType, 512, 512); // le hace un resize
             var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
@@ -106,27 +85,5 @@ namespace OhMyBoat.UI.Shared
             }
             return $"data:image;base64,{Convert.ToBase64String(buf)}";
         }
-
-        public static async Task<string> GetIconBase64(string relativePath)
-        {
-            string fullPath = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
-            if (!File.Exists(fullPath))
-            {
-                throw new FileNotFoundException("File not found.", fullPath);
-            }
-
-            using var image = await Image.LoadAsync(fullPath);
-            image.Mutate(x => x.Resize(new ResizeOptions
-            {
-                Size = new Size(512, 512),
-                Mode = ResizeMode.Max
-            }));
-
-            using var ms = new MemoryStream();
-            await image.SaveAsync(ms, new PngEncoder());
-            var imageBytes = ms.ToArray();
-            return $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
-        }
-
     }
 }
