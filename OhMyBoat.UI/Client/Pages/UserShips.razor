@@ -15,7 +15,7 @@
 <AuthorizeView>
     <Authorized>
 
-        <h3>Mis Navios</h3>
+        <h1>Mis Navios</h1>
 
         <Modal @ref="modal" />
 
@@ -25,27 +25,26 @@
         }
         else
         {
+            <div class="d-flex flex-row flex-wrap">
             @foreach (var nav in MisBarcos)
             {
-                <div class="container-navio">
-                    <div>
-                        <img src="@nav.base64imagen" />
-                    </div>
-                    <div>
-                        <p>@nav.Matricula</p>
-                        <p>@nav.Tipo</p>
-                        <p>@nav.descripcion</p>
-                        <p>@nav.Antiguedad</p>
-                        <p>@nav.Eslora</p>
-                        <p>@nav.Puntal</p>
-                        <p>@nav.Deuda</p>
-
-                    </div>
-                    <div>
-                        Boton detalle
-                    </div>
-                </div>
+                <Card Class="me-4 mb-4" Style="width:18rem;">
+                    <img class="rounded-top p-3" src="@nav.base64imagen" alt="Imagen del vehículo" style="width:25vh;"/>
+                    <CardBody>
+                        <CardTitle>@nav.Matricula</CardTitle>
+                        <CardText>@nav.descripcion</CardText>
+                        <CardText>@nav.Tipo</CardText>
+                        <CardText>@nav.Eslora</CardText>
+                        <CardText>@nav.Puntal</CardText>
+                        <CardText>@nav.Deuda</CardText>
+                        <CardText>@nav.Antiguedad</CardText>
+                    </CardBody>
+                    <CardFooter class="text-end">
+                        <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                    </CardFooter>
+                </Card>
             }
+            </div>
         }
 
         <Button Color="ButtonColor.Primary" @onclick="CargarNavio">Cargar Navio</Button>
@@ -91,6 +90,6 @@
     {
         var parameters = new Dictionary<string, object>();
         parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, closeModal));
-        await modal.ShowAsync<PublishBoat>(title: "cargar Navio", parameters: parameters);
+        await modal.ShowAsync<PublishBoat>(title: "Cargar Navio", parameters: parameters);
     }
 }

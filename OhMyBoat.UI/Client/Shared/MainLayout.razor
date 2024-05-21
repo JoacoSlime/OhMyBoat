@@ -47,6 +47,7 @@
         showAccount = false;
     }
     private async Task HideOffcanvas() {
+        await offcanvas.ShowAsync();
         await offcanvas.HideAsync();
     }
 

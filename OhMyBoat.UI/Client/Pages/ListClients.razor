@@ -6,11 +6,11 @@
 @inject IJSRuntime JsRuntime
 
 @using Microsoft.AspNetCore.Components.Authorization;
-@using Microsoft.AspNetCore.Authorization; // esto va en todas las fucking paginas que se requiera un rol
+@using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize(Roles = "jefe,empleado")]
 
 
-<h3>Lista de clientes</h3>
+<h1>Lista de clientes</h1>
 
 <AuthorizeView>
     <Authorized>

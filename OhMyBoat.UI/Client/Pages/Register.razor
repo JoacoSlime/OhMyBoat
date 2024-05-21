@@ -22,7 +22,7 @@
         <NotAuthorized>
             <div class="d-flex flex-column justify-content-center m-5 p-5 border">
                 <div class="mb-3 text-center">
-                    <img src="LogoColorTransp.jpg" style="width: max-content; height: 25vh;">
+                    <a href="/"><img src="LogoColorTransp.jpg" style="width: max-content; height: 25vh;"></a>
                     <h1>Crear cuenta</h1>
                 </div>
                 <div class="mb-3">
@@ -54,7 +54,7 @@
 
 
 @code{
-     private string today = DateTime.Now.ToString("yyyy-MM-dd"); // no puedo nacer ma►4ana mi rey es lo que se me ocurrio capas existe otra cosa mas linda -slds
+    private string today = DateTime.Now.ToString("yyyy-MM-dd"); // no puedo nacer ma►4ana mi rey es lo que se me ocurrio capas existe otra cosa mas linda -slds
     [Required]
     private DateTime FechaNac { get; set; } = DateTime.Now;
     [Required]
@@ -63,6 +63,8 @@
     private string Nombre { get; set; } = "";
     [Required]
     private string Password { get; set; } = "";
+
+    private string Base64imagen {get; set;} = "";
 
     private bool MayorDeEdad { get ; set ; } = true; 
     private TimeSpan EighteenYearSpan = new TimeSpan(6574,5, 0, 0, 0);
@@ -96,10 +98,10 @@
 
         passhashed = Utils.HashWithSha256(Password);
 
-        Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed}; 
+        Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed, Base64imagen = this.Base64imagen}; 
 
 
-        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/Usuario/RegistrarCliente", cliente);
+        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/cuenta/RegistrarCliente", cliente);
 
         //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK){
@@ -116,7 +118,7 @@
         if (respuestaSV.StatusCode == (System.Net.HttpStatusCode)418) // email taba mal
 
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Soy una tetera, no moleste");
+            await JsRuntime.InvokeVoidAsync("alert", "Email inválido");
         }
 
         //mandar el cliente a registro

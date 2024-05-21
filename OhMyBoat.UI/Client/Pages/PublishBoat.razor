@@ -12,59 +12,62 @@
 @using System.ComponentModel.DataAnnotations
 
 
-
-<h3>Publicar Navio</h3>
-<html>
-<div class="form_field">
-    <label for="nombre"><b>matricula del Navio</b></label>
-    <input @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
-</div>
-
-<div class="input-group">
-    <div class="custom-file">
-        <InputFile class="custom-file-input" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" required/>
-        <label class="custom-file-label" for="inputFile">Choose file</label>
+<div class="d-flex flex-column justify-content-center p-5">
+    <div class="mb-3">
+        <h1>Publicar Navío</h1>
     </div>
-    @if (filesBase64 != "")
-    {
-        <img src="@filesBase64" />
-    }
-</div>
+    <div class="mb-3">
+        <label class="form-label" for="nombre"><h3>Matricula del navío</h3></label>
+        <input class="form-control" @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
+    </div>
 
-<select @bind="tipoNav" name="select">
-    <option selected> Crucero</option>
-    <option>Catamaran</option>
-    <option>Velero</option>
-    <option>Lancha</option>
-</select>
+    <div class="input-group mb-3">
+        <div class="custom-file">
+            <label class="form-label" for="inputFile"><h3>Foto del navío</h3></label>
+            <InputFile class="form-control" OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile" required/>
+        </div>
+        @if (filesBase64 != "")
+        {
+            <img class="mt-3 border rounded p-5 bg-grey" style="width:100%;height:max-content;" src="@filesBase64" />
+        }
+    </div>
 
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Antiguedad del Navio</b></label>
-    <input @bind="antiguedad" type="int" placeholder="15 años"/>
-</div>
-<div class="form_field">
-    <label for="Descripcion"><b>Descripcion del vehiculo</b></label>
-    <input @bind="descripcion" type="Descipcion">
-</div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Eslora del Navio(Metros)</b></label>
-    <input @bind="Eslora" type="float" placeholder="7,5"/>
-</div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Puntal del Navio(Metros)</b></label>
-    <input @bind="Puntal" type="float" placeholder="12,12" />
-</div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Manga del Navio(Metros)</b></label>
-    <input @bind="Manga" type="float" placeholder="12,12" />
-</div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Deuda del Navio (si es que posee)$</b></label>
-    <input @bind="Deuda" type="float"placeholder="$ 12.050.678"/>
-</div>
-<button class="btn btn-primary" type="submit" @onclick="cargaVehiculoMaritimo"> cargar Navio</button>
+    <div class="mb-3">
+        <label class="form-label" for="select"><h3>Elegir tipo de navío</h3></label>
+        <select class="form-select" @bind="tipoNav" name="select">
+            <option selected> Crucero</option>
+            <option>Catamaran</option>
+            <option>Velero</option>
+            <option>Lancha</option>
+        </select>
+    </div>
 
-</html>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Antiguedad del navío (Años)</h3></label>
+        <input class="form-control" @bind="antiguedad" type="int" placeholder="15"/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="Descripcion"><h3>Descripcion del navío (Opcional)</h3></label>
+        <input class="form-control" @bind="descripcion" placeholder="Como nuevo, sin uso." type="Descipcion">
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Eslora del navío (Metros)</h3></label>
+        <input class="form-control" @bind="Eslora" type="float" placeholder="7.5"/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Puntal del navío (Metros)</h3></label>
+        <input class="form-control" @bind="Puntal" type="float" placeholder="12.12" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Manga del navío (Metros)</h3></label>
+        <input class="form-control" @bind="Manga" type="float" placeholder="12.12" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Deuda del navío (Si es que posee)</h3></label>
+        <input class="form-control" @bind="Deuda" type="float"placeholder="12050"/>
+    </div>
+    <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoMaritimo">Cargar navío</button>
+</div>
 
 
 
@@ -74,16 +77,16 @@
     [Required]
     private string? base64imagen { get; set; } = "";
     [Required]
-    public int antiguedad { get; set; }
+    public int? antiguedad { get; set; }
     [Required]
-    public float Eslora { get; set; } = 0;
+    public float? Eslora { get; set; }
     [Required]
-    public float Puntal { get; set; } = 0;
+    public float? Puntal { get; set; }
     [Required]
-    public float Manga { get; set; } = 0;    
-    public float Deuda { get; set; } 
+    public float? Manga { get; set; }   
+    public float? Deuda { get; set; } 
     
-    private string? descripcion { get; set; } = "";
+    private string descripcion { get; set; } = "";
     [Required]
     private TipoEmbarcacion tipoNav { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
@@ -113,14 +116,7 @@
         if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
         if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
-            var file = e.File; // agarra las fotos            
-            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
-            var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
-            using (var stream = resizedFile.OpenReadStream())
-            {
-                await stream.ReadAsync(buf); // copia el stream a el buffer
-            }
-            filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+            filesBase64 = await Utils.GetImageBase64(e.File);
 
             message = "subi las img para continuar";
         }
@@ -154,23 +150,28 @@
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingrese una matricula ");
             return;
+        }         
+        if (antiguedad == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Antiguedad de su navio");
+            return;
         }
         if (filesBase64 == "")
         {
             await JsRuntime.InvokeVoidAsync("alert", "El Navio necesita una imagen para ser cargado");
             return;
         }         
-        if (Eslora == 0 || Eslora <= 0.99)
+        if (Eslora == null || Eslora <= 0.99)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Eslora de su navio");
             return;
         }
-        if (Puntal == 0 || Puntal < 0.3)
+        if (Puntal == null || Puntal < 0.3)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Puntal de su navio");
             return;
         }
-        if (Manga == 0 || Manga < 0.99)
+        if (Manga == null || Manga < 0.99)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Por favor ingresa la Manga de su navio");
             return;
@@ -186,15 +187,15 @@
         Maritimo nav = new Maritimo()
             {
                 Matricula = this.matricula,
-                Antiguedad = this.antiguedad,
+                Antiguedad = this.antiguedad??0,
                 descripcion = this.descripcion,
                 Tipo = this.tipoNav,
                 IDCliente = this.Email,
                 base64imagen = this.filesBase64,
-                Eslora= this.Eslora,
-                Puntal= this.Puntal,
-                Deuda= this.Deuda,
-                Manga = this.Manga
+                Eslora= this.Eslora??0,
+                Puntal= this.Puntal??0,
+                Deuda= this.Deuda??0,
+                Manga = this.Manga??0
             };
 
         var RespuestaSv = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/CargarVehiculoMaritimo", nav);

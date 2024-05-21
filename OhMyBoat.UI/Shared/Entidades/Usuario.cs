@@ -15,7 +15,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         public bool Bloqueado { get; set; } = false;
         public string Contacto { get; set; } = "";
         public Roles Rol { get; set; }
-        public string? Base64imagen { get; set; }
+        public string Base64imagen { get; set; } = "";
 
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/admin/register-empleoyee"
+@page "/admin/register-empleoyee"
 @using OhMyBoat.UI.Shared.Entidades;
 @using OhMyBoat.UI.Shared;
 @using Microsoft.JSInterop;
@@ -15,19 +15,18 @@
 
 <AuthorizeView>
     <Authorized>
-        <div>
-            <h1>Registrar un empleado</h1>
-            <p>Complete los datos del empleado.</p>
-            <hr>
-            <div class="form_field">
-                <label for="email"><b>E-mail</b></label>
-                <input @bind="Email" type="text" placeholder="email@example.com" name="email" required
+        <div class="d-flex flex-column justify-content-center m-5 p-5 border">
+            <div class="mb-3 text-center">
+                <h1>Registrar un empleado</h1>
+            </div>
+            <div class="mb-3">
+                <label for="email"><h3>E-mail</h3></label>
+                <input class="form-control" @bind="Email" type="text" placeholder="email@example.com" name="email" required
                     asp-for="Email" />
             </div>
-            <div class="form_field">
-                <label for="nombre"><b>Nombre Completo</b></label>
-                <div id="nombre-contains"> Ingrese  nombre y apellido completos del empleado.</div>
-                <input @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required />
+            <div class="mb-3">
+                <label for="nombre"><h3>Nombre Completo</h3></label>
+                <input class="form-control mb-2" @bind="Nombre" type="text" placeholder="John Doe" name="nombre" required />
             </div>
             <button class="btn btn-primary" type="submit" @onclick="Registrarse">Registrarse</button>
         </div>
@@ -66,20 +65,24 @@
             await JsRuntime.InvokeVoidAsync("alert", "Ingrese un correo electrónico válido.");
             return;
         }
+        if (Nombre == "") {
+            await JsRuntime.InvokeVoidAsync("alert", "Ingrese el nombre del empleado.");
+            return;
+        }
         if (HasNum(Nombre))
         {
-            await JsRuntime.InvokeVoidAsync("alert", "El nombre del empleado no puede contener numeros");
+            await JsRuntime.InvokeVoidAsync("alert", "El nombre del empleado no puede contener numeros.");
             return;
         }
 
         Usuario empleado = new Usuario() { Nombre = this.Nombre, Email = this.Email, };
 
-        var respuestaSV = await HttpClient.PostAsJsonAsync<Usuario>("api/Usuario/RegistrarEmpleado", empleado);
+        var respuestaSV = await HttpClient.PostAsJsonAsync<Usuario>("api/cuenta/RegistrarEmpleado", empleado);
 
         //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Empleado registrado con exito, se le ha mandado un mail al emplado para registrar su contraseña");
+            await JsRuntime.InvokeVoidAsync("alert", "Empleado registrado con exito.\nSe le ha mandado un mail al empleado para registrar su contraseña");
             Navegador.NavigateTo("/admin/register-empleoyee");
         }
 
@@ -92,7 +95,7 @@
         if (respuestaSV.StatusCode == (System.Net.HttpStatusCode)418) // email taba mal
 
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Soy una tetera, no moleste");
+            await JsRuntime.InvokeVoidAsync("alert", "Email inválido");
         }
 
         //mandar el cliente a registro

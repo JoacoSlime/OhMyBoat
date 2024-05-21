@@ -28,10 +28,25 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
             using var db = new OhMyBoatUIServerContext();
-            if (await db.Usuarios.Where(cli => cli.Email == c.Email.ToLower()).AnyAsync())
+            if (db.Usuarios.Where(cli => cli.Email == c.Email.ToLower()).IsNullOrEmpty())
             {
                 c.Rol = Roles.empleado;
-                // se tiene que mandar el email para recuperar la contraseña // <-------------------------------------------------------------//
+                TokenRecu Token = new()
+                {
+                    Email = c.Email.ToLower(),
+                    StringAleatorioDelMomento = UniqueId.CreateRandomId(),
+                    FechaLimite = DateTime.Now.AddDays(7)                        
+                };
+                await db.TokenRecu.AddAsync(Token);
+                await db.SaveChangesAsync();
+                await _emailService.Send(
+                        to: c.Email,
+                        subject: "Aquí está tu clave para terminar de configurar tu cuenta.", 
+                        html: $@"<h2>Verificación de cuenta</h2>
+                        <p>Tu token de verificación de cuenta es: {Token.StringAleatorioDelMomento}<p/>
+                        <p>Haz click <a href=""http://localhost:5047/recovery/{Token.StringAleatorioDelMomento}"">aquí</a> para ir directamente.<p/>
+                        <p>Si no has sido tu quien pidió esta clave, ignora este mensaje.</p>"
+                    );
                 await db.Usuarios.AddAsync(c);
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK, c);
@@ -180,9 +195,9 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     // Generar el token
                     TokenRecu Token = new()
                     {
-                        Email = log.Email,
+                        Email = log.Email.ToLower(),
                         StringAleatorioDelMomento = UniqueId.CreateRandomId(),
-                        FechaLimite = DateTime.Now.AddDays(14)                        
+                        FechaLimite = DateTime.Now.AddDays(7)                        
                     };
                     await db.TokenRecu.AddAsync(Token);
                     await db.SaveChangesAsync();

@@ -9,7 +9,7 @@
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
 
-<h3>Vehiculos disponibles para intercambio</h3>
+<h1>Vehiculos disponibles para intercambio</h1>
 
 <AuthorizeView>
     <Authorized>
@@ -20,15 +20,15 @@
         }
         else
         {
-            @foreach (var Vec in ListaTerrestres)
-            {
-                <div class="container-Vehiculo">
-                    <div>
+            <div class="d-flex flex-column">
+                @foreach (var Vec in ListaTerrestres)
+                {
+                    <div class="d-flex flex-row">
                         <p>@Vec.Matricula</p>
-                        <img src="@Vec.base64imagen" />  
+                        <img src="@Vec.base64imagen" style="width: max-content; height=25vh" />  
                     </div>
-                </div>
-            }
+                }
+            </div>
         }
     </Authorized>
 </AuthorizeView>
