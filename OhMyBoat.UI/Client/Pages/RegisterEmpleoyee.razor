@@ -92,7 +92,7 @@
         if (respuestaSV.StatusCode == (System.Net.HttpStatusCode)418) // email taba mal
 
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Soy una tetera, no moleste");
+            await JsRuntime.InvokeVoidAsync("alert", "Email inválido");
         }
 
         //mandar el cliente a registro
