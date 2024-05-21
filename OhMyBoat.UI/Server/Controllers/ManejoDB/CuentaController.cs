@@ -146,7 +146,18 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
         }
 
-
+        [HttpPost]
+        [Route("SwitchUserBlock")]
+        public async Task<IActionResult> BloaquearUsuario([FromBody] LoginDTO log)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var user = await db.Usuarios.Where(u => u.Email == log.Email).FirstOrDefaultAsync();
+            if (user != null){
+                user.Bloqueado = user.Bloqueado;
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            else return StatusCode(StatusCodes.Status406NotAcceptable);
+        }
 
         [HttpPost]
         [Route("RecuperarContra")]
