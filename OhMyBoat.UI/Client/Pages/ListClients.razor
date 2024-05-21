@@ -12,35 +12,51 @@
 
 <h1>Lista de clientes</h1>
 
-<AuthorizeView>
-    <Authorized>
+<Grid @ref="grid"
+    TItem="Cliente"
+    Class="table table-hover table-bordered table-striped"
+    DataProvider="ClienteDataProvider"
+    AllowFiltering="true"
+    PageSize="10"
+    Responsive="true"
+    AllowSorting="true">
 
-        @if (ListaDeClientes.Count == 0)
-        {
-            <p>No hay Clientes en el sistema</p>
+    <GridColumn TItem="Cliente" HeaderText="Id" PropertyName="Id" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Ascending" SortKeySelector="@(item => item.Id)">
+        @context.Id
+    </GridColumn>
+    <GridColumn TItem="Cliente" HeaderText="Nombre" PropertyName="Nombre" SortKeySelector="@(item => item.Nombre)">
+        @context.Nombre
+    </GridColumn>
+    <GridColumn TItem="Cliente" HeaderText="Email" PropertyName="Email" SortKeySelector="@(item => item.Email)">
+        @context.Email
+    </GridColumn>
+    <GridColumn TItem="Cliente" HeaderText="Contacto" PropertyName="Contacto" SortKeySelector="@(item => item.Contacto)">
+        @context.Contacto
+    </GridColumn>
+    <GridColumn TItem="Cliente" HeaderText="Bloqueado" PropertyName="Bloqueado" SortKeySelector="@(item => item.Bloqueado)">
+        @if(context.Bloqueado) {
+            <Button Color="ButtonColor.Danger">Bloqueado</Button>
+        } else {
+            <Button Color="ButtonColor.Success">Desbloqueado</Button>
         }
-        else
-        {
-            @foreach (var Cli in ListaDeClientes)
-            {
-                <div class="container-navio">
-                    <div>
-                        <p>@Cli.Nombre</p>
-                        <p>@Cli.Email</p>
-                        <p>@Cli.Bloqueado </p>
-                    </div>
-                </div>
-            }
-        }
-    </Authorized>
-</AuthorizeView>
+    </GridColumn>
+
+</Grid>
 
 @code {
+    private BlazorBootstrap.Grid<Cliente> grid = default!;
+    private IEnumerable<Cliente> clientes = default!;
 
-    List<Cliente> ListaDeClientes = new();
+    private async Task<GridDataProviderResult<Cliente>> ClienteDataProvider(GridDataProviderRequest<Cliente> request)
+    {
+        if (clientes==null) {
+            await OnInitializedAsync();
+        }
+        return await Task.FromResult(request.ApplyTo(clientes));
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        ListaDeClientes = await ((HttpClient)HttpClient).GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes");
+        clientes = await ((HttpClient)HttpClient).GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes");
     }
 }
