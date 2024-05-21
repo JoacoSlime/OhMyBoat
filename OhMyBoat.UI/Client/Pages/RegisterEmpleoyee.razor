@@ -74,7 +74,7 @@
 
         Usuario empleado = new Usuario() { Nombre = this.Nombre, Email = this.Email, };
 
-        var respuestaSV = await HttpClient.PostAsJsonAsync<Usuario>("api/Usuario/RegistrarEmpleado", empleado);
+        var respuestaSV = await HttpClient.PostAsJsonAsync<Usuario>("api/cuenta/RegistrarEmpleado", empleado);
 
         //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK)

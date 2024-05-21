@@ -20,7 +20,7 @@
     <div class="d-flex flex-column justify-content-center">
         <div class="d-flex flex-row align-items-center mb-5">
             <div class="image-div d-flex flex-row align-items-end">
-                <img src=@Imagen class="profile-image" alt="User Profile">
+                <img src=@Imagen class="profile-image me-5" style="border-radius: 100%;" alt="User Profile">
                 <p class="fs-1 mb-0"> Nombre: @Nombre</p>
             </div>
         </div>
@@ -77,7 +77,7 @@
             Email = mevoyamatar.Email;
             Contacto = mevoyamatar.Contacto == null ? "-" : mevoyamatar.Contacto;
             Rol = Utils.CapitalizeString(mevoyamatar.Rol.ToString());
-            Imagen = mevoyamatar.Base64imagen ?? "/user.png";
+            Imagen = mevoyamatar.Base64imagen != "" ? mevoyamatar.Base64imagen : "./user.png";
             StateHasChanged();
 
             // await JsRuntime.InvokeVoidAsync("alert", String(mevoyamatar.toString(),mevoyamatar.Nombre,me));

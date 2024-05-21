@@ -64,6 +64,8 @@
     [Required]
     private string Password { get; set; } = "";
 
+    private string Base64imagen {get; set;} = "";
+
     private bool MayorDeEdad { get ; set ; } = true; 
     private TimeSpan EighteenYearSpan = new TimeSpan(6574,5, 0, 0, 0);
 
@@ -96,10 +98,10 @@
 
         passhashed = Utils.HashWithSha256(Password);
 
-        Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed}; 
+        Cliente cliente = new Cliente() { Nombre=this.Nombre, Email=this.Email, Password=passhashed, Base64imagen = this.Base64imagen}; 
 
 
-        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/Usuario/RegistrarCliente", cliente);
+        var respuestaSV = await HttpClient.PostAsJsonAsync<Cliente>("api/cuenta/RegistrarCliente", cliente);
 
         //await JsRuntime.InvokeVoidAsync("alert", respuestaSV.StatusCode.ToString());
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK){

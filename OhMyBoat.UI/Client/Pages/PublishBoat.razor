@@ -113,14 +113,7 @@
         if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
         if (containsValidFormat(e.File.Name ))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
-            var file = e.File; // agarra las fotos            
-            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // le hace un resize
-            var buf = new byte[resizedFile.Size]; // buffer para llenar la data de la imagen
-            using (var stream = resizedFile.OpenReadStream())
-            {
-                await stream.ReadAsync(buf); // copia el stream a el buffer
-            }
-            filesBase64 = ($"data:image;base64,{Convert.ToBase64String(buf)}"); // lo convierte a base64
+            filesBase64 = await Utils.GetImageBase64(e.File);
 
             message = "subi las img para continuar";
         }
