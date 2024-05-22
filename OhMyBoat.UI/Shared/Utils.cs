@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Tiff;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats;
 
@@ -92,19 +93,17 @@ namespace OhMyBoat.UI.Shared
                 }
 
                 // Read the file into a memory stream
-                using (var memoryStream = new MemoryStream())
+                using var memoryStream = new MemoryStream();
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                memoryStream.Position = 0; // Reset stream position to the beginning
+
+                // Detect the image format
+                IImageFormat format = Image.DetectFormat(memoryStream);
+
+                // Check if the format is either PNG or JPG
+                if (format == PngFormat.Instance || format == JpegFormat.Instance || format == TiffFormat.Instance)
                 {
-                    await file.OpenReadStream().CopyToAsync(memoryStream);
-                    memoryStream.Position = 0; // Reset stream position to the beginning
-
-                    // Detect the image format
-                    IImageFormat format = Image.DetectFormat(memoryStream);
-
-                    // Check if the format is either PNG or JPG
-                    if (format == PngFormat.Instance || format == JpegFormat.Instance)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             catch

@@ -15,7 +15,7 @@
 
 <AuthorizeView>
     <NotAuthorized>
-        @(async () => CheckToken())
+        @{CheckToken();}
         <h1>Recuperacion de cuenta</h1>
 
         @if(esValido){
