@@ -180,7 +180,7 @@
         } 
         if (kilometraje < 0)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "La antiguedad del vehículo no puede ser negativa.");
+            await JsRuntime.InvokeVoidAsync("alert", "El kilometraje del vehículo no puede ser negativo.");
             return;
         }
         Terrestre vec = new Terrestre()
