@@ -13,61 +13,64 @@
 
 
 
-<h3>Publicar Vehiculo terrestre</h3>
-<html>
-<div class="form_field">
-    <label for="nombre"><b>Patente del Vehiculo</b></label>
-    <input @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
-</div>
-
-<div class="input-group">
-    <div class="custom-file">
-        <InputFile class="custom-file-input"  OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile"
-            required />
-        <label class="custom-file-label" for="inputFile">Choose file</label>
+<div class="d-flex flex-column justify-content-center p-5">
+    <div class="mb-3">
+        <h1>Publicar Vehículo</h1>
     </div>
-    @if (filesBase64 != "")
-    {
-        <div class="d-flex justify-content-center">
-            <img class="mt-3 border rounded p-5 bg-grey" style="width:100%;height:max-content;" src="@filesBase64" />
+    <div class="mb-3">
+        <label class="form-label" for="nombre"><h3>Patente del Vehículo</h3></label>
+        <input class="form-control" @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
+    </div>
+
+    <div class="mb-3">
+        <div class="custom-file">
+            <label class="form-label" for="inputFile"><h3>Choose file</h3></label>
+            <InputFile class="form-control"  OnChange="OnChange" accept="image/png, image/jpeg" id="inputFile"/>
         </div>
-    }
-</div>
+        @if (filesBase64 != "")
+        {
+            <div class="d-flex justify-content-center">
+                <img class="mt-3 border rounded p-5 bg-grey" style="width:100%;height:max-content;" src="@filesBase64" />
+            </div>
+        }
+    </div>
 
-<select @bind="tipoVec" name="select">
-    <option selected> Auto</option>
-    <option>Camioneta</option>
-    <option>Moto</option>
-</select>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Marca del vehiculo</b></label>
-    <input @bind="marca" type="int" placeholder="Toyota" required />
+    <div class="mb-3">
+        <label class="form-label" for="select"><h3>Tipo</h3></label>
+        <select class="form-control" @bind="tipoVec" name="select">
+            <option selected>Auto</option>
+            <option>Camioneta</option>
+            <option>Moto</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Marca del vehiculo</h3></label>
+        <input class="form-control" @bind="marca" type="int" placeholder="Toyota" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Modelo del vehiculo</h3></label>
+        <input class="form-control" @bind="modelo" type="text" placeholder="Hilux" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Año del modelo</h3></label>
+        <input class="form-control" placeholder="2010" @bind="anio" type="int" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Kilometraje</h3></label>
+        <input class="form-control" placeholder="1200" @bind="kilometraje" type="int" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fecha de nacimiento"><h3>Antiguedad del Vehiculo</h3></label>
+        <input class="form-control" placeholder="14" @bind="antiguedad" type="int" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="Descripcion"><h3>Descripcion del vehiculo (opcional)</h3></label>
+        <input class="form-control" @bind="descripcion" placeholder="Con poco uso." type="String" required>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre"> Publicar vehiculo</button>
+    </div>
 </div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Modelo del vehiculo</b></label>
-    <input @bind="modelo" type="text" placeholder="Hilux" required />
-</div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Año del modelo  </b></label>
-    <input @bind="anio" type="int" required />
-</div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Kilometraje</b></label>
-    <input @bind="kilometraje" type="int" required />
-</div>
-<div class="form_field">
-    <label for="fecha de nacimiento"><b>Antiguedad del Vehiculo</b></label>
-    <input @bind="antiguedad" type="int" required />
-</div>
-<div class="form_field">
-    <label for="Descripcion"><b>Descripcion del vehiculo(opcional)</b></label>
-    <input @bind="descripcion" type="String" required>
-</div>
-<button class="btn btn-primary" type="submit" @onclick="cargaVehiculoterrrestre"> Publicar vehiculo</button>
-
-</html>
-
-
 
 @code {
     [Required]
