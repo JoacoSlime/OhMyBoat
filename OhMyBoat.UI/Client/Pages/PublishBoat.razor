@@ -99,7 +99,6 @@
 
     async Task OnChange(InputFileChangeEventArgs e)
     {       
-        if (e.File.ContentType.Equals("image/jpeg" ) || (e.File.ContentType.Equals("image/png" ))) // chequeo que sea un formato de imagen valido
         if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
             filesBase64 = await Utils.GetImageBase64(e.File);
@@ -107,7 +106,7 @@
             message = "subi las img para continuar";
         }
         else{
-            await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
+            await JsRuntime.InvokeVoidAsync("alert", "Fallo al procesar la imagen. Puede que esté en un formato inválido.");
             this.filesBase64 = "formato";
         }
     }
