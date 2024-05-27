@@ -10,7 +10,7 @@
 @inject IJSRuntime JsRuntime
 
 
-<Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.Large"/>
+<Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.Large" IsVerticallyCentered="true"/>
 
 <AuthorizeView>
     <Authorized>
@@ -32,7 +32,7 @@
                         <CardText>@Vec.Matricula</CardText>
                         </CardBody>
                         <CardFooter class="text-end">
-                            <Button Color="ButtonColor.Primary" @onclick="(async ()=> await VerDetalles(Vec.Id))">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                            <Button Color="ButtonColor.Primary" @onclick="(async ()=> await VerDetalles(Vec.Id))">Detalles</Button>
                         </CardFooter>
                     </Card>
                 }

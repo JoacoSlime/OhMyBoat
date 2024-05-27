@@ -17,6 +17,7 @@
     <Authorized>
         <h1>Mis Vehiculos</h1>
 
+        <Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.Large" />
         <Modal @ref="modal" />
 
         @if (MisRodados.Count == 0)
@@ -41,7 +42,7 @@
                         <CardText>@vec.Antiguedad</CardText>
                     </CardBody>
                     <CardFooter class="text-end">
-                        <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                            <Button Color="ButtonColor.Primary" @onclick="(async ()=> await VerDetalles(vec.Id))">Detalles</Button>
                     </CardFooter>
                 </Card>
             }
@@ -61,6 +62,7 @@
 
 @code {
     private Modal modal = default!;
+    private Modal DetalleModal = default!;
     List<Terrestre> MisRodados = new();
 
 
@@ -85,6 +87,17 @@
         await modal.ShowAsync();      // https://github.com/vikramlearning/blazorbootstrap/issues/393
         await modal.HideAsync();
         await RecargarLista();
+    }
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
+
+    private async Task VerDetalles(int Id) {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+        parameters.Add("Id", Id);
+        await DetalleModal.ShowAsync<DetalleVehiculoPropio>(title: "Detalles", parameters: parameters);
     }
     private async Task CargarVehiculo()
     {

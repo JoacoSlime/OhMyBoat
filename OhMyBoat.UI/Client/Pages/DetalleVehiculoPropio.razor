@@ -20,22 +20,9 @@
                     <h4 class="mb-3">Kilometraje: @Vehiculo.Kilometraje km aproximadamente.</h4>
                 </div>
             </div>
-            <div class="d-flex">
-                <ul>
-                    <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
-                        <h3>@Dueño.Nombre</h3>
-                        <h4>@Dueño.Email</h4>
-                        <h4>@Dueño.Contacto</h4>
-                    </div></li>
-                    <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@Vehiculo.descripcion</div></li>
-                </ul>
-            </div>
-            <div class="d-flex justify-content-end">
-                <AuthorizeView Roles="cliente" Context="clientContext">
-                    <Authorized Context="clientContext">
-                        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success">Hacer oferta</Button>
-                    </Authorized>
-                </AuthorizeView>
+            <div class="d-flex flex-column">
+                <h3>Descripcion:</h3>
+                <div class="border rounded p-3 mb-3">@Vehiculo.descripcion</div>
             </div>
         </div>
     </Authorized>
@@ -45,7 +32,6 @@
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
     [Parameter] public int Id { get; set; }
     public Terrestre Vehiculo {get; set;} = new();
-    public Cliente Dueño {get; set;} = new();
 
 
     protected override async Task OnParametersSetAsync() {
@@ -57,14 +43,5 @@
             return;
         }
         Vehiculo = await responseSV.Content.ReadFromJsonAsync<Terrestre>() ?? new();
-
-        responseSV = await HttpClient.PostAsJsonAsync<Vehiculo>("api/Vehiculos/GetDueño", Vehiculo) ?? new();
-            if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
-            await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
-            await OnClickCallback.InvokeAsync();
-            return;
-        }
-        Dueño = await responseSV.Content.ReadFromJsonAsync<Cliente>() ?? new();
-        Dueño.Contacto = Dueño.Contacto == "" ? "No posee información de contacto." : Dueño.Contacto;
     }
 }
