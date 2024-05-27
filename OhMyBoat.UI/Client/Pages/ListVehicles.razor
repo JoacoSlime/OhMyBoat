@@ -41,11 +41,11 @@
 
 
 @code {
-    List<Terrestre> ListaTerrestres= new();
+    List<Terrestre> ListaTerrestres = new();
 
 
     protected override async Task OnInitializedAsync()
     {
-            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles");      
+            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles") ?? new();      
         }
     } 

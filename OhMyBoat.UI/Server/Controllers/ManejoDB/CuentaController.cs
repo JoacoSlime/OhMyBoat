@@ -23,12 +23,12 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [Route("RegistrarEmpleado")]
         public async Task<IActionResult> RegistrarEmple([FromBody] Usuario c)
         {
-            if (!Utils.IsValidEmail(c.Email))
+            if (!Utils.IsValidEmail(c.Email.ToLower()))
             {
                 return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
             using var db = new OhMyBoatUIServerContext();
-            if (db.Usuarios.Where(cli => cli.Email == c.Email.ToLower()).IsNullOrEmpty())
+            if (db.Usuarios.Where(cli => cli.Email.ToLower() == c.Email.ToLower()).IsNullOrEmpty())
             {
                 c.Rol = Roles.empleado;
                 TokenRecu Token = new()
@@ -40,7 +40,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 await db.TokenRecu.AddAsync(Token);
                 await db.SaveChangesAsync();
                 await _emailService.Send(
-                        to: c.Email,
+                        to: c.Email.ToLower(),
                         subject: "Aquí está tu clave para terminar de configurar tu cuenta.", 
                         html: $@"<h2>Verificación de cuenta</h2>
                         <p>Tu token de verificación de cuenta es: {Token.StringAleatorioDelMomento}<p/>
@@ -61,12 +61,13 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [Route("RegistrarCliente")]
         public async Task<IActionResult> RegistrarCliente([FromBody] Cliente c)
         {
-            if (!Utils.IsValidEmail(c.Email)) {
+            if (!Utils.IsValidEmail(c.Email.ToLower())) {
                 return StatusCode(StatusCodes.Status418ImATeapot, null);
             }
             using var db = new OhMyBoatUIServerContext();
-            if (db.Clientes.Where(cli => cli.Email == c.Email.ToLower()).IsNullOrEmpty())
+            if (db.Clientes.Where(cli => cli.Email.ToLower() == c.Email.ToLower()).IsNullOrEmpty())
             {
+                c.Email = c.Email.ToLower();
                 c.Rol = Roles.cliente;
                 await db.Clientes.AddAsync(c);
                 await db.SaveChangesAsync();
@@ -83,7 +84,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             SesionDTO sesionDTO = new();
 
             using var db = new OhMyBoatUIServerContext();
-            var temp = await db.Usuarios.Where(usuario => usuario.Email == login.Email.ToLower() && usuario.Password == login.Password).FirstOrDefaultAsync();
+            var temp = await db.Usuarios.Where(usuario => usuario.Email.ToLower() == login.Email.ToLower() && usuario.Password == login.Password).FirstOrDefaultAsync();
             if (temp != null)
             {
                 sesionDTO.Rol = temp.Rol.ToString();
@@ -92,7 +93,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     return StatusCode(StatusCodes.Status506VariantAlsoNegotiates);
                 }
 
-                sesionDTO.Email = temp.Email;
+                sesionDTO.Email = temp.Email.ToLower();
                 sesionDTO.Nombre = temp.Nombre;
                 return StatusCode(StatusCodes.Status200OK, sesionDTO);
             }
@@ -120,10 +121,10 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async Task<IActionResult> RecuperarContrasenia ([FromBody] RecuCuentaDTO token)
         {
             using var db = new OhMyBoatUIServerContext();
-            var resul = await db.Tokens.Where(t => ((t.StringAleatorioDelMomento == token.Hash) && (!t.Usado) && (t.FechaLimite >= DateTime.Now))).FirstOrDefaultAsync();
+            var resul = await db.Tokens.Where(t => (t.StringAleatorioDelMomento == token.Hash) && (!t.Usado) && (t.FechaLimite >= DateTime.Now)).FirstOrDefaultAsync();
             if (resul != null)// hay token valido
             {
-                var coso = await db.Usuarios.Where(u => u.Email == resul.Email).FirstOrDefaultAsync();
+                var coso = await db.Usuarios.Where(u => u.Email.ToLower() == resul.Email.ToLower()).FirstOrDefaultAsync();
                 if (coso != null)
                 {
                     coso.Password = token.ContraNueva;
@@ -168,7 +169,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             if (Utils.IsValidEmail(papanatas.Email.ToLower()))
                     using (var db = new OhMyBoatUIServerContext())
                     {
-                        var persona = await db.Usuarios.Where(u => u.Email == papanatas.Email.ToLower() && ((u.Password == papanatas.HashViejo) ||(u.Password == papanatas.HashNuevo))).FirstOrDefaultAsync();
+                        var persona = await db.Usuarios.Where(u => u.Email.ToLower() == papanatas.Email.ToLower() && ((u.Password == papanatas.HashViejo) ||(u.Password == papanatas.HashNuevo))).FirstOrDefaultAsync();
                         if (persona != null)
                         {
                         if (persona.Password == papanatas.HashViejo)
@@ -200,9 +201,9 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [Route("Recuperacion")]
         public async Task<IActionResult> EnviarCodigo([FromBody] LoginDTO log)
         {
-            if (Utils.IsValidEmail(log.Email)){
+            if (Utils.IsValidEmail(log.Email.ToLower())){
                 using var db = new OhMyBoatUIServerContext();
-                var existe = await db.Usuarios.Where(u => u.Email == log.Email).AnyAsync();
+                var existe = await db.Usuarios.Where(u => u.Email.ToLower() == log.Email.ToLower()).AnyAsync();
                 if (existe)
                 {
                     // Generar el token
@@ -216,7 +217,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     await db.SaveChangesAsync();
                     // Enviar Mail
                     await _emailService.Send(
-                        to: log.Email,
+                        to: log.Email.ToLower(),
                         subject: "Aquí está tu clave de recuperación de cuenta", 
                         html: $@"<h2>Verificación de cuenta</h2>
                         <p>Tu token de verificación de cuenta es: {Token.StringAleatorioDelMomento}<p/>

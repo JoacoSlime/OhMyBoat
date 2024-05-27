@@ -94,23 +94,19 @@
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
     private string Email { get; set; } = "";
     string filesBase64 = "";
-    string message = "InputFile";
-    bool isDisabled = false;
 
     async Task OnChange(InputFileChangeEventArgs e)
     {       
         if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
             filesBase64 = await Utils.GetImageBase64(e.File);
-
-            message = "subi las img para continuar";
         }
         else{
             await JsRuntime.InvokeVoidAsync("alert", "Fallo al procesar la imagen. Puede que esté en un formato inválido.");
             this.filesBase64 = "formato";
         }
     }
-    AuthenticationState Auth;
+    AuthenticationState? Auth;
     protected override async Task OnInitializedAsync()
     {
         Auth = await authStateProvider.GetAuthenticationStateAsync();

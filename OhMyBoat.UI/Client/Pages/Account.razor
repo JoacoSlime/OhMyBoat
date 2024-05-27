@@ -93,8 +93,7 @@
 
         } else await JsRuntime.InvokeVoidAsync("alert", "Explote");
     }
-    private async Task ViewProfile() => navManager.NavigateTo("account");
-    private async Task EditAccount() => navManager.NavigateTo("edit-profile");
+    private void EditAccount() => navManager.NavigateTo("edit-profile");
     private async Task ChangePassword() {
         var parameters = new Dictionary<string, object>();
         parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));

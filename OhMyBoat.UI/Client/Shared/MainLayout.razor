@@ -43,7 +43,7 @@
     
     protected override void OnParametersSet()
     {
-        isOnAccountPage = (this.Body.Target as RouteView)?.RouteData?.PageType?.ToString() != "OhMyBoat.UI.Client.Pages.Account";
+        isOnAccountPage = (this.Body?.Target as RouteView)?.RouteData?.PageType?.ToString() != "OhMyBoat.UI.Client.Pages.Account";
         showAccount = false;
     }
     private async Task HideOffcanvas() {

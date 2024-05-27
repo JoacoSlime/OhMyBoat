@@ -49,7 +49,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-            ListaMisNavios = await ((HttpClient) HttpClient).GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles");    
+            ListaMisNavios = await HttpClient.GetFromJsonAsync<List<Maritimo>>("api/Vehiculos/ListarNaviosDisponibles") ?? new();    
         }
     } 
 

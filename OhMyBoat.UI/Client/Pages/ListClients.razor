@@ -63,7 +63,7 @@
     }
 
     private async Task LoadClientsAsync() {
-        clientes = await ((HttpClient)HttpClient).GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes");
+        clientes = await HttpClient.GetFromJsonAsync<List<Cliente>>("api/Usuario/ListarClientes") ?? new();
     }
 
     private async Task SwitchUserBlock(Cliente cliente) {
