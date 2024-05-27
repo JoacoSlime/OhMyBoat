@@ -21,7 +21,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> ObtenerUsuario([FromBody] LoginDTO a)
         {
             using var db = new OhMyBoatUIServerContext();
-            var clie = await db.Usuarios.Where(u => u.Email == a.Email).FirstAsync();
+            var clie = await db.Usuarios.Where(u => u.Email.ToLower() == a.Email.ToLower()).FirstAsync();
             if (clie != null)
             {
                 clie.Password = "que te importa lagarto";
@@ -35,7 +35,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> PostActualizarUsuario([FromBody] ActualizarUsuario parm)
         {
             using var db = new OhMyBoatUIServerContext();
-            var clie = await db.Usuarios.Where(user => user.Email == parm.Email).FirstOrDefaultAsync();
+            var clie = await db.Usuarios.Where(user => user.Email.ToLower() == parm.Email.ToLower()).FirstOrDefaultAsync();
             if (clie != null)
             {
                 clie.Nombre = parm.Nombre;
