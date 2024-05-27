@@ -11,8 +11,6 @@
 @inject NavigationManager navManager
 @inject IJSRuntime JsRuntime;
 @inject NavigationManager Navegador;
-@using Microsoft.AspNetCore.Components.Authorization;
-@using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
 
 <div class="d-flex flex-column justify-content-center m-5 p-5 border">
@@ -50,8 +48,7 @@
     private string Contacto {get; set;}= "";
     private string Email = ""; 
     private string fileBase64 = "";
-    string message = "InputFile";
-    AuthenticationState Auth;
+    AuthenticationState? Auth;
     protected override async Task OnInitializedAsync()
     {
         Auth = await authStateProvider.GetAuthenticationStateAsync();
@@ -66,8 +63,6 @@
         if (await Utils.IsValidImageFormat(e.File))  // los jfif pasan el chequeo de arriba por eso este chequeo // si te jode arreglalo vos gil -slds
         {
             fileBase64 = await Utils.GetIconBase64(e.File);
-
-            message = "subi las img para continuar";
         }
         else{
             await JsRuntime.InvokeVoidAsync("alert", "formato de imagen no soportado");
@@ -81,10 +76,10 @@
         LoginDTO auxSession = new LoginDTO();
         auxSession.Email = Email;       // es por que recibe una mierda de loginDTO
         var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ObtenerUsuario", auxSession);
-        var cliendeTraido = await respuestaSV.Content.ReadFromJsonAsync<Usuario>(); 
-        this.Nombre = cliendeTraido.Nombre;
-        this.Contacto = cliendeTraido.Contacto;
-        this.fileBase64 = cliendeTraido.Base64imagen;
+        var cliendeTraido = await respuestaSV.Content.ReadFromJsonAsync<Usuario>() ?? new(); 
+        this.Nombre = cliendeTraido.Nombre ?? "";
+        this.Contacto = cliendeTraido.Contacto ?? "";
+        this.fileBase64 = cliendeTraido.Base64imagen ?? "";
     }
 
     private async Task GuardarCambios()

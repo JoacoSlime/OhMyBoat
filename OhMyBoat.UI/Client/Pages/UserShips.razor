@@ -85,7 +85,7 @@
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
         var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarNaviosCliente", Email);
-        MisBarcos = await respSV.Content.ReadFromJsonAsync<List<Maritimo>>();
+        MisBarcos = await respSV.Content.ReadFromJsonAsync<List<Maritimo>>() ?? new();
          StateHasChanged();
     }
 

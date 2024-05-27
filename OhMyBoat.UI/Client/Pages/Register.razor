@@ -93,7 +93,7 @@
         }
         if (this.Nombre == "") {
             await JsRuntime.InvokeVoidAsync("alert", "Ingrese su nombre");
-        return;
+            return;
         }
 
         passhashed = Utils.HashWithSha256(Password);
@@ -107,18 +107,20 @@
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.OK){
             await JsRuntime.InvokeVoidAsync("alert", "Usuario registrado con exito");
             NavManager.NavigateTo("/");
+            return;
         }
         
         if (respuestaSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired) // ya registrado
-
         {
             await JsRuntime.InvokeVoidAsync("alert", "El email ya esta registrado, ingrese otro email");
+            return;
         }
 
         if (respuestaSV.StatusCode == (System.Net.HttpStatusCode)418) // email taba mal
 
         {
             await JsRuntime.InvokeVoidAsync("alert", "Email inválido");
+            return;
         }
 
         //mandar el cliente a registro

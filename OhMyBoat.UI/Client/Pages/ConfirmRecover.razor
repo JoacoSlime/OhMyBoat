@@ -15,10 +15,12 @@
 
 <AuthorizeView>
     <NotAuthorized>
-        @{CheckToken();}
-        <h1>Recuperacion de cuenta</h1>
 
-        @if(esValido){
+        @if(esValido == null){
+            <h1>Cargando...</h1>
+        } else if (esValido.GetValueOrDefault()) {
+        <h1>Recuperacion de cuenta</h1>
+        
             <div class="row mt-5">
 
                 <div class="col-lg-4 offset-lg-4 border">
@@ -48,7 +50,7 @@
 @code {
     [Parameter]
     public string codigo { get; set; } = "";
-    private bool esValido = false;
+    private bool? esValido = null;
     private RecuCuentaDTO mesi = new();
 
     private string contraNueva1 { get; set; } = "";
@@ -58,12 +60,13 @@
     protected override async Task OnInitializedAsync()
     {
         mesi.Hash = codigo;
+        await CheckToken();
     }
 
     private async Task CheckToken() {
         var peticion = await HttpClient.PostAsJsonAsync<RecuCuentaDTO>("api/cuenta/CheckearToken", mesi);
         esValido = peticion.IsSuccessStatusCode;
-        if (!esValido)
+        if (!(esValido.GetValueOrDefault()))
         {
             await JsRuntime.InvokeVoidAsync("alert", "El token ya fue usado o expiro");
             navManager.NavigateTo("/");
@@ -94,7 +97,7 @@
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", $"{RespuestaSV.StatusCode}");
+            await JsRuntime.InvokeVoidAsync("alert", "La cuenta que intenta recuperar ya no existe.");
             Navegador.NavigateTo("/");
         }
 

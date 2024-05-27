@@ -67,6 +67,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             using var db = new OhMyBoatUIServerContext();
             if (db.Clientes.Where(cli => cli.Email == c.Email.ToLower()).IsNullOrEmpty())
             {
+                c.Email = c.Email.ToLower();
                 c.Rol = Roles.cliente;
                 await db.Clientes.AddAsync(c);
                 await db.SaveChangesAsync();

@@ -22,10 +22,10 @@
 
     protected override void OnParametersSet()
     {
-        string added_classes = ButtonAttributes.GetValueOrDefault("class")?.ToString() ?? string.Empty;
+        string added_classes = ButtonAttributes?.GetValueOrDefault("class")?.ToString() ?? string.Empty;
         added_classes = "btn btn-secondary " + added_classes;
-        ButtonAttributes.Remove("class");
-        ButtonAttributes.Add("class",added_classes);
+        ButtonAttributes?.Remove("class");
+        ButtonAttributes?.Add("class",added_classes);
     }
 
     private async Task OnClick()
