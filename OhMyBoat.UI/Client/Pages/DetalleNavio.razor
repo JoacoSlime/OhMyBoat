@@ -5,7 +5,7 @@
 @using OhMyBoat.UI.Shared
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
-
+@inject NavigationManager Navegador
 
 <AuthorizeView>
     <Authorized>
@@ -33,7 +33,7 @@
             <div class="d-flex justify-content-end">
                 <AuthorizeView Roles="cliente" Context="clientContext">
                     <Authorized Context="clientContext">
-                        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success">Hacer oferta</Button>
+                        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
                     </Authorized>
                 </AuthorizeView>
             </div>
@@ -66,5 +66,10 @@
         }
         Dueño = await responseSV.Content.ReadFromJsonAsync<Cliente>() ?? new();
         Dueño.Contacto = Dueño.Contacto == "" ? "No posee información de contacto." : Dueño.Contacto;
+    }
+
+    private void  EnviarOferta( ) 
+    {
+       Navegador.NavigateTo($"/oferta/{Navio.Matricula}");
     }
 }
