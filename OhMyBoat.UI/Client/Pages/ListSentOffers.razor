@@ -1,0 +1,84 @@
+@page "/sent-offers"
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject AuthenticationStateProvider authStateProvider;
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@using System.Security.Claims
+@inject NavigationManager NavManager
+
+<AuthorizeView Roles="cliente">
+    <Authorized>
+        <h1>Mis Ofertas Enviadas</h1>
+
+    </Authorized>
+    <NotAuthorized>
+       @{NavManager.NavigateTo("/",true);} 
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+/*
+    
+    Ofreciste:                                      A cambio de:
+
+    (foto vehiculoEnviaOferta)          --->        (foto vehiculoRecibeOferta) 
+    TipoVehiculo, Marca, Modelo, Año                TipoVehiculo, Marca, Modelo, Año
+
+   [VER DETALLE OFERTA]
+
+*/
+
+    private Modal modal = default!;
+    private Modal DetalleModal = default!;
+
+    List<Oferta> SentOffers = new();
+
+    List<Vehiculo> VehiculosRecibeOferta = new();
+    List<Vehiculo> VehiculosEnviaOferta = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RecargarLista();
+    }
+
+    private async Task RecargarLista()
+    {
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasEnviadas", Email);
+        SentOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
+
+        VehiculosRecibeOferta.Clear();
+        VehiculosEnviaOferta.Clear();
+
+        foreach (Oferta o in SentOffers)
+        {
+            var recibe = await HttpClient.GetFromJsonAsync<Vehiculo>("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            VehiculosRecibeOferta.Add(recibe);
+            var envia = await HttpClient.GetFromJsonAsync<Vehiculo>("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoEnviaOferta) ?? new();
+            VehiculosEnviaOferta.Add(envia);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task closeModal()
+    {
+        await modal.ShowAsync();      // https://github.com/vikramlearning/blazorbootstrap/issues/393
+        await modal.HideAsync();
+        await RecargarLista();
+    }
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
+    
+}
