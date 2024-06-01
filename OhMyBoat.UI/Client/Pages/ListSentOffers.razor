@@ -28,7 +28,7 @@
     
     Ofreciste:                                      A cambio de:
 
-    (foto vehiculoEnviaOferta)          --->        (foto vehiculoRecibeOferta) 
+    (foto vehiculoEnviaOferta)           --->       (foto vehiculoRecibeOferta) 
     TipoVehiculo, Marca, Modelo, Año                TipoVehiculo, Marca, Modelo, Año
 
    [VER DETALLE OFERTA]
@@ -61,10 +61,13 @@
 
         foreach (Oferta o in SentOffers)
         {
-            var recibe = await HttpClient.GetFromJsonAsync<Vehiculo>("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
-            var envia = await HttpClient.GetFromJsonAsync<Vehiculo>("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoEnviaOferta) ?? new();
-            VehiculosEnviaOferta.Add(envia);
+
+            var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
+            VehiculosRecibeOferta.Add(envia);
         }
 
         StateHasChanged();

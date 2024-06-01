@@ -152,7 +152,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
-        
 
         [HttpPost]
         [Route("GetDueño")]
@@ -172,19 +171,19 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async Task<IActionResult> BuscarVehiculo([FromBody] string Matricula)
         {
             using var db = new OhMyBoatUIServerContext();
-            Vehiculo? v = await db.Terrestres.Where(v => v.Matricula == Matricula).FirstAsync();
+            Vehiculo? v = await db.Terrestres.Where(ter => ter.Matricula == Matricula).FirstAsync(); 
             if (v != null)
             {
                 return StatusCode(StatusCodes.Status200OK, v);
             }
-            v = await db.Maritimos.Where(mar => mar.Matricula == Matricula).FirstAsync();
-            if (v != null)
-            {
-                return StatusCode(StatusCodes.Status200OK, v);
-            }
-            return StatusCode(StatusCodes.Status403Forbidden, null);
+            else{
+                v = await db.Maritimos.Where(mar => mar.Matricula == Matricula).FirstAsync();
+                if (v != null)
+                {
+                    return StatusCode(StatusCodes.Status200OK, v);
+                }
+                return StatusCode(StatusCodes.Status403Forbidden, null);
+           }
         }
-    
-    
     }
 }
