@@ -12,11 +12,13 @@
 @inject NavigationManager NavManager
 @attribute [Authorize(Roles = "cliente")]
 
+
 <AuthorizeView Roles="cliente">
     <Authorized>
 
         <h1>Mis Navios</h1>
 
+        <Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.Large" />
         <Modal @ref="modal" />
 
         @if (MisBarcos.Count == 0)
@@ -51,7 +53,7 @@
                         <CardText>@nav.Antiguedad</CardText>
                     </CardBody>
                     <CardFooter class="text-end">
-                        <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                            <Button Color="ButtonColor.Primary" @onclick="(async ()=> await VerDetalles(nav.Id))">Detalles</Button>
                     </CardFooter>
                 </Card>
             }
@@ -70,6 +72,7 @@
 
 @code {
     private Modal modal = default!;
+    private Modal DetalleModal = default!;
     List<Maritimo> MisBarcos = new();
 
 
@@ -95,8 +98,17 @@
         await modal.HideAsync();
         await RecargarLista();
     }
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
 
-
+    private async Task VerDetalles(int Id) {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+        parameters.Add("Id", Id);
+        await DetalleModal.ShowAsync<DetalleNavioPropio>(title: "Detalles", parameters: parameters);
+    }
     private async Task CargarNavio()
     {
         var parameters = new Dictionary<string, object>();

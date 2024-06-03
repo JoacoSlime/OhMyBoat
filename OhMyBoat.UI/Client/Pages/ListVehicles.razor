@@ -10,6 +10,8 @@
 @inject IJSRuntime JsRuntime
 
 
+<Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.Large" IsVerticallyCentered="true"/>
+
 <AuthorizeView>
     <Authorized>
 
@@ -30,7 +32,7 @@
                         <CardText>@Vec.Matricula</CardText>
                         </CardBody>
                         <CardFooter class="text-end">
-                            <Button class="btn btn-primary">Detalles</Button> <!-- TODO: Joaco, implementá -->
+                            <Button Color="ButtonColor.Primary" @onclick="(async ()=> await VerDetalles(Vec.Id))">Detalles</Button>
                         </CardFooter>
                     </Card>
                 }
@@ -41,11 +43,24 @@
 
 
 @code {
+    private Modal DetalleModal = default!;
     List<Terrestre> ListaTerrestres = new();
 
 
     protected override async Task OnInitializedAsync()
     {
-            ListaTerrestres = await  HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles") ?? new();      
-        }
-    } 
+        ListaTerrestres = await HttpClient.GetFromJsonAsync<List<Terrestre>>("api/Vehiculos/ListarVehiculosDisponibles") ?? new();      
+    }
+
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
+
+    private async Task VerDetalles(int Id) {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+        parameters.Add("Id", Id);
+        await DetalleModal.ShowAsync<DetalleVehiculo>(title: "Detalles", parameters: parameters);
+    }
+} 

@@ -1,0 +1,47 @@
+@inject HttpClient HttpClient
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+
+<AuthorizeView>
+    <Authorized>
+        <div class="d-flex flex-column">
+            <div class="d-flex">
+                <img class="rounded-3 m-3" src="@Vehiculo.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                <div class="d-flex flex-column">
+                    <h3>@Vehiculo.Tipo</h3>
+                    <h4>@Vehiculo.Marca @Vehiculo.Modelo @Vehiculo.Anio</h4>
+                    <h4 class="mb-5">@Vehiculo.Matricula</h4>
+                    <h4 class="mb-3">Antiguedad: @Vehiculo.Antiguedad años.</h4>
+                    <h4 class="mb-3">Kilometraje: @Vehiculo.Kilometraje km aproximadamente.</h4>
+                </div>
+            </div>
+            <div class="d-flex flex-column">
+                <h3>Descripcion:</h3>
+                <div class="border rounded p-3 mb-3">@Vehiculo.descripcion</div>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    [Parameter] public int Id { get; set; }
+    public Terrestre Vehiculo {get; set;} = new();
+
+
+    protected override async Task OnParametersSetAsync() {
+        Vehiculo.Id = Id;
+        var responseSV = await HttpClient.PostAsJsonAsync<Terrestre>("api/Vehiculos/GetVehiculo", Vehiculo) ?? new();
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "Id innexistente");
+            await OnClickCallback.InvokeAsync();
+            return;
+        }
+        Vehiculo = await responseSV.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+    }
+}
