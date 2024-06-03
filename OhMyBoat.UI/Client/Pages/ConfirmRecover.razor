@@ -68,7 +68,7 @@
         esValido = peticion.IsSuccessStatusCode;
         if (!(esValido.GetValueOrDefault()))
         {
-            await JsRuntime.InvokeVoidAsync("alert", "El token ya fue usado o expiro");
+            await JsRuntime.InvokeVoidAsync("alert", "El enlace ya fue usado o expiro");
             navManager.NavigateTo("/");
         }
     }
