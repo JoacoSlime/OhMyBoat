@@ -49,7 +49,7 @@
     public Maritimo Navio {get; set;} = new();
     public Cliente Dueño {get; set;} = new();
 
-    public String deuda;
+    public String deuda {get; set;} = "";
 
     protected override async Task OnParametersSetAsync() {
         
