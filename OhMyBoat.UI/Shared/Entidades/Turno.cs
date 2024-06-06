@@ -9,7 +9,8 @@ namespace OhMyBoat.UI.Shared.Entidades
     public class Turno
     {
         public int Id { get; set; }
-        public int TurnoId {  get; set; }
+        public int IDTrueque {  get; set; }
+        public int IDSucursal { get; set; }
         public DateTime FechaTurno {  get; set; }
 
     }
