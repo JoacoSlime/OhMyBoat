@@ -1,4 +1,3 @@
-@page "/oferta/{vehiculoOfertado}"
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @using System.Security.Claims
@@ -15,120 +14,138 @@
 
 
 
-        <h1>Mis Navios</h1>
+<h1>Seleccionar vehiculo para Ofertar</h1>
 
-        <Modal @ref="modal" />
-            <div class="d-flex flex-row flex-wrap">
-            @foreach (var nav in MisBarcos)
-            {
-                <Card Class="me-4 mb-4" Style="width:auto;">
-                    <img class="rounded-top p-3" src="@nav.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
-                    <CardBody>
-                        <CardTitle>Matrícula:</CardTitle>
-                        <CardText>@nav.Matricula</CardText>
-                        <CardTitle>Descripción:</CardTitle>
-                        <CardText>@(nav.descripcion != "" ? nav.descripcion : "-")</CardText>
-                        <CardTitle>Tipo:</CardTitle>
-                        <CardText>@nav.Tipo</CardText>
-                        <CardTitle>Dimensiones:</CardTitle>
-                    </CardBody>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Eslora: @nav.Eslora</li>
-                        <li class="list-group-item">Puntal: @nav.Puntal</li>
-                        <li class="list-group-item">Deuda: @nav.Deuda</li>
-                    </ul>
-                    <CardBody>
-                        <CardTitle>Deuda:</CardTitle>
-                        <CardText>@nav.Deuda</CardText>
-                        <CardTitle>Antiguedad:</CardTitle>
-                        <CardText>@nav.Antiguedad</CardText>
-                    </CardBody>
-                    <CardFooter class="text-end">
-                            <Button Color="ButtonColor.Primary" @onclick="(async ()=> await OnClick(nav.Matricula))">Ofertar Navio</Button>
-                    </CardFooter>
-                </Card>
-            }
-            </div>
-            <div class="d-flex flex-row flex-wrap">
-            @foreach (var vec in MisRodados)
-            {
-                <Card Class="me-4 mb-4" Style="width:auto;">
-                    <img class="rounded-top p-3" src="@vec.base64imagen" alt="Imagen del vehículo" style="width:auto; height:25vh; max-width: 75vh"/>
-                    <CardBody>
-                        <CardTitle>Matrícula:</CardTitle>
-                        <CardText>@vec.Matricula</CardText>
-                        <CardTitle>Descripción:</CardTitle>
-                        <CardText>@(vec.descripcion != "" ? vec.descripcion : "-")</CardText>
-                        <CardTitle>Tipo:</CardTitle>
-                        <CardText>@vec.Tipo</CardText>
-                        <CardTitle>Antiguedad:</CardTitle>
-                        <CardText>@vec.Antiguedad</CardText>
-                    </CardBody>
-                    <CardFooter class="text-end">
-                            <Button Color="ButtonColor.Primary" @onclick="(async ()=> await OnClickVehiculo(vec.Matricula))">Ofertar Vehiculo</Button>
-                    </CardFooter>
-                </Card>
-            }
-            </div>
-        }           
+@if (isLoading)
+{
+     <p>Cargando vehiculos, por favor espere...</p>
+}
+else
+{
+ @if (MisBarcos.Count == 0 && MisRodados.Count == 0)
+    {
+        <p>ustend no tiene vehiculos por favor haga click en "Cerrar" para continuar </p>
+        <CardFooter class="text-end">
+        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>NoHayVehiculos()">Cerrar</Button>
+         </CardFooter>       
+    }
+    else
+    {
+<div class="d-flex flex-row flex-wrap">
+    @foreach (var nav in MisBarcos)
+    {
+        <Card Class="me-4 mb-4" Style="width:auto;">
+            <img class="rounded-top p-3" src="@nav.base64imagen" alt="Imagen del vehículo"
+                style="width:auto; height:25vh; max-width: 75vh" />
+            <CardBody>
+                <CardTitle>Matrícula:</CardTitle>
+                <CardText>@nav.Matricula</CardText>
+                <CardTitle>Descripción:</CardTitle>
+                <CardText>@(nav.descripcion != "" ? nav.descripcion : "-")</CardText>
+                <CardTitle>Tipo:</CardTitle>
+                <CardText>@nav.Tipo</CardText>
+                <CardTitle>Dimensiones:</CardTitle>
+            </CardBody>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Eslora: @nav.Eslora</li>
+                <li class="list-group-item">Puntal: @nav.Puntal</li>
+                <li class="list-group-item">Deuda: @nav.Deuda</li>
+            </ul>
+            <CardBody>
+                <CardTitle>Deuda:</CardTitle>
+                <CardText>@nav.Deuda</CardText>
+                <CardTitle>Antiguedad:</CardTitle>
+                <CardText>@nav.Antiguedad</CardText>
+            </CardBody>
+            <CardFooter class="text-end">
+                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>OnClick(nav.Matricula)">Ofertar Navio</Button>
+            </CardFooter>
+        </Card>
+    }
+</div>
+<div class="d-flex flex-row flex-wrap">
+    @foreach (var vec in MisRodados)
+    {
+        <Card Class="me-4 mb-4" Style="width:auto;">
+            <img class="rounded-top p-3" src="@vec.base64imagen" alt="Imagen del vehículo"
+                style="width:auto; height:25vh; max-width: 75vh" />
+            <CardBody>
+                <CardTitle>Matrícula:</CardTitle>
+                <CardText>@vec.Matricula</CardText>
+                <CardTitle>Descripción:</CardTitle>
+                <CardText>@(vec.descripcion != "" ? vec.descripcion : "-")</CardText>
+                <CardTitle>Tipo:</CardTitle>
+                <CardText>@vec.Tipo</CardText>
+                <CardTitle>Antiguedad:</CardTitle>
+                <CardText>@vec.Antiguedad</CardText>
+            </CardBody>
+            <CardFooter class="text-end">
+                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success"
+                    @onclick="()=>OnClickVehiculo(vec.Matricula)">Ofertar Vehiculo</Button>
+            </CardFooter>
+        </Card>
+    }
+</div>
+}
+}
 
 @code
 {
-    [Parameter]
-    public string? vehiculoOfertado { get; set; } 
-    
-    private Modal modal = default!;
+    [Parameter] public Vehiculo vehiculoOfertado { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+
     List<Maritimo> MisBarcos = new();
     List<Terrestre> MisRodados = new();
 
-    
+    private Boolean isLoading = true;
+
+
     protected override async Task OnInitializedAsync()
     {
         await RecargarLista();
     }
 
-        private async Task RecargarLista()
+    private async Task RecargarLista()
     {
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
         var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarNaviosCliente", Email);
         MisBarcos = await respSV.Content.ReadFromJsonAsync<List<Maritimo>>();
-        
+
         var respSVeh = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosCliente", Email);
         MisRodados = await respSVeh.Content.ReadFromJsonAsync<List<Terrestre>>();
-        StateHasChanged();     
+
+        isLoading =false;    
+        StateHasChanged();
     }
 
-    private async  Task OnClick(string patenteOfertado)
+    private async Task OnClick(string patenteOfertado)
     {
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
-        var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;            
+        var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        Maritimo vec = new Maritimo() {Matricula = this.vehiculoOfertado};
+        Oferta ofer = new Oferta
+            {
+                ID_RecibeOferta = vehiculoOfertado.IDCliente,
+                ID_EnviaOferta = Email,
+                PatenteVehiculoEnviaOferta = patenteOfertado,
+                PatenteVehiculoRecibeOferta = vehiculoOfertado.Matricula
+            };
 
-        var responseVec = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/GetNavioPatente", vec) ; // geteo la data del vehiculo al que se le envia la oferta
-        if (responseVec.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-        var vecOfer = await responseVec.Content.ReadFromJsonAsync<Maritimo>() ?? new(); 
-        Oferta ofer = new Oferta {
-            ID_RecibeOferta =vecOfer.IDCliente,
-            ID_EnviaOferta =Email,
-            PatenteVehiculoEnviaOferta = patenteOfertado,
-            PatenteVehiculoRecibeOferta = vecOfer.Matricula     
-        };
+        var RespuestaSv = HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/RegistrarOferta", ofer);
+        await JsRuntime.InvokeVoidAsync("alert", RespuestaSv.Status);
+        await JsRuntime.InvokeVoidAsync("alert", "La oferta se ha enviado");
 
-        var RespuestaSv =  HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/RegistrarOferta", ofer);
-        }
-       await JsRuntime.InvokeVoidAsync("alert", "La oferta se ha enviado");
+        await OnClickCallback.InvokeAsync();
     }
 
 
 
-    private async  Task OnClickVehiculo(string patenteOfertado)
+    private async Task OnClickVehiculo(string patenteOfertado)
     {
-        Terrestre ter = new Terrestre() {Matricula = this.vehiculoOfertado};
-        var RespuestaAfirmativa = await HttpClient.PostAsJsonAsync<Terrestre>("api/vehiculos/GetTerrestrePatente", ter);   //verifico que no sea un terrestre
+        Terrestre ter = new Terrestre() { Matricula = this.vehiculoOfertado.Matricula };
+        var RespuestaAfirmativa = await HttpClient.PostAsJsonAsync<Terrestre>("api/vehiculos/GetTerrestrePatente", ter);        //verifico que no sea un terrestre // cosa que pasa que en la realidad no deberia pasar: si hay un navio y un vehiculo con la misma patente falla 
         if (RespuestaAfirmativa.StatusCode == System.Net.HttpStatusCode.OK)
         {
             await JsRuntime.InvokeVoidAsync("alert", "la oferta debe contener al menos un navío.");
@@ -139,26 +156,26 @@
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
 
-        Vehiculo vec = new Vehiculo() {Matricula = this.vehiculoOfertado};
-        var responseVec = await HttpClient.PostAsJsonAsync<Vehiculo>("api/vehiculos/GetVehiculoPatente", vec);  //geteo la data del vehiculo al que se le envia la oferta
-        if (responseVec.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-        var vecOfer = await responseVec.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
+        Oferta ofer = new Oferta
+            {
+                ID_RecibeOferta = vehiculoOfertado.IDCliente,
+                ID_EnviaOferta = Email,
+                PatenteVehiculoEnviaOferta = patenteOfertado,
+                PatenteVehiculoRecibeOferta = vehiculoOfertado.Matricula
+            };
 
-        Oferta ofer = new Oferta {
-            ID_RecibeOferta =vecOfer.IDCliente,
-            ID_EnviaOferta =Email,
-            PatenteVehiculoEnviaOferta = patenteOfertado,
-            PatenteVehiculoRecibeOferta = vecOfer.Matricula     
-        };
-        
-
-        var RespuestaSv =  await HttpClient.PostAsJsonAsync<Oferta>("api/oferta/RegistrarOferta", ofer);
-        }
-
+        var RespuestaSv = await HttpClient.PostAsJsonAsync<Oferta>("api/oferta/RegistrarOferta", ofer);
         await JsRuntime.InvokeVoidAsync("alert", "La oferta se ha enviado");
+
+        await OnClickCallback.InvokeAsync();
     }
-    
+
+    private async Task NoHayVehiculos()
+    {        
+        await OnClickCallback.InvokeAsync();
+    }
+
+
 
 
 }
