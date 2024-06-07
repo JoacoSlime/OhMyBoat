@@ -10,5 +10,6 @@ namespace OhMyBoat.UI.Shared.Entidades
     {
         public DateTime dia { get; set; }
         public Sucursal suc { get; set; }
+
     }
 }

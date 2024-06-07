@@ -14,9 +14,9 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         {
             using ( var db = new OhMyBoatUIServerContext())
             {
-                return await db.Turno.Where(t => (t.IDSucursal == suc.Id && t.FechaTurno.Year == dia.Year && t.FechaTurno.Month == dia.Month && t.FechaTurno.Day == dia.Day)).ToListAsync();          
+                return await db.Turno.Where(t => (t.IDTrueque != null && t.IDSucursal == suc.Id && t.FechaTurno.Year == dia.Year && t.FechaTurno.Month == dia.Month && t.FechaTurno.Day == dia.Day)).ToListAsync();          
             }
-           // si no funciona hacer que esto devuelva null y listo
+           // si no funciona hacer que esto devuelva null y listo            
         }
         private async Task<List<Turno>?> ObtenerTurnosDisponiblesSinReservados(List<Turno>todosLosTurnosDelDia, DateTime dia, Sucursal suc) 
         {
@@ -83,7 +83,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [Route("VerificarDisponibilidadDia")]
         public async Task<IActionResult> ObtenerHorarios([FromBody] ConsultaHorariosDTO tapioca)
         {
-            var horarios = obtenerTurnosDisponibles(tapioca.dia, tapioca.suc);
+            var horarios = await obtenerTurnosDisponibles(tapioca.dia, tapioca.suc);
             if (horarios != null)               
                 return StatusCode(StatusCodes.Status200OK, horarios);            
             else return StatusCode(StatusCodes.Status403Forbidden, null);
