@@ -1,4 +1,4 @@
-@page "/sent-offers"
+@page "/received-offers"
 
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
@@ -14,7 +14,7 @@
 
 <AuthorizeView Roles="cliente">
     <Authorized>
-        <h1>Mis Ofertas Enviadas</h1>
+        <h1>Mis Ofertas Recibidas</h1>
 
     </Authorized>
     <NotAuthorized>
@@ -26,10 +26,11 @@
 
 /*
     
-    Ofreciste:                                      A cambio de:
+    Nombre ofrece:                                                  A cambio de:
 
-    (foto vehiculoEnviaOferta)           --->       (foto vehiculoRecibeOferta) 
-    TipoVehiculo, Marca, Modelo, Año                TipoVehiculo, Marca, Modelo, Año
+    (Foto de perfil     (foto vehiculoEnviaOferta)         --->     (foto vehiculoRecibeOferta) 
+    del que envia       TipoVehiculo, Marca, Modelo, Año            TipoVehiculo, Marca, Modelo, Año
+    una oferta)
 
    [VER DETALLE OFERTA]
 
@@ -43,6 +44,8 @@
     List<Vehiculo> VehiculosRecibeOferta = new();
     List<Vehiculo> VehiculosEnviaOferta = new();
 
+    List<Cliente> ClienteOfertante = new();
+
     protected override async Task OnInitializedAsync()
     {
         await RecargarLista();
@@ -53,11 +56,12 @@
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasEnviadas", MyEmail);
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", MyEmail);
         SentOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
         VehiculosRecibeOferta.Clear();
         VehiculosEnviaOferta.Clear();
+        ClienteOfertante.Clear();
 
         foreach (Oferta o in SentOffers)
         {
@@ -68,6 +72,18 @@
             var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(envia);
+
+            var resp3 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetDueño", envia) ?? new();
+            var ofertante = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
+            ClienteOfertante.Add(ofertante);
+
+            /*Tambien se podria hacer con la otra api
+
+            var resp4 = await HttpClient.PostAsJsonAsync("api/Usuario/BuscarUsuario", o.ID_EnviaOferta) ?? new();
+            var ofertante2 = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
+            ClienteOfertante.Add(ofertante);
+
+            */
         }
 
         StateHasChanged();

@@ -40,5 +40,15 @@ namespace OhMyBoat.UI.Server.Controllers
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
+
+        [HttpPost]
+        [Route("ListarOfertasRecibidas")]
+        public async Task<IActionResult> ListReceivedOffers([FromBody] string Email){
+            
+            using var bd = new OhMyBoatUIServerContext();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.ToLower()).ToListAsync();
+            return StatusCode(StatusCodes.Status200OK, offers);
+
+        }
     }
 }
