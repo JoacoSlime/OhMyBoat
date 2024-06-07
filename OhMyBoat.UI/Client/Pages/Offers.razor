@@ -24,7 +24,7 @@ else
 {
  @if (MisBarcos.Count == 0 && MisRodados.Count == 0)
     {
-        <p>ustend no tiene vehiculos por favor haga click en "Cerrar" para continuar </p>
+        <p>Usted no tiene vehiculos por favor haga click en "Cerrar" para continuar.</p>
         <CardFooter class="text-end">
         <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>NoHayVehiculos()">Cerrar</Button>
          </CardFooter>       
@@ -91,7 +91,7 @@ else
 
 @code
 {
-    [Parameter] public Vehiculo vehiculoOfertado { get; set; }
+    [Parameter] public Vehiculo? vehiculoOfertado { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
 
     List<Maritimo> MisBarcos = new();
@@ -111,10 +111,10 @@ else
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
         var respSV = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarNaviosCliente", Email);
-        MisBarcos = await respSV.Content.ReadFromJsonAsync<List<Maritimo>>();
+        MisBarcos = await respSV.Content.ReadFromJsonAsync<List<Maritimo>>() ?? new();
 
         var respSVeh = await HttpClient.PostAsJsonAsync("api/vehiculos/ListarVehiculosCliente", Email);
-        MisRodados = await respSVeh.Content.ReadFromJsonAsync<List<Terrestre>>();
+        MisRodados = await respSVeh.Content.ReadFromJsonAsync<List<Terrestre>>() ?? new();
 
         isLoading =false;    
         StateHasChanged();
@@ -127,10 +127,10 @@ else
 
         Oferta ofer = new Oferta
             {
-                ID_RecibeOferta = vehiculoOfertado.IDCliente,
+                ID_RecibeOferta = vehiculoOfertado?.IDCliente,
                 ID_EnviaOferta = Email,
                 PatenteVehiculoEnviaOferta = patenteOfertado,
-                PatenteVehiculoRecibeOferta = vehiculoOfertado.Matricula
+                PatenteVehiculoRecibeOferta = vehiculoOfertado?.Matricula ?? ""
             };
 
         var RespuestaSv = HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/RegistrarOferta", ofer);
@@ -144,7 +144,7 @@ else
 
     private async Task OnClickVehiculo(string patenteOfertado)
     {
-        Terrestre ter = new Terrestre() { Matricula = this.vehiculoOfertado.Matricula };
+        Terrestre ter = new Terrestre() { Matricula = this.vehiculoOfertado?.Matricula ?? "" };
         var RespuestaAfirmativa = await HttpClient.PostAsJsonAsync<Terrestre>("api/vehiculos/GetTerrestrePatente", ter);        //verifico que no sea un terrestre // cosa que pasa que en la realidad no deberia pasar: si hay un navio y un vehiculo con la misma patente falla 
         if (RespuestaAfirmativa.StatusCode == System.Net.HttpStatusCode.OK)
         {
@@ -158,10 +158,10 @@ else
 
         Oferta ofer = new Oferta
             {
-                ID_RecibeOferta = vehiculoOfertado.IDCliente,
+                ID_RecibeOferta = vehiculoOfertado?.IDCliente,
                 ID_EnviaOferta = Email,
                 PatenteVehiculoEnviaOferta = patenteOfertado,
-                PatenteVehiculoRecibeOferta = vehiculoOfertado.Matricula
+                PatenteVehiculoRecibeOferta = vehiculoOfertado?.Matricula ?? ""
             };
 
         var RespuestaSv = await HttpClient.PostAsJsonAsync<Oferta>("api/oferta/RegistrarOferta", ofer);
