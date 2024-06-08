@@ -144,30 +144,14 @@ else
 
     private async Task OnClickVehiculo(string patenteOfertado)
     {
-        Terrestre ter = new Terrestre() { Matricula = this.vehiculoOfertado?.Matricula ?? "" };
+        Terrestre ter = new Terrestre() { Matricula = this.vehiculoOfertado.Matricula };
         var RespuestaAfirmativa = await HttpClient.PostAsJsonAsync<Terrestre>("api/vehiculos/GetTerrestrePatente", ter);        //verifico que no sea un terrestre // cosa que pasa que en la realidad no deberia pasar: si hay un navio y un vehiculo con la misma patente falla 
         if (RespuestaAfirmativa.StatusCode == System.Net.HttpStatusCode.OK)
         {
             await JsRuntime.InvokeVoidAsync("alert", "la oferta debe contener al menos un navío.");
             return;
         }
-
-        var Aut = await authStateProvider.GetAuthenticationStateAsync();
-        var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
-
-
-        Oferta ofer = new Oferta
-            {
-                ID_RecibeOferta = vehiculoOfertado?.IDCliente,
-                ID_EnviaOferta = Email,
-                PatenteVehiculoEnviaOferta = patenteOfertado,
-                PatenteVehiculoRecibeOferta = vehiculoOfertado?.Matricula ?? ""
-            };
-
-        var RespuestaSv = await HttpClient.PostAsJsonAsync<Oferta>("api/oferta/RegistrarOferta", ofer);
-        await JsRuntime.InvokeVoidAsync("alert", "La oferta se ha enviado");
-
-        await OnClickCallback.InvokeAsync();
+        await OnClick( patenteOfertado);
     }
 
     private async Task NoHayVehiculos()
