@@ -134,7 +134,7 @@ else
             };
 
         var RespuestaSv = HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/RegistrarOferta", ofer);
-        await JsRuntime.InvokeVoidAsync("alert", RespuestaSv.Status);
+        
         await JsRuntime.InvokeVoidAsync("alert", "La oferta se ha enviado");
 
         await OnClickCallback.InvokeAsync();
