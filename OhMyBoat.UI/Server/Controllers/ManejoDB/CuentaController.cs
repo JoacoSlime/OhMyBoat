@@ -31,6 +31,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             if (db.Usuarios.Where(cli => cli.Email.ToLower() == c.Email.ToLower()).IsNullOrEmpty())
             {
                 c.Rol = Roles.empleado;
+                /*
                 TokenRecu Token = new()
                 {
                     Email = c.Email.ToLower(),
@@ -47,9 +48,11 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                         <p>Haz click <a href=""http://localhost:5047/recovery/{Token.StringAleatorioDelMomento}"">aquí</a> para ir directamente.<p/>
                         <p>Si no has sido tu quien pidió esta clave, ignora este mensaje.</p>"
                     );
+                 */
                 await db.Usuarios.AddAsync(c);
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK, c);
+                
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }

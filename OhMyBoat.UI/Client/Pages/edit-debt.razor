@@ -1,0 +1,55 @@
+@page "/edit-debt"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider authStateProvider
+@using OhMyBoat.UI.Shared.Entidades
+@using OhMyBoat.UI.Shared
+@using Microsoft.JSInterop
+@using System
+@inject IJSRuntime JsRuntime
+@inject HttpClient HttpClient
+@inject NavigationManager Navegador
+@using System.ComponentModel.DataAnnotations
+
+<AuthorizeView>
+    <Authorized>
+<div class="d-flex flex-column justify-content-center p-5">
+    <div class="mb-3">
+        <h1>Editar deuda de un navio</h1>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="nombre"><h3>Matricula del navío</h3></label>
+        <input class="form-control" @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="nombre"><h3>Deuda del navio</h3></label>
+        <input class="form-control" @bind="Deuda" type="float"placeholder="12050" name="nombre" required />
+    </div>
+</div>
+
+<Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>OnClick()">Confirmar</Button>
+
+    </Authorized>
+</AuthorizeView>
+@code{
+
+private float Deuda;
+private string matricula;
+
+private async Task OnClick()
+{
+    Maritimo nav = new Maritimo(){Matricula = this.matricula, Deuda = this.Deuda};
+        var responseSV = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/GetNavioPatente", nav) ?? new();
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "El la matricula no corresponde a ningun navio");            
+            return;
+        }
+         
+    var respuestaSV = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/EditarDeudaNavio", nav) ?? new();
+      await JsRuntime.InvokeVoidAsync("alert", "Deuda editada con"); 
+
+}
+
+}
