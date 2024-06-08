@@ -122,11 +122,11 @@
         if(turnosPropuestos.Count>=1){
             foreach(Turno t in turnosPropuestos)
             {
-                t.IDOferta = idOferta;
-                t.IDSucursal = sucursalElegida.Id;
+                t.OfertaId = idOferta;
+                t.SucursalId = sucursalElegida.Id;
             }
             var cosito = await HttpClient.PostAsJsonAsync<List<Turno>>("api/turnos/EnviarTurnosPropuesta", turnosPropuestos);
-            if (cosito.StatusCode == System.Net.HttpStatusCode.OK)
+            if (cosito.IsSuccessStatusCode)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Se han registrado los turnos con exito");
                 NavManager.NavigateTo("/");

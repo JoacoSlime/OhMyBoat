@@ -21,8 +21,8 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             {
                 using (var db = new OhMyBoatUIServerContext())
                 {
-                    return await db.Turno.Where(t => (t.IDTrueque != null && 
-                                                        t.IDSucursal == turno.IDSucursal && 
+                    return await db.Turno.Where(t => (t.TruequeId != null && 
+                                                        t.SucursalId == turno.SucursalId && 
                                                         t.FechaTurno.Year == turno.FechaTurno.Year && 
                                                         t.FechaTurno.Month == turno.FechaTurno.Month && 
                                                         t.FechaTurno.Day == turno.FechaTurno.Day && 
@@ -35,7 +35,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         {
             using ( var db = new OhMyBoatUIServerContext())
             {
-                return await db.Turno.Where(t => (t.IDTrueque != null && t.IDSucursal == suc.Id && t.FechaTurno.Year == dia.Year && t.FechaTurno.Month == dia.Month && t.FechaTurno.Day == dia.Day)).ToListAsync();          
+                return await db.Turno.Where(t => (t.TruequeId != null && t.SucursalId == suc.Id && t.FechaTurno.Year == dia.Year && t.FechaTurno.Month == dia.Month && t.FechaTurno.Day == dia.Day)).ToListAsync();          
             }
            // si no funciona hacer que esto devuelva null y listo            
         }
@@ -115,13 +115,13 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         {
             if(turnos.Count >=1 && turnos.Count <= 3)
             {
-                var numero = turnos.First().IDOferta;
+                var numero = turnos.First().OfertaId;
                 bool todoOk = true;
                 foreach (var turno in turnos)
                 {
                     if(!await VerificarTurnoDisponible(turno))
                     {
-                        if (turno.IDOferta != numero)
+                        if (turno.OfertaId != numero)
                         {
                             todoOk = false; // por si algun vivo quiere explotar la api 
                         }
@@ -139,9 +139,9 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                         {                            
                                 await db.Turno.AddAsync(turno);                            
                         }                            
-                        db.SaveChanges(); // explota aca por algun motivo
-                        StatusCode(StatusCodes.Status200OK, null);
+                       await db.SaveChangesAsync(); // explota aca por algun motivo                       
                     }
+                    return StatusCode(StatusCodes.Status200OK, null);
                 }
             }
             return StatusCode(StatusCodes.Status412PreconditionFailed, null); // si mandan  0 o 30 turnos porque si
