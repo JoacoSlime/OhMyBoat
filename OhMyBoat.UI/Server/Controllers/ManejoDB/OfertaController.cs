@@ -30,5 +30,20 @@ namespace OhMyBoat.UI.Server.Controllers
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
+
+        [HttpPost]
+        [Route("GetOferta")]
+        public async Task<IActionResult> GetOferta([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Oferta? offer = await db.Ofertas.Where(oferta => oferta.Id == o.Id).FirstOrDefaultAsync();
+            if (offer != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, offer);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
     }
+
 }
