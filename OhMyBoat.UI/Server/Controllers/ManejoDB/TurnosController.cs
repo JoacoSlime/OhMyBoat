@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using OhMyBoat.UI.Server.Data;
 using OhMyBoat.UI.Shared.Entidades;
+using System.Security.Cryptography;
 
 namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 {  
@@ -10,6 +11,26 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
     public class TurnosController : Controller
     {
+        private async Task<bool>VerificarTurnoDisponible(Turno turno) // tira false si no se superpone
+        {
+            if (turno == null)
+            {
+                return false;
+            }
+            else
+            {
+                using (var db = new OhMyBoatUIServerContext())
+                {
+                    return await db.Turno.Where(t => (t.IDTrueque != null && 
+                                                        t.IDSucursal == turno.IDSucursal && 
+                                                        t.FechaTurno.Year == turno.FechaTurno.Year && 
+                                                        t.FechaTurno.Month == turno.FechaTurno.Month && 
+                                                        t.FechaTurno.Day == turno.FechaTurno.Day && 
+                                                        t.FechaTurno.Hour == turno.FechaTurno.Hour && 
+                                                        t.FechaTurno.Minute == turno.FechaTurno.Minute)).AnyAsync();
+                }
+            }
+        } 
         private async Task<List<Turno>?> ObtenerTurnosReservados(DateTime dia, Sucursal suc)
         {
             using ( var db = new OhMyBoatUIServerContext())
@@ -65,7 +86,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
        // private List<Turno> obtenerTurnosReservadosSucursal() { return new List<Turno>(); } // simulo que no hay nada
 
-
         [HttpGet]
         [Route("ObtenerSucursales")]
         public async Task<IActionResult> ObtenerSucursales()
@@ -87,6 +107,44 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             if (horarios != null)               
                 return StatusCode(StatusCodes.Status200OK, horarios);            
             else return StatusCode(StatusCodes.Status403Forbidden, null);
+        }
+
+        [HttpPost]
+        [Route("EnviarTurnosPropuesta")]
+        public async Task<IActionResult> enviarTurnos([FromBody] List<Turno> turnos)
+        {
+            if(turnos.Count >=1 && turnos.Count <= 3)
+            {
+                var numero = turnos.First().IDOferta;
+                bool todoOk = true;
+                foreach (var turno in turnos)
+                {
+                    if(!await VerificarTurnoDisponible(turno))
+                    {
+                        if (turno.IDOferta != numero)
+                        {
+                            todoOk = false; // por si algun vivo quiere explotar la api 
+                        }
+                    }
+                    else return StatusCode(StatusCodes.Status406NotAcceptable, null); // si por X motivo se agarran el turno mientras confirman la seleccion
+
+                }
+                if (!todoOk)
+                    return StatusCode(StatusCodes.Status409Conflict, null); // algun hdp tocando la api
+                else
+                {
+                    using (var db = new OhMyBoatUIServerContext())
+                    {
+                        foreach (var turno in turnos)
+                        {                            
+                                await db.Turno.AddAsync(turno);                            
+                        }                            
+                        db.SaveChanges(); // explota aca por algun motivo
+                        StatusCode(StatusCodes.Status200OK, null);
+                    }
+                }
+            }
+            return StatusCode(StatusCodes.Status412PreconditionFailed, null); // si mandan  0 o 30 turnos porque si
         }
 
     }

@@ -10,7 +10,7 @@ namespace OhMyBoat.UI.Shared.Entidades
     {
         public int Id { get; set; }
         public int? IDTrueque {  get; set; } // si no tiene, no esta confirmado
-        public int IDProposicionTurno { get; set; }
+        public int IDOferta { get; set; }
         public int IDSucursal { get; set; }
         public DateTime FechaTurno {  get; set; }
 
