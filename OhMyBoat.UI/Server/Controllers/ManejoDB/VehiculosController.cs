@@ -145,7 +145,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             {
                 return StatusCode(StatusCodes.Status200OK, vec);
             }
-            vec = await db.Maritimos.Where(mar => mar.Matricula == vec.Matricula).FirstAsync();
+            vec = await db.Maritimos.Where(mar => mar.Matricula == v.Matricula).FirstAsync();
             if (vec != null)
             {
                 return StatusCode(StatusCodes.Status200OK, vec);

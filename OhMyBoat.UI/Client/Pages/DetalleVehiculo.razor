@@ -9,6 +9,10 @@
 
 <AuthorizeView>
     <Authorized>
+
+        <Modal @ref="modal" IsScrollable="true" Size="ModalSize.Large" />
+        
+
         <div class="d-flex flex-column">
             <div class="d-flex">
                 <img class="rounded-3 m-3" src="@Vehiculo.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
@@ -46,6 +50,7 @@
     [Parameter] public int Id { get; set; }
     public Terrestre Vehiculo {get; set;} = new();
     public Cliente Dueño {get; set;} = new();
+    private Modal modal = default!;
 
 
     protected override async Task OnParametersSetAsync() {
@@ -69,8 +74,18 @@
     }
 
 
-    private void  EnviarOferta( ) 
+
+    private async Task hideModal(){
+        await modal.ShowAsync();
+        await modal.HideAsync();
+    }
+
+        private async Task EnviarOferta()
     {
-       Navegador.NavigateTo($"/oferta/{Vehiculo.Matricula}");
+        Vehiculo vec = new Vehiculo() {IDCliente = this.Vehiculo.IDCliente , Matricula = this.Vehiculo.Matricula};
+        var parameters = new Dictionary<string, object>();
+            parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+            parameters.Add("vehiculoOfertado" , vec);      
+        await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 }
