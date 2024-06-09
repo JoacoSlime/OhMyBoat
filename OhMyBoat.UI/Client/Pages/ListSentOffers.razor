@@ -15,11 +15,49 @@
 <AuthorizeView Roles="cliente">
     <Authorized>
         <h1>Mis Ofertas Enviadas</h1>
-            @foreach (var Nav in SentOffers ) {
-                <CardText>@Nav.PatenteVehiculoEnviaOferta</CardText>
-                <CardText>@Nav.PatenteVehiculoRecibeOferta</CardText>
+            @if (SentOffers.Count == 0)
+            {
+                <p>Usted no tiene ninguna oferta enviada aún</p>
+            } else {
+            <div class="d-flex flex-column p-4 border rounded">
+            @foreach (var vo in VehiculosOfertas ) {
+                <div class="mb-me-4 mb-4 p-4 border rounded">
+                    <div class="d-flex flex-row align-items-center justify-content-between" Style="width:auto;">
+                        <div class="flex-fill">
+                            <h1>Ofreciste:</h1>
+                            <div>
+                                <img class="rounded-3 m-3" src="@vo.Item3.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
+                            </div>
+                            <h2>
+                                Tipo
+                            </h2>
+                            <h2>
+                                Algo, Algo, Algo
+                            </h2>
+                        </div>
+                        <div class="flex-fill">
+                            <Icon Name="IconName.ArrowRight" Size="IconSize.x1"></Icon>
+                        </div>
+                        <div class="flex-fill">
+                            <h1>A cambio de:</h1>
+                            <div>
+                                <img class="rounded-3 m-3" src="@vo.Item2.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
+                            </div>
+                            <h2>
+                                Tipo
+                            </h2>
+                            <h2>
+                                Algo, Algo, Algo
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <Button Color="ButtonColor.Primary" class="position-relative end-0">Ver detalle</Button>
+                    </div>
+                </div>
             }
-                    
+            </div>
+            }
     </Authorized>
     <NotAuthorized>
        @{NavManager.NavigateTo("/",true);} 
@@ -44,8 +82,7 @@
 
     List<Oferta> SentOffers = new();
 
-    List<Vehiculo> VehiculosRecibeOferta = new();
-    List<Vehiculo> VehiculosEnviaOferta = new();
+    List<(Oferta,Vehiculo,Vehiculo)> VehiculosOfertas = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,8 +99,7 @@
         var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasEnviadas", us);
         SentOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
-        VehiculosRecibeOferta.Clear();
-        VehiculosEnviaOferta.Clear();
+        VehiculosOfertas.Clear();
 
         foreach (Oferta o in SentOffers)
         {
@@ -75,9 +111,8 @@
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
             }
-           
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
-            VehiculosRecibeOferta.Add(recibe);
+           
 
             Vehiculo VehiculoEnviado= new Vehiculo() { Matricula = o.PatenteVehiculoEnviaOferta};           
             var resp2 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculoPatente", VehiculoEnviado) ?? new();
@@ -87,7 +122,7 @@
                 return;
             }
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
-            VehiculosRecibeOferta.Add(envia);
+            VehiculosOfertas.Add((o,recibe,envia));
 
         }
 

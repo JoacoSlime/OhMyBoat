@@ -31,6 +31,53 @@
             }
         }
 
+        <div class="d-flex flex-column p-4 border rounded">
+            @foreach (var vo in VehiculosOfertas ) {
+                <div class="mb-me-4 mb-4 p-4 border rounded">
+                    <div class="d-flex flex-row align-items-center justify-content-between" Style="width:auto;">
+                        <div class="flex-fill">
+                            <h1>
+                                <h2>@vo.Item2.Nombre</h2>
+                                <img class="me-5" style="border-radius: 100%; width: 15vh; height: auto;" src="@vo.Item2.Base64imagen"/>
+                            </h1>
+                        </div>
+                        <div class="flex-fill">
+                            <h1>Ofrece:</h1>
+                            <div>
+                                <img class="rounded-3 m-3" src="@vo.Item4.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
+                            </div>
+                            <h2>
+                                Tipo
+                            </h2>
+                            <h2>
+                                Algo, Algo, Algo
+                            </h2>
+                        </div>
+                        <div class="flex-fill">
+                            <Icon Name="IconName.ArrowRight" Size="IconSize.x1"></Icon>
+                        </div>
+                        <div class="flex-fill">
+                            <h1>A cambio de:</h1>
+                            <div>
+                                <img class="rounded-3 m-3" src="@vo.Item3.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
+                            </div>
+                            <h2>
+                                Tipo
+                            </h2>
+                            <h2>
+                                Algo, Algo, Algo
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end flex-row">
+                        <Button Color="ButtonColor.Primary" class="position-relative end-0 ms-3">Ver detalle</Button>
+                        <Button Color="ButtonColor.Success" class="position-relative end-0 ms-3">Aceptar</Button>
+                        <Button Color="ButtonColor.Danger" class="position-relative end-0 ms-3">Rechazar</Button>
+                    </div>
+                </div>
+            }
+            </div>
+        }
     </Authorized>
     <NotAuthorized>
        @{NavManager.NavigateTo("/",true);} 
@@ -56,8 +103,7 @@
 
     List<Oferta> ReceivedOffers = new();
 
-    List<Vehiculo> VehiculosRecibeOferta = new();
-    List<Vehiculo> VehiculosEnviaOferta = new();
+    List<(Oferta,Usuario,Vehiculo,Vehiculo)> VehiculosOfertas = new();
 
     List<Usuario> ClienteOfertante = new();
 
@@ -76,9 +122,7 @@
         var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", us);
         ReceivedOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
-        VehiculosRecibeOferta.Clear();
-        VehiculosEnviaOferta.Clear();
-        ClienteOfertante.Clear();
+        VehiculosOfertas.Clear();
 
         foreach (Oferta o in ReceivedOffers)
         {
@@ -92,7 +136,6 @@
 
            
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
-            VehiculosRecibeOferta.Add(recibe);
 
 
 
@@ -104,7 +147,6 @@
                 return;
             }
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
-            VehiculosRecibeOferta.Add(envia);
 
             var resp3 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetDueño", envia) ?? new();
             if (resp3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
@@ -113,15 +155,9 @@
             }
 
             var ofertante = await resp3.Content.ReadFromJsonAsync<Usuario>() ?? new();
-            ClienteOfertante.Add(ofertante);
 
-            /*Tambien se podria hacer con la otra api
-
-            var resp4 = await HttpClient.PostAsJsonAsync("api/Usuario/BuscarUsuario", o.ID_EnviaOferta) ?? new();
-            var ofertante2 = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
-            ClienteOfertante.Add(ofertante);
-
-            */
+            ofertante.Base64imagen = (ofertante.Base64imagen != "" ? ofertante.Base64imagen : "./user.png");
+            VehiculosOfertas.Add((o, ofertante, recibe, envia));
         }
 
         StateHasChanged();
