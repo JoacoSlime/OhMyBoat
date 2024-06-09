@@ -22,7 +22,8 @@
         }else{
             @foreach (var Nav in ReceivedOffers ) {
                     <CardText>@Nav.PatenteVehiculoEnviaOferta</CardText>
-                    <CardText>@Nav.PatenteVehiculoRecibeOferta</CardText>
+                    <CardText>@Nav.PatenteVehiculoRecibeOferta</CardText>  
+                    <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>aceptarOferta()">Aceptar Ofertar</Button>                
             }
             }
         }
@@ -121,6 +122,12 @@
         }
 
         StateHasChanged();
+    }
+
+
+    private async Task aceptarOferta()
+    {
+        NavManager.NavigateTo("/propose-date",true);
     }
 
     private async Task closeModal()
