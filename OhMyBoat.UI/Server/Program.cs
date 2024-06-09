@@ -63,6 +63,10 @@ using (var context = new OhMyBoatUIServerContext()) // ESTO ES PARA QUE NO EXPLO
         context.Tokens.Add(new OhMyBoat.UI.Shared.Entidades.TokenRecu() { Email = "empleado@empleado.com", StringAleatorioDelMomento = "TokenRecuEmpleado", Usado=false, FechaLimite= DateTime.Now.AddDays(-5)}); // token valido vencido
         context.Tokens.Add(new OhMyBoat.UI.Shared.Entidades.TokenRecu() { Email = "cliente@cliente.com", StringAleatorioDelMomento = "TokenRecuCliente", Usado=true, FechaLimite= DateTime.Now.AddDays(7)}); // token usado que vence en 3 dias
         context.Tokens.Add(new OhMyBoat.UI.Shared.Entidades.TokenRecu() { Email = "cliente2@cliente.com", StringAleatorioDelMomento = "TokenRecuCliente2", Usado=true, FechaLimite= DateTime.Now.AddDays(-5)}); // token vencido usado
+        context.Sucursales.Add(new OhMyBoat.UI.Shared.Entidades.Sucursal() { NombreSuck = "Punta Indio" });
+        context.Sucursales.Add(new OhMyBoat.UI.Shared.Entidades.Sucursal() { NombreSuck = "La Plata" });
+        context.Sucursales.Add(new OhMyBoat.UI.Shared.Entidades.Sucursal() { NombreSuck = "Berisso" });
+
         context.SaveChanges();
     }
     var connection = context.Database.GetDbConnection();
