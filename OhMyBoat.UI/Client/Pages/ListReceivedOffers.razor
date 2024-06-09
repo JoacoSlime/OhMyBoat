@@ -20,11 +20,10 @@
         {
             <p>Usted no tiene ninguna oferta enviada aún</p>
         }else{
-            //@for (var i = 0; i < SentOffers.Count; i++) {
-                // ClienteOfertante[i];
-                // VehiculosEnviaOferta[i];
-                // VehiculosRecibeOferta[i];
-            //}
+            @foreach (var Nav in ReceivedOffers ) {
+                    <CardText>@Nav.PatenteVehiculoEnviaOferta</CardText>
+                    <CardText>@Nav.PatenteVehiculoRecibeOferta</CardText>
+            }
             }
         }
 
@@ -56,10 +55,7 @@
     List<Vehiculo> VehiculosRecibeOferta = new();
     List<Vehiculo> VehiculosEnviaOferta = new();
 
-    List<Cliente> ClienteOfertante = new();
-
-    Vehiculo VehiculoEnviado = new();
-    Vehiculo VehiculoRecibido = new();
+    List<Usuario> ClienteOfertante = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,7 +67,9 @@
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", MyEmail);
+
+        Usuario us = new Usuario() {Email = MyEmail};
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", us);
         ReceivedOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
         VehiculosRecibeOferta.Clear();
@@ -80,18 +78,22 @@
 
         foreach (Oferta o in ReceivedOffers)
         {
-            VehiculoRecibido.Matricula = o.PatenteVehiculoRecibeOferta;
-            var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetVehiculoPatente", VehiculoRecibido) ?? new();
+            Vehiculo VehiculoRecibido = new Vehiculo() { Matricula = o.PatenteVehiculoRecibeOferta};
+            var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculoPatente", VehiculoRecibido) ?? new();
             if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
             }
+
+           
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
-            VehiculoEnviado.Matricula = o.PatenteVehiculoEnviaOferta;
-            var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetVehiculoPatente", VehiculoEnviado) ?? new();
+
+
+            Vehiculo VehiculoEnviado= new Vehiculo() { Matricula = o.PatenteVehiculoEnviaOferta};           
+            var resp2 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculoPatente", VehiculoEnviado) ?? new();
             if (resp2.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
@@ -100,14 +102,22 @@
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(envia);
 
-            var resp3 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetDueño", envia) ?? new();
+            var resp3 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetDueño", envia) ?? new();
             if (resp3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
                 await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
                 return;
             }
-            var ofertante = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
+
+            var ofertante = await resp3.Content.ReadFromJsonAsync<Usuario>() ?? new();
             ClienteOfertante.Add(ofertante);
 
+            /*Tambien se podria hacer con la otra api
+
+            var resp4 = await HttpClient.PostAsJsonAsync("api/Usuario/BuscarUsuario", o.ID_EnviaOferta) ?? new();
+            var ofertante2 = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
+            ClienteOfertante.Add(ofertante);
+
+            */
         }
 
         StateHasChanged();

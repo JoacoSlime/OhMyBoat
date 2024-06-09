@@ -33,20 +33,20 @@ namespace OhMyBoat.UI.Server.Controllers
 
         [HttpPost]
         [Route("ListarOfertasEnviadas")]
-        public async Task<IActionResult> ListSentOffers([FromBody] string Email){
+        public async Task<IActionResult> ListSentOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_EnviaOferta == Email.ToLower()).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_EnviaOferta == Email.Email.ToLower()).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
 
         [HttpPost]
         [Route("ListarOfertasRecibidas")]
-        public async Task<IActionResult> ListReceivedOffers([FromBody] string Email){
+        public async Task<IActionResult> ListReceivedOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.ToLower()).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.Email.ToLower()).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }

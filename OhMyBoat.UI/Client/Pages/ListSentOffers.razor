@@ -15,7 +15,12 @@
 <AuthorizeView Roles="cliente">
     <Authorized>
         <h1>Mis Ofertas Enviadas</h1>
-
+            @foreach (var Nav in SentOffers ) {
+                    <CardText>@Nav.PatenteVehiculoEnviaOferta</CardText>
+                    <CardText>@Nav.PatenteVehiculoRecibeOferta</CardText>
+                    }
+                    }
+                    
     </Authorized>
     <NotAuthorized>
        @{NavManager.NavigateTo("/",true);} 
@@ -53,7 +58,9 @@
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasEnviadas", MyEmail);
+
+        Usuario us = new Usuario() {Email = MyEmail};
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", us);
         SentOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
         VehiculosRecibeOferta.Clear();
@@ -61,13 +68,28 @@
 
         foreach (Oferta o in SentOffers)
         {
-            var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+
+            Vehiculo VehiculoRecibido = new Vehiculo() { Matricula = o.PatenteVehiculoRecibeOferta};
+            var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculoPatente", VehiculoRecibido) ?? new();
+            if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
+           
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
-            var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            Vehiculo VehiculoEnviado= new Vehiculo() { Matricula = o.PatenteVehiculoEnviaOferta};           
+            var resp2 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculoPatente", VehiculoEnviado) ?? new();
+            if (resp2.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(envia);
+
         }
 
         StateHasChanged();
