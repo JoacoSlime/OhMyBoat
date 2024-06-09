@@ -32,18 +32,36 @@ namespace OhMyBoat.UI.Server.Controllers
         }
 
         [HttpPost]
+        [Route("ListarOfertasEnviadas")]
+        public async Task<IActionResult> ListSentOffers([FromBody] string Email){
+            
+            using var bd = new OhMyBoatUIServerContext();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_EnviaOferta == Email.ToLower()).ToListAsync();
+            return StatusCode(StatusCodes.Status200OK, offers);
+
+        }
+
+        [HttpPost]
+        [Route("ListarOfertasRecibidas")]
+        public async Task<IActionResult> ListReceivedOffers([FromBody] string Email){
+            
+            using var bd = new OhMyBoatUIServerContext();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.ToLower()).ToListAsync();
+            return StatusCode(StatusCodes.Status200OK, offers);
+
+        }
+
+        [HttpPost]
         [Route("GetOferta")]
         public async Task<IActionResult> GetOferta([FromBody] Oferta o)
         {
             using var db = new OhMyBoatUIServerContext();
-            Oferta? offer = await db.Ofertas.Where(oferta => oferta.Id == o.Id).FirstOrDefaultAsync();
+            Oferta? offer = await db.Ofertas.Where(of => of.Id == o.Id).FirstOrDefaultAsync();
             if (offer != null)
             {
                 return StatusCode(StatusCodes.Status200OK, offer);
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
-
     }
-
 }
