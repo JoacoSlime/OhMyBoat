@@ -25,7 +25,8 @@
                     <CardText>@ofer.PatenteVehiculoRecibeOferta</CardText>  
                     
                     <Button Size="Size.Large" Color="ButtonColor.Success" @onclick="()=>aceptarOferta()">Aceptar Ofertar</Button>
-                    <Button Size="Size.Large" Color="ButtonColor.Danger" @onclick="()=>rechazarOferta(ofer)">rechazar Ofertar</Button>                                
+                    <Button Size="Size.Large" Color="ButtonColor.Danger" @onclick="()=>rechazarOferta(ofer)">Rechazar Ofertar</Button>   \
+                     <Button Size="Size.Large" Color="ButtonColor.Warning" @onclick="()=>editarHorario(ofer)">Editar horarios</Button>                                  
 
             }
             }
@@ -91,7 +92,7 @@
             }
 
            
-            var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
+            var recibe = await resp1.Content.ReadFromJsgit nAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
 
@@ -137,6 +138,12 @@
     {
         var response = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/EliminarOferta", ofer);
         RecargarLista();
+    }
+
+    private async Task editarHorario(Oferta ofer)
+    {
+        var response = await HttpClient.PostAsJsonAsync<Oferta>("api/Turnos/EliminarTurno", ofer);
+        NavManager.NavigateTo("/propose-date",true);
     }
 
     private async Task closeModal()

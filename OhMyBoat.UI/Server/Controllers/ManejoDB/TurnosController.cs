@@ -147,5 +147,20 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             return StatusCode(StatusCodes.Status412PreconditionFailed, null); // si mandan  0 o 30 turnos porque si
         }
 
+        [HttpPost]
+        [Route("EliminarTurno")]
+        public async Task<IActionResult> EliminarOferta([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+        Turno turn = await db.Turno.FirstOrDefaultAsync(turn => turn.OfertaId == o.Id);
+        if (turn != null)
+            {
+                db.Turno.Remove(turn);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, turn);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
     }
 }
