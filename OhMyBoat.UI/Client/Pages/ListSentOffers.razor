@@ -16,6 +16,17 @@
     <Authorized>
         <h1>Mis Ofertas Enviadas</h1>
 
+        @if (SentOffers.Count == 0)
+        {
+            <p>Usted no tiene ninguna oferta enviada aún</p>
+        }else{
+            //@for (var i = 0; i < SentOffers.Count; i++) {
+                // VehiculosEnviaOferta[i];
+                // VehiculosRecibeOferta[i];
+            //}
+            }
+        }
+
     </Authorized>
     <NotAuthorized>
        @{NavManager.NavigateTo("/",true);} 
@@ -62,12 +73,23 @@
         foreach (Oferta o in SentOffers)
         {
             var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            if (resp1.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
             var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            if (resp2.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(envia);
+
         }
 
         StateHasChanged();
