@@ -59,7 +59,7 @@
 
 
         Usuario us = new Usuario() {Email = MyEmail};
-        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", us);
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasEnviadas", us);
         SentOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
         VehiculosRecibeOferta.Clear();
