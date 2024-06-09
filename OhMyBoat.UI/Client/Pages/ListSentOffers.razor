@@ -54,6 +54,9 @@
     List<Vehiculo> VehiculosRecibeOferta = new();
     List<Vehiculo> VehiculosEnviaOferta = new();
 
+    Vehiculo VehiculoEnviado = new();
+    Vehiculo VehiculoRecibido = new();
+
     protected override async Task OnInitializedAsync()
     {
         await RecargarLista();
@@ -72,8 +75,9 @@
 
         foreach (Oferta o in SentOffers)
         {
-            var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
-            if (resp1.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            VehiculoRecibido.Matricula = o.PatenteVehiculoRecibeOferta;
+            var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetVehiculoPatente", VehiculoRecibido) ?? new();
+            if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
@@ -81,8 +85,9 @@
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
-            var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
-            if (resp2.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            VehiculoEnviado.Matricula = o.PatenteVehiculoEnviaOferta;
+            var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetVehiculoPatente", VehiculoEnviado) ?? new();
+            if (resp2.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
