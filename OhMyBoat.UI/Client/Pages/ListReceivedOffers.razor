@@ -20,11 +20,14 @@
         {
             <p>Usted no tiene ninguna oferta enviada aún</p>
         }else{
-            //@for (var i = 0; i < SentOffers.Count; i++) {
-                // ClienteOfertante[i];
-                // VehiculosEnviaOferta[i];
-                // VehiculosRecibeOferta[i];
-            //}
+            @foreach (var ofer in ReceivedOffers ) {
+                    <CardText>@ofer.PatenteVehiculoEnviaOferta</CardText>
+                    <CardText>@ofer.PatenteVehiculoRecibeOferta</CardText>  
+                    
+                    <Button Size="Size.Large" Color="ButtonColor.Success" @onclick="()=>aceptarOferta()">Aceptar Ofertar</Button>
+                    <Button Size="Size.Large" Color="ButtonColor.Danger" @onclick="()=>rechazarOferta(ofer)">rechazar Ofertar</Button>                                
+
+            }
             }
         }
 
@@ -56,7 +59,7 @@
     List<Vehiculo> VehiculosRecibeOferta = new();
     List<Vehiculo> VehiculosEnviaOferta = new();
 
-    List<Cliente> ClienteOfertante = new();
+    List<Usuario> ClienteOfertante = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,7 +71,9 @@
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", MyEmail);
+
+        Usuario us = new Usuario() {Email = MyEmail};
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", us);
         ReceivedOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
         VehiculosRecibeOferta.Clear();
@@ -77,17 +82,23 @@
 
         foreach (Oferta o in ReceivedOffers)
         {
-            var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
-            if (resp1.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            Vehiculo VehiculoRecibido = new Vehiculo() { Matricula = o.PatenteVehiculoRecibeOferta};
+            var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculoPatente", VehiculoRecibido) ?? new();
+            if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
             }
+
+           
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
-            var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
-            if (resp2.StatusCode == System.Net.HttpStatusCode.Forbidden)
+
+
+            Vehiculo VehiculoEnviado= new Vehiculo() { Matricula = o.PatenteVehiculoEnviaOferta};           
+            var resp2 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculoPatente", VehiculoEnviado) ?? new();
+            if (resp2.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
@@ -95,12 +106,13 @@
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(envia);
 
-            var resp3 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetDueño", envia) ?? new();
+            var resp3 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetDueño", envia) ?? new();
             if (resp3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
                 await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
                 return;
             }
-            var ofertante = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
+
+            var ofertante = await resp3.Content.ReadFromJsonAsync<Usuario>() ?? new();
             ClienteOfertante.Add(ofertante);
 
             /*Tambien se podria hacer con la otra api
@@ -113,6 +125,18 @@
         }
 
         StateHasChanged();
+    }
+
+
+    private async Task aceptarOferta()
+    {
+        NavManager.NavigateTo("/propose-date",true);
+    }
+
+    private async Task rechazarOferta(Oferta ofer)
+    {
+        var response = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/EliminarOferta", ofer);
+        RecargarLista();
     }
 
     private async Task closeModal()
