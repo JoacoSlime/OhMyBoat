@@ -152,10 +152,13 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async Task<IActionResult> EliminarOferta([FromBody] Oferta o)
         {
             using var db = new OhMyBoatUIServerContext();
-        Turno turn = await db.Turno.FirstOrDefaultAsync(turn => turn.OfertaId == o.Id);
+        var turn = await db.Turno.Where(turn => turn.OfertaId == o.Id).ToListAsync();
         if (turn != null)
             {
-                db.Turno.Remove(turn);
+                foreach (Turno t in turn )
+                {
+                    db.Turno.Remove(t);
+                }                
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK, turn);
             }

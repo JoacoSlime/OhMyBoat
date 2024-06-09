@@ -147,7 +147,7 @@
             }
             else
             {
-                await JsRuntime.InvokeVoidAsync("alert", $"Algo salio mal (Status code : {cosito.StatusCode})");
+                await JsRuntime.InvokeVoidAsync("alert", $"Algo salio mal (Status code : {cosito.StatusCode})");//cosito
                 NavManager.NavigateTo("/");
             }
 
