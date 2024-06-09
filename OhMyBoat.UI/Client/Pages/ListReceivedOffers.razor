@@ -16,6 +16,18 @@
     <Authorized>
         <h1>Mis Ofertas Recibidas</h1>
 
+        @if (ReceivedOffers.Count == 0)
+        {
+            <p>Usted no tiene ninguna oferta enviada aún</p>
+        }else{
+            //@for (var i = 0; i < SentOffers.Count; i++) {
+                // ClienteOfertante[i];
+                // VehiculosEnviaOferta[i];
+                // VehiculosRecibeOferta[i];
+            //}
+            }
+        }
+
     </Authorized>
     <NotAuthorized>
        @{NavManager.NavigateTo("/",true);} 
@@ -39,7 +51,7 @@
     private Modal modal = default!;
     private Modal DetalleModal = default!;
 
-    List<Oferta> SentOffers = new();
+    List<Oferta> ReceivedOffers = new();
 
     List<Vehiculo> VehiculosRecibeOferta = new();
     List<Vehiculo> VehiculosEnviaOferta = new();
@@ -57,23 +69,37 @@
         var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
         var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", MyEmail);
-        SentOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
+        ReceivedOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
         VehiculosRecibeOferta.Clear();
         VehiculosEnviaOferta.Clear();
         ClienteOfertante.Clear();
 
-        foreach (Oferta o in SentOffers)
+        foreach (Oferta o in ReceivedOffers)
         {
             var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            if (resp1.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
             var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
             var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/BuscarVehiculo", o.PatenteVehiculoRecibeOferta) ?? new();
+            if (resp2.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
             var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(envia);
 
             var resp3 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetDueño", envia) ?? new();
+            if (resp3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
+                return;
+            }
             var ofertante = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
             ClienteOfertante.Add(ofertante);
 
