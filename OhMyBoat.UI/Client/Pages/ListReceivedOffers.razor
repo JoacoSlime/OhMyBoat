@@ -60,6 +60,8 @@
 
     Vehiculo VehiculoEnviado = new();
     Vehiculo VehiculoRecibido = new();
+    Vehiculo envia = new();
+    Vehiculo recibe = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,7 +89,7 @@
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
             }
-            var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
+            recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(recibe);
 
             VehiculoEnviado.Matricula = o.PatenteVehiculoEnviaOferta;
@@ -97,7 +99,7 @@
                 await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
                 return;
             }
-            var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
+            envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
             VehiculosRecibeOferta.Add(envia);
 
             var resp3 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetDueño", envia) ?? new();
