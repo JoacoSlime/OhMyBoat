@@ -20,10 +20,13 @@
         {
             <p>Usted no tiene ninguna oferta enviada aún</p>
         }else{
-            @foreach (var Nav in ReceivedOffers ) {
-                    <CardText>@Nav.PatenteVehiculoEnviaOferta</CardText>
-                    <CardText>@Nav.PatenteVehiculoRecibeOferta</CardText>  
-                    <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>aceptarOferta()">Aceptar Ofertar</Button>                
+            @foreach (var ofer in ReceivedOffers ) {
+                    <CardText>@ofer.PatenteVehiculoEnviaOferta</CardText>
+                    <CardText>@ofer.PatenteVehiculoRecibeOferta</CardText>  
+                    
+                    <Button Size="Size.Large" Color="ButtonColor.Success" @onclick="()=>aceptarOferta()">Aceptar Ofertar</Button>
+                    <Button Size="Size.Large" Color="ButtonColor.Danger" @onclick="()=>rechazarOferta(ofer)">rechazar Ofertar</Button>                                
+
             }
             }
         }
@@ -128,6 +131,12 @@
     private async Task aceptarOferta()
     {
         NavManager.NavigateTo("/propose-date",true);
+    }
+
+    private async Task rechazarOferta(Oferta ofer)
+    {
+        var response = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/EliminarOferta", ofer);
+        RecargarLista();
     }
 
     private async Task closeModal()

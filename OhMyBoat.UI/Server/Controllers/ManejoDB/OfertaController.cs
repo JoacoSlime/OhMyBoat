@@ -32,6 +32,21 @@ namespace OhMyBoat.UI.Server.Controllers
         }
 
         [HttpPost]
+        [Route("EliminarOferta")]
+        public async Task<IActionResult> EliminarOferta([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var cli = db.Usuarios.Where(cli => cli.Email == o.ID_RecibeOferta).FirstAsync();
+        if (cli != null)
+            {
+                db.Ofertas.Remove(o);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, o);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
+        [HttpPost]
         [Route("ListarOfertasEnviadas")]
         public async Task<IActionResult> ListSentOffers([FromBody] Usuario Email){
             
