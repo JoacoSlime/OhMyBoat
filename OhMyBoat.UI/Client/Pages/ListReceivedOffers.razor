@@ -73,7 +73,10 @@
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", MyEmail);
+        Cliente cli = new();
+        cli.Email = MyEmail;
+
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", cli);
         ReceivedOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
 
         VehiculosRecibeOferta.Clear();
