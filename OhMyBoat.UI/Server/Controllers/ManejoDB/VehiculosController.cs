@@ -140,12 +140,12 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async Task<IActionResult> GetPatente([FromBody] Vehiculo v)
         {
             using var db = new OhMyBoatUIServerContext();
-            Vehiculo? vec = await db.Terrestres.Where(vec => vec.Matricula == v.Matricula).FirstAsync();
+            Vehiculo? vec = await db.Terrestres.Where(vec => vec.Matricula == v.Matricula).FirstOrDefaultAsync();
             if (vec != null)
             {
                 return StatusCode(StatusCodes.Status200OK, vec);
             }
-            vec = await db.Maritimos.Where(mar => mar.Matricula == v.Matricula).FirstAsync();
+            vec = await db.Maritimos.Where(mar => mar.Matricula == v.Matricula).FirstOrDefaultAsync();
             if (vec != null)
             {
                 return StatusCode(StatusCodes.Status200OK, vec);
