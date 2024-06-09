@@ -152,7 +152,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
-        
 
         [HttpPost]
         [Route("GetDueño")]
@@ -166,5 +165,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
+    
     }
 }
