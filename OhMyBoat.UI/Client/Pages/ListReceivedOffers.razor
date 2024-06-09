@@ -1,0 +1,127 @@
+@page "/received-offers"
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject AuthenticationStateProvider authStateProvider;
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@using System.Security.Claims
+@inject NavigationManager NavManager
+
+<AuthorizeView Roles="cliente">
+    <Authorized>
+        <h1>Mis Ofertas Recibidas</h1>
+
+        @if (ReceivedOffers.Count == 0)
+        {
+            <p>Usted no tiene ninguna oferta enviada aún</p>
+        }else{
+            //@for (var i = 0; i < SentOffers.Count; i++) {
+                // ClienteOfertante[i];
+                // VehiculosEnviaOferta[i];
+                // VehiculosRecibeOferta[i];
+            //}
+            }
+        }
+
+    </Authorized>
+    <NotAuthorized>
+       @{NavManager.NavigateTo("/",true);} 
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+/*
+    
+    Nombre ofrece:                                                  A cambio de:
+
+    (Foto de perfil     (foto vehiculoEnviaOferta)         --->     (foto vehiculoRecibeOferta) 
+    del que envia       TipoVehiculo, Marca, Modelo, Año            TipoVehiculo, Marca, Modelo, Año
+    una oferta)
+
+   [VER DETALLE OFERTA]
+
+*/
+
+    private Modal modal = default!;
+    private Modal DetalleModal = default!;
+
+    List<Oferta> ReceivedOffers = new();
+
+    List<Vehiculo> VehiculosRecibeOferta = new();
+    List<Vehiculo> VehiculosEnviaOferta = new();
+
+    List<Cliente> ClienteOfertante = new();
+
+    Vehiculo VehiculoEnviado = new();
+    Vehiculo VehiculoRecibido = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RecargarLista();
+    }
+
+    private async Task RecargarLista()
+    {
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasRecibidas", MyEmail);
+        ReceivedOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
+
+        VehiculosRecibeOferta.Clear();
+        VehiculosEnviaOferta.Clear();
+        ClienteOfertante.Clear();
+
+        foreach (Oferta o in ReceivedOffers)
+        {
+            VehiculoRecibido.Matricula = o.PatenteVehiculoRecibeOferta;
+            var resp1 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetVehiculoPatente", VehiculoRecibido) ?? new();
+            if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
+            var recibe = await resp1.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
+            VehiculosRecibeOferta.Add(recibe);
+
+            VehiculoEnviado.Matricula = o.PatenteVehiculoEnviaOferta;
+            var resp2 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetVehiculoPatente", VehiculoEnviado) ?? new();
+            if (resp2.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                return;
+            }
+            var envia = await resp2.Content.ReadFromJsonAsync<Vehiculo>() ?? new();
+            VehiculosRecibeOferta.Add(envia);
+
+            var resp3 = await HttpClient.PostAsJsonAsync("api/Vehiculo/GetDueño", envia) ?? new();
+            if (resp3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
+                return;
+            }
+            var ofertante = await resp1.Content.ReadFromJsonAsync<Cliente>() ?? new();
+            ClienteOfertante.Add(ofertante);
+
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task closeModal()
+    {
+        await modal.ShowAsync();      // https://github.com/vikramlearning/blazorbootstrap/issues/393
+        await modal.HideAsync();
+        await RecargarLista();
+    }
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
+    
+}
