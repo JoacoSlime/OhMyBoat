@@ -47,10 +47,30 @@
                                 <img class="rounded-3 m-3" src="@vo.Item4.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
                             </div>
                             <h2>
-                                Tipo
+                                @if (@vo.Item4 is Maritimo){
+                                    var m = @vo.Item4 as Maritimo;
+                                    <h4 class="mb-5">@m?.Tipo</h4>;
+                                }else{
+                                    @if(@vo.Item4 is Terrestre){
+                                        var t = @vo.Item4 as Terrestre;
+                                        <h4 class="mb-5">@t?.Tipo</h4>;
+                                    }
+                                }
                             </h2>
                             <h2>
-                                Algo, Algo, Algo
+                                @if (@vo.Item4 is Maritimo){
+                                    var m = @vo.Item4 as Maritimo;
+                                    <h4 class="mb-5">@m?.Eslora</h4>;
+                                    <h4 class="mb-5">@m?.Puntal</h4>;
+                                    <h4 class="mb-5">@m?.Manga</h4>;
+                                }else{
+                                    @if (@vo.Item4 is Terrestre){
+                                        var t = @vo.Item4 as Terrestre;
+                                        <h4 class="mb-5">@t?.Marca</h4>;
+                                        <h4 class="mb-5">@t?.Modelo</h4>;
+                                        <h4 class="mb-5">@t?.Anio</h4>;
+                                    } 
+                                }
                             </h2>
                         </div>
                         <div class="flex-fill">
@@ -62,10 +82,30 @@
                                 <img class="rounded-3 m-3" src="@vo.Item3.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
                             </div>
                             <h2>
-                                Tipo
+                                @if (@vo.Item3 is Maritimo){
+                                    var m = @vo.Item3 as Maritimo;
+                                    <h4 class="mb-5">@m?.Tipo</h4>;
+                                }else{
+                                    @if(@vo.Item3 is Terrestre){
+                                        var t = @vo.Item3 as Terrestre;
+                                        <h4 class="mb-5">@t?.Tipo</h4>;
+                                    }
+                                }
                             </h2>
                             <h2>
-                                Algo, Algo, Algo
+                                @if (@vo.Item3 is Maritimo){
+                                    var m = @vo.Item3 as Maritimo;
+                                    <h4 class="mb-5">@m?.Eslora</h4>;
+                                    <h4 class="mb-5">@m?.Puntal</h4>;
+                                    <h4 class="mb-5">@m?.Manga</h4>;
+                                }else{
+                                    @if (@vo.Item3 is Terrestre){
+                                        var t = @vo.Item3 as Terrestre;
+                                        <h4 class="mb-5">@t?.Marca</h4>;
+                                        <h4 class="mb-5">@t?.Modelo</h4>;
+                                        <h4 class="mb-5">@t?.Anio</h4>;
+                                    } 
+                                }
                             </h2>
                         </div>
                     </div>
