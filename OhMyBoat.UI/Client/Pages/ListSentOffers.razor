@@ -151,7 +151,7 @@
                 var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetNavio", VehiculoRecibido) ?? new();
                 if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del navío recibido es innexistente");
                     return;
                 }
                 recibe = await resp1.Content.ReadFromJsonAsync<Maritimo>() ?? new();
@@ -159,7 +159,7 @@
                 var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoRecibido) ?? new();
                 if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del terrestre recibido es innexistente");
                     return;
                 }
                 recibe = await resp1.Content.ReadFromJsonAsync<Terrestre>() ?? new();
@@ -170,7 +170,7 @@
                 var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetNavio", VehiculoRecibido) ?? new();
                 if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula navio enviado es innexistente");
                     return;
                 }
                 envia = await resp1.Content.ReadFromJsonAsync<Maritimo>() ?? new();
@@ -178,7 +178,7 @@
                 var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoRecibido) ?? new();
                 if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del terrestre enviado es innexistente");
                     return;
                 }
                 envia = await resp1.Content.ReadFromJsonAsync<Terrestre>() ?? new();

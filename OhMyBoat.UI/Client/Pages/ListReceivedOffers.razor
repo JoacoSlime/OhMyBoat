@@ -173,46 +173,48 @@
                 var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetNavio", VehiculoRecibido) ?? new();
                 if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del navío recibido es innexistente");
                     return;
                 }
                 recibe = await resp1.Content.ReadFromJsonAsync<Maritimo>() ?? new();
             }else{
-                var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoRecibido) ?? new();
-                if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+                var resp2 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoRecibido) ?? new();
+                if (resp2.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del terrestre recibido es innexistente");
                     return;
                 }
-                recibe = await resp1.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+                recibe = await resp2.Content.ReadFromJsonAsync<Terrestre>() ?? new();
             }
 
+            Vehiculo VehiculoEnviado = new Vehiculo() { Id = o.ID_VehiculoEnviaOferta};
+            
             Vehiculo envia;
             if (o.EsNavioEnvia){
-                var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetNavio", VehiculoRecibido) ?? new();
-                if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+                var resp3 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetNavio", VehiculoEnviado) ?? new();
+                if (resp3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del navío enviado es innexistente");
                     return;
                 }
-                envia = await resp1.Content.ReadFromJsonAsync<Maritimo>() ?? new();
+                envia = await resp3.Content.ReadFromJsonAsync<Maritimo>() ?? new();
             }else{
-                var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoRecibido) ?? new();
-                if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+                var resp4 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoEnviado) ?? new();
+                if (resp4.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
                 {
-                    await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del terrestre enviado es innexistente");
                     return;
                 }
-                envia = await resp1.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+                envia = await resp4.Content.ReadFromJsonAsync<Terrestre>() ?? new();
             }
 
-            var resp3 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetDueño", envia) ?? new();
-            if (resp3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            var resp5 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetDueño", envia) ?? new();
+            if (resp5.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
                 await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
                 return;
             }
 
-            var ofertante = await resp3.Content.ReadFromJsonAsync<Usuario>() ?? new();
+            var ofertante = await resp5.Content.ReadFromJsonAsync<Usuario>() ?? new();
 
             ofertante.Base64imagen = (ofertante.Base64imagen != "" ? ofertante.Base64imagen : "./user.png");
             VehiculosOfertas.Add((o, ofertante, recibe, envia));
