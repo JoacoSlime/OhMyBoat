@@ -43,12 +43,12 @@ private async Task OnClick()
     Maritimo nav = new Maritimo(){Matricula = this.matricula, Deuda = this.Deuda};
         var responseSV = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/GetNavioPatente", nav) ?? new();
         if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
-            await JsRuntime.InvokeVoidAsync("alert", "El la matricula no corresponde a ningun navio");            
+            await JsRuntime.InvokeVoidAsync("alert", "la matricula no corresponde a ningun navio activo en el sistema");            
             return;
         }
          
     var respuestaSV = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/EditarDeudaNavio", nav) ?? new();
-      await JsRuntime.InvokeVoidAsync("alert", "Deuda editada con"); 
+      await JsRuntime.InvokeVoidAsync("alert", "Deuda editada con exito"); 
 
 }
 
