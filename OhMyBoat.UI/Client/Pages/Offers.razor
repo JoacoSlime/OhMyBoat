@@ -130,7 +130,7 @@ else
                 ID_RecibeOferta = vehiculoOfertado?.IDCliente,
                 ID_EnviaOferta = Email,
                 ID_VehiculoEnviaOferta = patenteOfertado,
-                ID_VehiculoRecibeOferta = vehiculoOfertado?.Id,
+                ID_VehiculoRecibeOferta = vehiculoOfertado.Id,
                 EsNavioEnvia = ofertado,
                 EsNavioRecibe = vehiculoOfertado?.GetType() == typeof(Maritimo)
 
