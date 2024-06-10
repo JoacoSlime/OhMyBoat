@@ -125,6 +125,7 @@ else
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
+        await JsRuntime.InvokeVoidAsync("alert",  vehiculoOfertado.Id);
         Oferta ofer = new Oferta
             {
                 ID_RecibeOferta = vehiculoOfertado?.IDCliente,
@@ -149,10 +150,10 @@ else
     {
         Terrestre ter = new Terrestre() { Id = (this.vehiculoOfertado??new()).Id };
         var RespuestaAfirmativa = await HttpClient.PostAsJsonAsync<Terrestre>("api/vehiculos/GetVehiculo", ter);        //verifico que no sea un terrestre // cosa que pasa que en la realidad no deberia pasar: si hay un navio y un vehiculo con la misma patente falla 
-        if (RespuestaAfirmativa.StatusCode == System.Net.HttpStatusCode.OK)
+        if (RespuestaAfirmativa.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
         {
             await JsRuntime.InvokeVoidAsync("alert", "la oferta debe contener al menos un navío.");
-            return;
+            return;         
         }
         await OnClick( patenteOfertado, false);
     }
