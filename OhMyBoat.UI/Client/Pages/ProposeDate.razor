@@ -1,0 +1,175 @@
+@inject HttpClient HttpClient
+@inject IJSRuntime JsRuntime;
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@inject NavigationManager NavManager;
+
+
+<h3>Propuesta de Reunion</h3>
+
+<div>
+    <hr>
+    <div>        
+        @if (sucursales != null && !selecciono)
+        {
+            <div>
+                
+                <div>Seleccione la Sucursal donde quiere realizar la reunion</div>
+                <br>
+               <div>
+                    @foreach (Sucursal suc in sucursales)
+                    {
+                            <button @onclick="()=>{sucursalElegida=suc;selecciono=true;}" class="btn btn-primary"> @suc.NombreSuck</button>               
+                    }
+                </div>
+            </div>
+        }
+        @if (selecciono)
+        {
+            <button @onclick="()=> {sucursalElegida=null; selecciono=false; turnosPropuestos.Clear();turnosRecibidos=null;}" class="btn btn-primary">Cambiar Sucursal (Actual : @sucursalElegida?.NombreSuck)</button>
+
+            <br>
+
+            
+            <hr>
+            
+                <div>
+                <input @bind="DiaQueVoyAVerSiTieneTurno" class="form-control" type="date" min="@today" id="Test_Date" />
+                </div>
+                <br>
+                <div>
+                    <button @onclick="buscarTurnos" class="btn btn-primary"> Buscar turnos disponibles </button>
+                </div>
+                
+                
+                
+                @if(turnosRecibidos != null && turnosRecibidos.Count != 0)
+                {
+                    <br>
+                    <div>
+                    @foreach(Turno t in turnosRecibidos)
+                    {
+                            <button @onclick="()=>agregarTurno(t)" class="btn btn-outline-dark">@t.FechaTurno.ToString("dd/MM HH:mm") a @t.FechaTurno.AddMinutes(30).ToString("HH:mm")</button>
+                    }
+                    </div>
+                }
+                else if (turnosRecibidos != null && turnosRecibidos.Count == 0)
+                {
+                    <br>
+                    <div class="alert alert-danger" role="alert">
+                        No hay turnos disponibles en el dia seleccionado :(
+                    </div>
+                }
+            
+
+            <hr>
+            <div> 
+                @if (turnosPropuestos.Count == 0)
+                {
+                    <div class="alert alert-warning" role="alert">
+                        No hay turnos seleccionados
+                    </div>
+                }
+                else{
+                    <div class="alert alert-info" role="alert">
+                        Turnos : 
+                        @foreach(Turno t in turnosPropuestos)
+                        {
+                            <div>@t.FechaTurno.ToString("dddd dd/MM HH:mm") a @t.FechaTurno.AddMinutes(30).ToString("HH:mm") <button @onclick="()=>turnosPropuestos.Remove(t)" class="btn btn-outline-danger">borrar</button></div>
+                            <br>
+                        }
+                    </div>
+                }
+            </div>
+            
+        }
+    </div>
+    
+</div>
+<hr>
+<button @onclick="Enviar" class="btn btn-outline-success" >Aceptar</button>
+
+@code {
+
+    [Parameter] 
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    [Parameter]
+    public int idOferta { get; set; }
+
+    private string today = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd");
+    private List<Turno> turnosPropuestos = new();
+    private List<Sucursal>? sucursales;
+    private Sucursal? sucursalElegida = null;
+    private List<Turno>? turnosRecibidos = null;
+    private DateTime DiaQueVoyAVerSiTieneTurno = DateTime.Now.AddDays(1);
+    private bool selecciono = false;
+
+    private bool verSiYaEstaElTurnoEnElArreglo(Turno t)
+    {
+        bool Esta = false;
+        foreach (Turno turno in turnosPropuestos)
+        {
+            if (turno.FechaTurno.Year == t.FechaTurno.Year &&
+                turno.FechaTurno.Month == t.FechaTurno.Month &&
+                turno.FechaTurno.Day == t.FechaTurno.Day &&
+                turno.FechaTurno.Hour == t.FechaTurno.Hour &&
+                turno.FechaTurno.Minute == t.FechaTurno.Minute) ;
+            Esta = true;
+        }
+        return Esta;
+    }
+    private async void agregarTurno(Turno t)
+    {
+        if (verSiYaEstaElTurnoEnElArreglo(t))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Este horario ya fue seleccionado");
+        }
+        else if (turnosPropuestos.Count <= 2)
+        {
+            turnosPropuestos.Add(t);
+            StateHasChanged();
+        }
+        else         
+            await JsRuntime.InvokeVoidAsync("alert", "Solo es posible ofrecer 3 horarios");
+
+    }
+
+    private async void Enviar()
+    {
+        if(turnosPropuestos.Count>=1){
+            foreach(Turno t in turnosPropuestos)
+            {
+                t.OfertaId = idOferta;
+                t.SucursalId = sucursalElegida.Id;
+            }
+            var cosito = await HttpClient.PostAsJsonAsync<List<Turno>>("api/turnos/EnviarTurnosPropuesta", turnosPropuestos);
+            if (cosito.IsSuccessStatusCode)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Se han registrado los turnos con exito");
+                await OnClickCallback.InvokeAsync();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", $"Algo salio mal (Status code : {cosito.StatusCode})");
+                await OnClickCallback.InvokeAsync();
+            }
+
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Debe seleccionar por lo menos un turno en una sede para completar la propuesta de reunion");
+        }
+    }
+    private async void buscarTurnos()
+    {
+        var consulta = new ConsultaHorariosDTO { dia = DiaQueVoyAVerSiTieneTurno, suc = sucursalElegida };
+        var respuestaServidor = await HttpClient.PostAsJsonAsync<ConsultaHorariosDTO>("api/turnos/VerificarDisponibilidadDia", consulta);
+        turnosRecibidos = await respuestaServidor.Content.ReadFromJsonAsync<List<Turno>>();
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        //var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log);
+        sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales");        
+    }
+}
