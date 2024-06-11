@@ -81,6 +81,22 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
 
+        [HttpPost]
+        [Route("EditarDeudaNavio")]
+        public async Task<IActionResult> EditarDeuda([FromBody] Maritimo m)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var mar =db.Maritimos.Where(nav => nav.Matricula == m.Matricula).FirstOrDefault();
+            if (mar != null)
+            {
+                mar.Deuda = m.Deuda;
+                db.Maritimos.Update(mar);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, m);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
 
 
         [HttpPost]
