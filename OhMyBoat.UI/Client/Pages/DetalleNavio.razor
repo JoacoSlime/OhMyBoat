@@ -51,8 +51,8 @@
     [Parameter] public int Id { get; set; }
     public Maritimo Navio {get; set;} = new();
     public Cliente Dueño {get; set;} = new();
+    [Parameter] public Modal modal { get; set; } = default!;
 
-    private Modal modal = default!;
 
 
     public String deuda {get; set;} = "";
@@ -101,11 +101,12 @@
 
         private async Task EnviarOferta()
     {
-
         Vehiculo nav = new Vehiculo() {IDCliente = this.Navio.IDCliente , Matricula = this.Navio.Matricula, Id = this.Id};
+
         var parameters = new Dictionary<string, object>();           
             parameters.Add("vehiculoOfertado" , nav);     
             parameters.Add("OnClickCallback",EventCallback.Factory.Create<MouseEventArgs>(this, hideModal)); 
+        
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 }
