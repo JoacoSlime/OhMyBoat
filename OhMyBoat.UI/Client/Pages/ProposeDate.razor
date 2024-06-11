@@ -1,4 +1,4 @@
-﻿@inject HttpClient HttpClient
+@inject HttpClient HttpClient
 @inject IJSRuntime JsRuntime;
 @using OhMyBoat.UI.Shared.Entidades;
 @using OhMyBoat.UI.Shared;
@@ -34,7 +34,7 @@
             <hr>
             
                 <div>
-                    <input @bind="pinga" class="form-control" type="date" min="@today" id="Test_Date" />
+                <input @bind="DiaQueVoyAVerSiTieneTurno" class="form-control" type="date" min="@today" id="Test_Date" />
                 </div>
                 <br>
                 <div>
@@ -87,7 +87,7 @@
     
 </div>
 <hr>
-<button @onclick="Cremoso" class="btn btn-outline-success" >Aceptar</button>
+<button @onclick="Enviar" class="btn btn-outline-success" >Aceptar</button>
 
 @code {
 
@@ -101,16 +101,30 @@
     private List<Sucursal>? sucursales;
     private Sucursal? sucursalElegida = null;
     private List<Turno>? turnosRecibidos = null;
-    private DateTime pinga = DateTime.Now.AddDays(1);
+    private DateTime DiaQueVoyAVerSiTieneTurno = DateTime.Now.AddDays(1);
     private bool selecciono = false;
 
-
+    private bool verSiYaEstaElTurnoEnElArreglo(Turno t)
+    {
+        bool Esta = false;
+        foreach (Turno turno in turnosPropuestos)
+        {
+            if (turno.FechaTurno.Year == t.FechaTurno.Year &&
+                turno.FechaTurno.Month == t.FechaTurno.Month &&
+                turno.FechaTurno.Day == t.FechaTurno.Day &&
+                turno.FechaTurno.Hour == t.FechaTurno.Hour &&
+                turno.FechaTurno.Minute == t.FechaTurno.Minute) ;
+            Esta = true;
+        }
+        return Esta;
+    }
     private async void agregarTurno(Turno t)
     {
-        if (turnosPropuestos.Contains(t))
+        if (verSiYaEstaElTurnoEnElArreglo(t))
         {
             await JsRuntime.InvokeVoidAsync("alert", "Este horario ya fue seleccionado");
-        }else if (turnosPropuestos.Count <= 2)
+        }
+        else if (turnosPropuestos.Count <= 2)
         {
             turnosPropuestos.Add(t);
             StateHasChanged();
@@ -120,7 +134,7 @@
 
     }
 
-    private async void Cremoso()
+    private async void Enviar()
     {
         if(turnosPropuestos.Count>=1){
             foreach(Turno t in turnosPropuestos)
@@ -148,9 +162,9 @@
     }
     private async void buscarTurnos()
     {
-        var socotroco = new ConsultaHorariosDTO { dia = pinga, suc = sucursalElegida };
-        var cosito = await HttpClient.PostAsJsonAsync<ConsultaHorariosDTO>("api/turnos/VerificarDisponibilidadDia", socotroco);
-        turnosRecibidos = await cosito.Content.ReadFromJsonAsync<List<Turno>>();
+        var consulta = new ConsultaHorariosDTO { dia = DiaQueVoyAVerSiTieneTurno, suc = sucursalElegida };
+        var respuestaServidor = await HttpClient.PostAsJsonAsync<ConsultaHorariosDTO>("api/turnos/VerificarDisponibilidadDia", consulta);
+        turnosRecibidos = await respuestaServidor.Content.ReadFromJsonAsync<List<Turno>>();
         StateHasChanged();
     }
     protected override async Task OnInitializedAsync()

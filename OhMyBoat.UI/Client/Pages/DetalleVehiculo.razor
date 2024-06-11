@@ -82,7 +82,7 @@
 
         private async Task EnviarOferta()
     {
-        Vehiculo vec = new Vehiculo() {IDCliente = this.Vehiculo.IDCliente , Matricula = this.Vehiculo.Matricula};
+        Vehiculo vec = new Vehiculo() {IDCliente = this.Vehiculo.IDCliente , Matricula = this.Vehiculo.Matricula,  Id = this.Id};
         var parameters = new Dictionary<string, object>();
             parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
             parameters.Add("vehiculoOfertado" , vec);      
