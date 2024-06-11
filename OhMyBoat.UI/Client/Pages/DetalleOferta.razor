@@ -10,7 +10,61 @@
 
 <AuthorizeView>
     <Authorized>
-        Balls
+        <div class="d-flex p-5 flex-row align-items-center justify-content-between">
+            <div class="d-flex flex-column">
+                @if (Vehiculo_Enviado is Maritimo) {
+                    Maritimo mar = Vehiculo_Enviado as Maritimo ?? new();
+                        <div class="d-flex">
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <div class="d-flex flex-column">
+                                <h3>@mar.Tipo</h3>
+                                <h4 class="mb-5">@mar.Matricula</h4>
+                                <h4 class="mb-3">Eslora: @($"{mar.Eslora}m.")</h4>
+                                <h4 class="mb-3">Puntal: @mar.Puntal km aproximadamente.</h4>
+                                <h4 class="mb-3">Manga: @mar.Manga km aproximadamente.</h4>
+                                <h4 class="mb-3">Antigüedad: @mar.Antiguedad años aproximadamente.</h4>
+                                <h4 class="mb-3">Deuda: @(mar.Deuda==0? "Libre de deuda." : "$" + mar.Deuda.ToString())</h4>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <ul>
+                                <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                    <h3>@Dueño_Recibe.Nombre</h3>
+                                    <h4>@Dueño_Recibe.Email</h4>
+                                    <h4>@Dueño_Recibe.Contacto</h4>
+                                </div></li>
+                                <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@mar.descripcion</div></li>
+                            </ul>
+                        </div>
+                } else {
+                    Terrestre ter = Vehiculo_Enviado as Terrestre ?? new();
+                    <div class="d-flex">
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <div class="d-flex flex-column">
+                            <h3>@ter.Tipo</h3>
+                            <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
+                            <h4 class="mb-5">@ter.Matricula</h4>
+                            <h4 class="mb-3">Antiguedad: @ter.Antiguedad años.</h4>
+                            <h4 class="mb-3">Kilometraje: @ter.Kilometraje km aproximadamente.</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <ul>
+                            <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                <h3>@Dueño_Recibe.Nombre</h3>
+                                <h4>@Dueño_Recibe.Email</h4>
+                                <h4>@Dueño_Recibe.Contacto</h4>
+                            </div></li>
+                            <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@ter.descripcion</div></li>
+                        </ul>
+                    </div>
+                }
+            </div>
+            <div >
+                <Button @onclick="RechazarOferta" Color="ButtonColor.Danger">Rechazar Oferta</Button>
+                <Button @onclick="AceptarOferta" Color="ButtonColor.Success">Aceptar Oferta</Button>
+            </div>
+        </div>
     </Authorized>
 </AuthorizeView>
 
@@ -102,4 +156,11 @@
         Dueño_Recibe.Contacto = Dueño_Recibe.Contacto == "" ? "No posee información de contacto." : Dueño_Recibe.Contacto;
     }
 
+    async Task RechazarOferta() {
+
+    }
+
+    async Task AceptarOferta() {
+        
+    }
 }
