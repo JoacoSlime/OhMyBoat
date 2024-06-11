@@ -1,0 +1,76 @@
+@inject HttpClient HttpClient
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+@code {
+
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    [Parameter] public int Id_Oferta { get; set; }
+
+    public Terrestre Vehiculo_Enviado {get; set;} = new();
+    public Terrestre Vehiculo_Recibido {get; set;} = new();
+
+    public Cliente Dueño_Envia {get; set;} = new();
+    public Cliente Dueño_Recibe {get; set;} = new();
+
+    public Oferta Oferta {get; set;} = new();
+
+
+    protected override async Task OnParametersSetAsync() {
+
+        Oferta.Id = Id_Oferta;
+        var responseSV = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/GetOferta", Oferta) ?? new();
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "El identificador de oferta es innexistente");
+            await OnClickCallback.InvokeAsync();
+            return;
+        }
+
+        Vehiculo_Enviado.Matricula = Oferta.PatenteVehiculoEnviaOferta;
+
+        responseSV = await HttpClient.PostAsJsonAsync<Terrestre>("api/Vehiculos/GetVehiculoPatente", Vehiculo_Enviado) ?? new();
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+            await OnClickCallback.InvokeAsync();
+            return;
+        }
+
+        Vehiculo_Enviado = await responseSV.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+
+        responseSV = await HttpClient.PostAsJsonAsync<Vehiculo>("api/Vehiculos/GetDueño", Vehiculo_Enviado) ?? new();
+            if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
+            await OnClickCallback.InvokeAsync();
+            return;
+        }
+        
+        Dueño_Envia = await responseSV.Content.ReadFromJsonAsync<Cliente>() ?? new();
+        Dueño_Envia.Contacto = Dueño_Envia.Contacto == "" ? "No posee información de contacto." : Dueño_Envia.Contacto;
+
+        Vehiculo_Recibido.Matricula = Oferta.PatenteVehiculoRecibeOferta;
+
+        responseSV = await HttpClient.PostAsJsonAsync<Terrestre>("api/Vehiculos/GetVehiculoPatente", Vehiculo_Recibido) ?? new();
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "Matricula innexistente");
+            await OnClickCallback.InvokeAsync();
+            return;
+        }
+        
+        Vehiculo_Recibido = await responseSV.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+
+        responseSV = await HttpClient.PostAsJsonAsync<Vehiculo>("api/Vehiculos/GetDueño", Vehiculo_Recibido) ?? new();
+            if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
+            await OnClickCallback.InvokeAsync();
+            return;
+        }
+
+        Dueño_Recibe = await responseSV.Content.ReadFromJsonAsync<Cliente>() ?? new();
+        Dueño_Recibe.Contacto = Dueño_Recibe.Contacto == "" ? "No posee información de contacto." : Dueño_Recibe.Contacto;
+    }
+
+}

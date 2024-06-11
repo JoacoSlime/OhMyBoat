@@ -26,7 +26,6 @@
                     
                     <Button Size="Size.Large" Color="ButtonColor.Success" @onclick="()=>aceptarOferta()">Aceptar Ofertar</Button>
                     <Button Size="Size.Large" Color="ButtonColor.Danger" @onclick="()=>rechazarOferta(ofer)">rechazar Ofertar</Button>                                
-
             }
             }
         }
@@ -142,7 +141,6 @@
     private Modal DetalleModal = default!;
 
     List<Oferta> ReceivedOffers = new();
-
     List<(Oferta,Usuario,Vehiculo,Vehiculo)> VehiculosOfertas = new();
 
     List<Usuario> ClienteOfertante = new();
@@ -166,6 +164,7 @@
 
         foreach (Oferta o in ReceivedOffers)
         {
+
             Vehiculo VehiculoRecibido = new Vehiculo() { Id = o.ID_VehiculoRecibeOferta};
 
             Vehiculo recibe;
@@ -206,6 +205,7 @@
                     return;
                 }
                 envia = await resp4.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+
             }
 
             var resp5 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetDueño", envia) ?? new();
