@@ -147,5 +147,14 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             return StatusCode(StatusCodes.Status412PreconditionFailed, null); // si mandan  0 o 30 turnos porque si
         }
 
+        [HttpGet]
+        [Route("ListarTurnos")]
+        public async Task<IActionResult> Get()
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var listTurnos = await db.Turno.Where( t => t.TruequeId != null).OrderBy(t => t.Id).ToListAsync();
+            return StatusCode(StatusCodes.Status200OK, listTurnos);
+        }
+
     }
 }
