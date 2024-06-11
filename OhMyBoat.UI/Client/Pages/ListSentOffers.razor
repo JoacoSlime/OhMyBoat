@@ -124,6 +124,9 @@
 
     List<(Oferta,Vehiculo,Vehiculo)> VehiculosOfertas = new();
 
+    Vehiculo VehiculoEnviado = new();
+    Vehiculo VehiculoRecibido = new();
+
     protected override async Task OnInitializedAsync()
     {
         await RecargarLista();

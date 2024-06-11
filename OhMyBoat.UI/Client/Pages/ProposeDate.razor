@@ -1,4 +1,3 @@
-﻿@page "/propose-date" 
 @inject HttpClient HttpClient
 @inject IJSRuntime JsRuntime;
 @using OhMyBoat.UI.Shared.Entidades;
@@ -7,6 +6,7 @@
 
 
 <h3>Propuesta de Reunion</h3>
+
 <div>
     <hr>
     <div>        
@@ -90,7 +90,10 @@
 <button @onclick="Enviar" class="btn btn-outline-success" >Aceptar</button>
 
 @code {
-    [Parameter]    
+
+    [Parameter] 
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    [Parameter]
     public int idOferta { get; set; }
 
     private string today = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd");
@@ -143,12 +146,12 @@
             if (cosito.IsSuccessStatusCode)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Se han registrado los turnos con exito");
-                NavManager.NavigateTo("/");
+                await OnClickCallback.InvokeAsync();
             }
             else
             {
                 await JsRuntime.InvokeVoidAsync("alert", $"Algo salio mal (Status code : {cosito.StatusCode})");
-                NavManager.NavigateTo("/");
+                await OnClickCallback.InvokeAsync();
             }
 
         }
