@@ -5,10 +5,13 @@
 @using OhMyBoat.UI.Shared
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
-
+@inject NavigationManager Navegador
 
 <AuthorizeView>
     <Authorized>
+
+        <Modal @ref="modal" IsScrollable="true" Size="ModalSize.Large" />        
+
         <div class="d-flex flex-column">
             <div class="d-flex">
                 <img class="rounded-3 m-3" src="@Navio.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
@@ -35,7 +38,7 @@
             <div class="d-flex justify-content-end">
                 <AuthorizeView Roles="cliente" Context="clientContext">
                     <Authorized Context="clientContext">
-                        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success">Hacer oferta</Button>
+                        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
                     </Authorized>
                 </AuthorizeView>
             </div>
@@ -49,7 +52,11 @@
     public Maritimo Navio {get; set;} = new();
     public Cliente Dueño {get; set;} = new();
 
+    private Modal modal = default!;
+
+
     public String deuda {get; set;} = "";
+
 
     protected override async Task OnParametersSetAsync() {
         
@@ -83,5 +90,21 @@
 
         Dueño = await responseSV.Content.ReadFromJsonAsync<Cliente>() ?? new();
         Dueño.Contacto = Dueño.Contacto == "" ? "No posee información de contacto." : Dueño.Contacto;
+    }
+
+
+    private async Task hideModal(){
+        await modal.ShowAsync();
+        await modal.HideAsync();
+       
+    }
+
+        private async Task EnviarOferta()
+    {
+        Vehiculo nav = new Vehiculo() {IDCliente = this.Navio.IDCliente , Matricula = this.Navio.Matricula};
+        var parameters = new Dictionary<string, object>();           
+            parameters.Add("vehiculoOfertado" , nav);     
+            parameters.Add("OnClickCallback",EventCallback.Factory.Create<MouseEventArgs>(this, hideModal)); 
+        await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 }

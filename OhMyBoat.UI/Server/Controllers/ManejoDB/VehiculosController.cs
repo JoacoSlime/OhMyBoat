@@ -110,6 +110,50 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         }
 
         [HttpPost]
+        [Route("GetNavioPatente")]
+        public async Task<IActionResult> GetNavioPatente([FromBody] Maritimo m)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Maritimo? maritimo = await db.Maritimos.Where(mar => mar.Matricula == m.Matricula).FirstAsync();
+            if (maritimo != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, maritimo);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
+        [HttpPost]
+        [Route("GetTerrestrePatente")]
+        public async Task<IActionResult> GetVehiculoPatente([FromBody] Terrestre v)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Terrestre? terrestre = await db.Terrestres.Where(vec => vec.Matricula == v.Matricula).FirstOrDefaultAsync();
+            if (terrestre != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, terrestre);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
+        [HttpPost]
+        [Route("GetVehiculoPatente")]
+        public async Task<IActionResult> GetPatente([FromBody] Vehiculo v)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Vehiculo? vec = await db.Terrestres.Where(vec => vec.Matricula == v.Matricula).FirstOrDefaultAsync();
+            if (vec != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, vec);
+            }
+            vec = await db.Maritimos.Where(mar => mar.Matricula == v.Matricula).FirstOrDefaultAsync();
+            if (vec != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, vec);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
+        [HttpPost]
         [Route("GetDueño")]
         public async Task<IActionResult> GetDueño([FromBody] Vehiculo v)
         {
@@ -120,6 +164,26 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 return StatusCode(StatusCodes.Status200OK, dueño);
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+    
+        [HttpGet]
+        [Route("BuscarVehiculo")]
+        public async Task<IActionResult> BuscarVehiculo([FromBody] string Matricula)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Vehiculo? v = await db.Terrestres.Where(ter => ter.Matricula == Matricula).FirstAsync(); 
+            if (v != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, v);
+            }
+            else{
+                v = await db.Maritimos.Where(mar => mar.Matricula == Matricula).FirstAsync();
+                if (v != null)
+                {
+                    return StatusCode(StatusCodes.Status200OK, v);
+                }
+                return StatusCode(StatusCodes.Status403Forbidden, null);
+           }
         }
     }
 }

@@ -57,6 +57,20 @@ namespace OhMyBoat.UI.Server.Controllers
             listClientes.ForEach(c => c.Password = "vivaracho"); // asi no hay un vivo 
             return StatusCode(StatusCodes.Status200OK, listClientes);
         }
+
+        [HttpGet]
+        [Route("BuscarUsuario")]
+        public async Task<IActionResult> BuscarUsuario([FromBody] string Email)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Cliente? cli = await db.Clientes.Where(u => u.Email.ToLower() == Email.ToLower()).FirstAsync();
+            if (cli != null)
+            {
+                cli.Password = "***";
+                return StatusCode(StatusCodes.Status200OK, cli);
+            }
+            return StatusCode(StatusCodes.Status403Forbidden, null);
+        }
     }
 }
 
