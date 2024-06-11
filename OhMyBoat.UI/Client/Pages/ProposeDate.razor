@@ -19,7 +19,7 @@
                <div>
                     @foreach (Sucursal suc in sucursales)
                     {
-                            <button @onclick="()=>{sucursalElegida=suc;selecciono=true;}" class="btn btn-primary"> @suc.NombreSuck</button>               
+                            <button class="me-2 btn btn-primary" @onclick="()=>{sucursalElegida=suc;selecciono=true;}"> @suc.NombreSuck</button>               
                     }
                 </div>
             </div>
@@ -49,7 +49,7 @@
                     <div>
                     @foreach(Turno t in turnosRecibidos)
                     {
-                            <button @onclick="()=>agregarTurno(t)" class="btn btn-outline-dark">@t.FechaTurno.ToString("dd/MM HH:mm") a @t.FechaTurno.AddMinutes(30).ToString("HH:mm")</button>
+                            <button class="me-2 mb-2 btn btn-outline-secondary" @onclick="()=>agregarTurno(t)">@t.FechaTurno.ToString("dd/MM HH:mm") a @t.FechaTurno.AddMinutes(30).ToString("HH:mm")</button>
                     }
                     </div>
                 }
@@ -91,10 +91,8 @@
 
 @code {
 
-    [Parameter] 
-    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
-    [Parameter]
-    public int idOferta { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    [Parameter] public int idOferta { get; set; }
 
     private string today = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd");
     private List<Turno> turnosPropuestos = new();
@@ -109,11 +107,7 @@
         bool Esta = false;
         foreach (Turno turno in turnosPropuestos)
         {
-            if (turno.FechaTurno.Year == t.FechaTurno.Year &&
-                turno.FechaTurno.Month == t.FechaTurno.Month &&
-                turno.FechaTurno.Day == t.FechaTurno.Day &&
-                turno.FechaTurno.Hour == t.FechaTurno.Hour &&
-                turno.FechaTurno.Minute == t.FechaTurno.Minute) ;
+            if (turno.FechaTurno.Equals(t.FechaTurno))
             Esta = true;
         }
         return Esta;
@@ -124,7 +118,7 @@
         {
             await JsRuntime.InvokeVoidAsync("alert", "Este horario ya fue seleccionado");
         }
-        else if (turnosPropuestos.Count <= 2)
+        else if (fechaValida(t) && turnosPropuestos.Count <= 2)
         {
             turnosPropuestos.Add(t);
             StateHasChanged();
@@ -132,6 +126,10 @@
         else         
             await JsRuntime.InvokeVoidAsync("alert", "Solo es posible ofrecer 3 horarios");
 
+    }
+
+    private bool fechaValida(Turno t) {
+        return t.FechaTurno>=DateTime.Today.AddDays(1);
     }
 
     private async void Enviar()

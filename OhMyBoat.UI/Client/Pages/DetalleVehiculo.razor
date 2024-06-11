@@ -92,7 +92,7 @@
         await modal.HideAsync();
     }
 
-        private async Task EnviarOferta()
+    private async Task EnviarOferta()
     {
         var parameters = new Dictionary<string, object>();
             parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));

@@ -10,6 +10,7 @@
 
 <AuthorizeView>
     <Authorized>
+        <Modal @ref="modal" IsScrollable="true" Size="ModalSize.ExtraLarge" />
         <div class="d-flex p-5 flex-row align-items-center justify-content-between">
             <div class="d-flex flex-column">
                 @if (Vehiculo_Enviado is Maritimo) {
@@ -80,6 +81,7 @@
     public Cliente Dueño_Recibe {get; set;} = new();
 
     public Oferta Oferta {get; set;} = new();
+    [Parameter] public Modal modal {get;set;} = default!;
 
 
     protected override async Task OnParametersSetAsync() {
@@ -157,10 +159,20 @@
     }
 
     async Task RechazarOferta() {
-
+        var responseSV = await HttpClient.PostAsJsonAsync("api/Oferta/EliminarOferta", Oferta);
+        await OnClickCallback.InvokeAsync();
     }
 
-    async Task AceptarOferta() {
-        
+    private async Task hideModal(){
+        await modal.ShowAsync();
+        await modal.HideAsync();
+    }
+
+    private async Task AceptarOferta()
+    {
+        var parameters = new Dictionary<string, object>();
+            parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+            parameters.Add("idOferta", Oferta.Id);      
+        await modal.ShowAsync<ProposeDate>(title: "Enviar Oferta", parameters: parameters);
     }
 }
