@@ -58,12 +58,11 @@ else
                 <CardText>@nav.Antiguedad</CardText>
             </CardBody>
             <CardFooter class="text-end">
-                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>OnClick(nav.Id, true)">Ofertar Navio</Button>
+                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success"
+                @onclick="()=>OnClick(nav.Id, true)">Ofertar Navio</Button>
             </CardFooter>
         </Card>
     }
-</div>
-<div class="d-flex flex-row flex-wrap">
     @foreach (var vec in MisRodados)
     {
         <Card Class="me-4 mb-4" Style="width:auto;">
@@ -151,9 +150,7 @@ else
 
     private async Task OnClickVehiculo(int patenteOfertado)
     {
-        Terrestre ter = new Terrestre() { Id = (this.vehiculoOfertado??new()).Id };
-        var RespuestaAfirmativa = await HttpClient.PostAsJsonAsync<Terrestre>("api/vehiculos/GetVehiculo", ter);        //verifico que no sea un terrestre // cosa que pasa que en la realidad no deberia pasar: si hay un navio y un vehiculo con la misma patente falla 
-        if (RespuestaAfirmativa.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+        if (vehiculoOfertado is Terrestre)
         {
             await JsRuntime.InvokeVoidAsync("alert", "la oferta debe contener al menos un navío.");
             return;         

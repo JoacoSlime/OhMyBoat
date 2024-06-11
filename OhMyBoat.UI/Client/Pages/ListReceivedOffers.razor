@@ -14,22 +14,13 @@
 
 <AuthorizeView Roles="cliente">
     <Authorized>
+        <Modal @ref="modal" IsScrollable="true" Size="ModalSize.Large" />
         <h1>Mis Ofertas Recibidas</h1>
 
         @if (ReceivedOffers.Count == 0)
         {
             <p>Usted no tiene ninguna oferta enviada aún</p>
         }else{
-            @foreach (var ofer in ReceivedOffers ) {
-                    <CardText>@ofer.ID_VehiculoEnviaOferta</CardText>
-                    <CardText>@ofer.ID_VehiculoRecibeOferta</CardText>  
-                    
-                    <Button Size="Size.Large" Color="ButtonColor.Success" @onclick="()=>aceptarOferta()">Aceptar Ofertar</Button>
-                    <Button Size="Size.Large" Color="ButtonColor.Danger" @onclick="()=>rechazarOferta(ofer)">rechazar Ofertar</Button>                                
-            }
-            }
-        }
-
         <div class="d-flex flex-column p-4 border rounded">
             @foreach (var vo in VehiculosOfertas ) {
                 <div class="mb-me-4 mb-4 p-4 border rounded">
@@ -56,21 +47,33 @@
                                     }
                                 }
                             </h2>
-                            <h2>
+                            <div class="ms-3">
                                 @if (@vo.Item4 is Maritimo){
                                     var m = @vo.Item4 as Maritimo;
-                                    <h4 class="mb-5">@m?.Eslora</h4>;
-                                    <h4 class="mb-5">@m?.Puntal</h4>;
-                                    <h4 class="mb-5">@m?.Manga</h4>;
+                                    <li>
+                                        <h4 class="mb-3">Eslora: @m?.Eslora</h4>
+                                    </li>
+                                    <li>
+                                        <h4 class="mb-3">Puntal: @m?.Puntal</h4>
+                                    </li>
+                                    <li>
+                                        <h4 class="mb-3">Manga: @m?.Manga</h4>
+                                    </li>
                                 }else{
                                     @if (@vo.Item4 is Terrestre){
                                         var t = @vo.Item4 as Terrestre;
-                                        <h4 class="mb-5">@t?.Marca</h4>;
-                                        <h4 class="mb-5">@t?.Modelo</h4>;
-                                        <h4 class="mb-5">@t?.Anio</h4>;
+                                        <li>
+                                            <h4 class="mb-3">Marca: @t?.Marca</h4>
+                                        </li>
+                                        <li>
+                                            <h4 class="mb-3">Modelo: @t?.Modelo</h4>
+                                        </li>
+                                        <li>
+                                            <h4 class="mb-3">Año: @t?.Anio</h4>
+                                        </li>
                                     } 
                                 }
-                            </h2>
+                            </div>
                         </div>
                         <div class="flex-fill">
                             <Icon Name="IconName.ArrowRight" Size="IconSize.x1"></Icon>
@@ -87,31 +90,43 @@
                                 }else{
                                     @if(@vo.Item3 is Terrestre){
                                         var t = @vo.Item3 as Terrestre;
-                                        <h4 class="mb-5">@t?.Tipo</h4>;
+                                        <h4 class="mb-5">@t?.Tipo</h4>
                                     }
                                 }
                             </h2>
-                            <h2>
+                            <div class="ms-3">
                                 @if (@vo.Item3 is Maritimo){
                                     var m = @vo.Item3 as Maritimo;
-                                    <h4 class="mb-5">@m?.Eslora</h4>;
-                                    <h4 class="mb-5">@m?.Puntal</h4>;
-                                    <h4 class="mb-5">@m?.Manga</h4>;
+                                    <li>
+                                        <h4 class="mb-3">Eslora: @m?.Eslora</h4>
+                                    </li>
+                                    <li>
+                                        <h4 class="mb-3">Puntal: @m?.Puntal</h4>
+                                    </li>
+                                    <li>
+                                        <h4 class="mb-3">Manga: @m?.Manga</h4>
+                                    </li>
                                 }else{
                                     @if (@vo.Item3 is Terrestre){
                                         var t = @vo.Item3 as Terrestre;
-                                        <h4 class="mb-5">@t?.Marca</h4>;
-                                        <h4 class="mb-5">@t?.Modelo</h4>;
-                                        <h4 class="mb-5">@t?.Anio</h4>;
+                                        <li>
+                                            <h4 class="mb-3">Marca: @t?.Marca</h4>
+                                        </li>
+                                        <li>
+                                            <h4 class="mb-3">Modelo: @t?.Modelo</h4>
+                                        </li>
+                                        <li>
+                                            <h4 class="mb-3">Año: @t?.Anio</h4>
+                                        </li>;
                                     } 
                                 }
-                            </h2>
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-end flex-row">
-                        <Button Color="ButtonColor.Primary" class="position-relative end-0 ms-3">Ver detalle</Button>
-                        <Button Color="ButtonColor.Success" class="position-relative end-0 ms-3">Aceptar</Button>
-                        <Button Color="ButtonColor.Danger" class="position-relative end-0 ms-3">Rechazar</Button>
+                        <Button Color="ButtonColor.Primary" class="position-relative end-0 ms-3"
+                            @onclick="(async () => await (VerOferta(vo.Item1.Id)))">Ver detalle
+                        </Button>
                     </div>
                 </div>
             }
@@ -130,7 +145,7 @@
     Nombre ofrece:                                                  A cambio de:
 
     (Foto de perfil     (foto vehiculoEnviaOferta)         --->     (foto vehiculoRecibeOferta) 
-    del que envia       TipoVehiculo, Marca, Modelo, Año            TipoVehiculo, Marca, Modelo, Año
+    <li>del que envia       TipoVehiculo, Marca, Modelo, Año            TipoVehiculo, Marca, Modelo, Año</li>
     una oferta)
 
    [VER DETALLE OFERTA]
@@ -138,7 +153,6 @@
 */
 
     private Modal modal = default!;
-    private Modal DetalleModal = default!;
 
     List<Oferta> ReceivedOffers = new();
     List<(Oferta,Usuario,Vehiculo,Vehiculo)> VehiculosOfertas = new();
@@ -223,27 +237,17 @@
         StateHasChanged();
     }
 
-
-    private async Task aceptarOferta()
-    {
-        NavManager.NavigateTo("/propose-date",true);
-    }
-
-    private async Task rechazarOferta(Oferta ofer)
-    {
-        var response = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/EliminarOferta", ofer);
-        RecargarLista();
-    }
-
     private async Task closeModal()
     {
         await modal.ShowAsync();      // https://github.com/vikramlearning/blazorbootstrap/issues/393
         await modal.HideAsync();
         await RecargarLista();
     }
-    private async Task hideModal(){
-        await DetalleModal.ShowAsync();
-        await DetalleModal.HideAsync();
+
+    private async Task VerOferta(int Id) {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, closeModal));
+        parameters.Add("Id_Oferta", Id);
+        await modal.ShowAsync<DetalleOferta>(title: "Detalles", parameters: parameters);
     }
-    
 }

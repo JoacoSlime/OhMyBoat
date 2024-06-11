@@ -56,32 +56,36 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         }
         private async Task <List<Turno>> obtenerTurnosDisponibles(DateTime dia, Sucursal suc) // 9am a 6pm los horarios de trabajo
         {
-            if (dia.DayOfWeek == DayOfWeek.Sunday)
-            {
-                return new List<Turno>();
-            }
-            else if (dia.DayOfWeek == DayOfWeek.Saturday) // 8 a 12 hs (30 min x turno, 8 turnos)
-            {
-                var turnosSabado = new List<Turno>();
-                var diaTemp = new DateTime(dia.Year, dia.Month, dia.Day, 8, 0, 0); 
-                for (int i = 0; i < 8; i++)
-                {
-                    turnosSabado.Add(new Turno() { FechaTurno = diaTemp.AddMinutes(i * 30) });
+            return await Task.Run( () => {
+
+                    if (dia.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        return new List<Turno>();
+                    }
+                    else if (dia.DayOfWeek == DayOfWeek.Saturday) // 8 a 12 hs (30 min x turno, 8 turnos)
+                    {
+                        var turnosSabado = new List<Turno>();
+                        var diaTemp = new DateTime(dia.Year, dia.Month, dia.Day, 8, 0, 0); 
+                        for (int i = 0; i < 8; i++)
+                        {
+                            turnosSabado.Add(new Turno() { FechaTurno = diaTemp.AddMinutes(i * 30) });
+                        }
+                        // si quisiese sacar los turnos reservados seria en esta linea
+                        return turnosSabado;
+                    }
+                    else // si no es domingo o sabado, osea si es dia de semana  9am a 6pm = 9 hs = 18 turnos
+                    {
+                        var turnosSemana = new List<Turno>();
+                        var diaTemp = new DateTime(dia.Year, dia.Month, dia.Day, 9, 0, 0); 
+                        for (int i = 0; i < 18; i++)
+                        {
+                            turnosSemana.Add(new Turno() { FechaTurno = diaTemp.AddMinutes(i * 30) });
+                        }
+                        // si quisiese sacar los turnos reservados seria en esta linea
+                        return turnosSemana;
+                    }
                 }
-                // si quisiese sacar los turnos reservados seria en esta linea
-                return turnosSabado;
-            }
-            else // si no es domingo o sabado, osea si es dia de semana  9am a 6pm = 9 hs = 18 turnos
-            {
-                var turnosSemana = new List<Turno>();
-                var diaTemp = new DateTime(dia.Year, dia.Month, dia.Day, 9, 0, 0); 
-                for (int i = 0; i < 18; i++)
-                {
-                    turnosSemana.Add(new Turno() { FechaTurno = diaTemp.AddMinutes(i * 30) });
-                }
-                // si quisiese sacar los turnos reservados seria en esta linea
-                return turnosSemana;
-            }
+            );
         }
 
        // private List<Turno> obtenerTurnosReservadosSucursal() { return new List<Turno>(); } // simulo que no hay nada
