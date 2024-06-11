@@ -27,6 +27,20 @@
                 <div class="border rounded p-3 mb-3">
                     <p>@Navio.descripcion</p>
                 </div>
+                <div>
+                    @if (!mostrarMensajeConfirmacion)
+                    {
+                        <button @onclick="()=> mostrarMensajeConfirmacion=true" class="btn btn-outline-danger">Eliminar</button>
+                    }
+                    else
+                    {
+                        <div>
+                            Esta seguro que desea eliminar el vehiculo?
+                            <button @onclick="() => {mostrarMensajeConfirmacion = false; StateHasChanged();}" class="btn btn-outline-secondary">Cancelar</button>
+                            <button @onclick="() => {eliminarNavio(Navio);}" class="btn btn-outline-success"> Confirmar</button>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </Authorized>
@@ -36,8 +50,8 @@
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
     [Parameter] public int Id { get; set; }
     public Maritimo Navio {get; set;} = new();
-
     public String deuda = "";
+    private bool mostrarMensajeConfirmacion = false;
 
     protected override async Task OnParametersSetAsync() {
         
@@ -58,5 +72,26 @@
             deuda =  Convert.ToString(Navio.Deuda);
         }
 
+    }
+
+    private async Task eliminarNavio(Maritimo t)
+    {
+        var respuesta = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/EliminarMaritimo", t);
+        if (respuesta != null)
+        {
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Se ha eliminado el vehiculo con exito");
+                await OnClickCallback.InvokeAsync();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", $"Error de api {respuesta.StatusCode}");
+            }
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Error de api (no llega el objeto del post)");
+        }
     }
 }

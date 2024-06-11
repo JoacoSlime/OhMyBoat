@@ -91,6 +91,7 @@
     private async Task hideModal(){
         await DetalleModal.ShowAsync();
         await DetalleModal.HideAsync();
+        await RecargarLista();
     }
 
     private async Task VerDetalles(int Id) {
