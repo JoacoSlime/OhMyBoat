@@ -66,7 +66,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> ListSentOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_EnviaOferta == Email.Email.ToLower()).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_EnviaOferta == Email.Email.ToLower() && o.Estado == false).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
@@ -76,7 +76,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> ListReceivedOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.Email.ToLower()).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.Email.ToLower() && o.Estado == false).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
@@ -86,7 +86,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> GetOferta([FromBody] Oferta o)
         {
             using var db = new OhMyBoatUIServerContext();
-            Oferta? offer = await db.Ofertas.Where(of => of.Id == o.Id).FirstOrDefaultAsync();
+            Oferta? offer = await db.Ofertas.Where(of => of.Id == o.Id && o.Estado == false).FirstOrDefaultAsync();
             if (offer != null)
             {
                 return StatusCode(StatusCodes.Status200OK, offer);
