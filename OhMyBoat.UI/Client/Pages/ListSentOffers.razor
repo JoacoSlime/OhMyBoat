@@ -1,0 +1,207 @@
+@page "/sent-offers"
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject AuthenticationStateProvider authStateProvider;
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@using System.Security.Claims
+@inject NavigationManager NavManager
+
+<AuthorizeView Roles="cliente">
+    <Authorized>
+        <h1>Mis Ofertas Enviadas</h1>
+            @if (SentOffers.Count == 0)
+            {
+                <p>Usted no tiene ninguna oferta enviada aún</p>
+            } else {
+            <div class="d-flex flex-column p-4 border rounded">
+            @foreach (var vo in VehiculosOfertas ) {
+                <div class="mb-me-4 mb-4 p-4 border rounded">
+                    <div class="d-flex flex-row align-items-center justify-content-between" Style="width:auto;">
+                        <div class="flex-fill">
+                            <h1>Ofreciste:</h1>
+                            <div>
+                                <img class="rounded-3 m-3" src="@vo.Item3.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
+                            </div>
+                            <h2>
+                                @if (@vo.Item3 is Maritimo){
+                                    var m = @vo.Item3 as Maritimo;
+                                    <h4 class="mb-5">@m?.Tipo</h4>;
+                                }else{
+                                    @if(@vo.Item3 is Terrestre){
+                                        var t = @vo.Item3 as Terrestre;
+                                        <h4 class="mb-5">@t?.Tipo</h4>;
+                                    }
+                                }
+                            </h2>
+                            <h2>
+                                @if (@vo.Item3 is Maritimo){
+                                    var m = @vo.Item3 as Maritimo;
+                                    <h4 class="mb-5">@m?.Eslora</h4>;
+                                    <h4 class="mb-5">@m?.Puntal</h4>;
+                                    <h4 class="mb-5">@m?.Manga</h4>;
+                                }else{
+                                    @if (@vo.Item3 is Terrestre){
+                                        var t = @vo.Item3 as Terrestre;
+                                        <h4 class="mb-5">@t?.Marca</h4>;
+                                        <h4 class="mb-5">@t?.Modelo</h4>;
+                                        <h4 class="mb-5">@t?.Anio</h4>;
+                                    } 
+                                }
+                            </h2>
+                        </div>
+                        <div class="flex-fill">
+                            <Icon Name="IconName.ArrowRight" Size="IconSize.x1"></Icon>
+                        </div>
+                        <div class="flex-fill">
+                            <h1>A cambio de:</h1>
+                            <div>
+                                <img class="rounded-3 m-3" src="@vo.Item2.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
+                            </div>
+                            <h2>
+                                @if (@vo.Item2 is Maritimo){
+                                    var m = @vo.Item2 as Maritimo;
+                                    <h4 class="mb-5">@m?.Tipo</h4>;
+                                }else{
+                                    @if(@vo.Item2 is Terrestre){
+                                        var t = @vo.Item2 as Terrestre;
+                                        <h4 class="mb-5">@t?.Tipo</h4>;
+                                    }
+                                }
+                            </h2>
+                            <h2>
+                                @if (@vo.Item2 is Maritimo){
+                                    var m = @vo.Item2 as Maritimo;
+                                    <h4 class="mb-5">@m?.Eslora</h4>;
+                                    <h4 class="mb-5">@m?.Puntal</h4>;
+                                    <h4 class="mb-5">@m?.Manga</h4>;
+                                }else{
+                                    @if (@vo.Item2 is Terrestre){
+                                        var t = @vo.Item2 as Terrestre;
+                                        <h4 class="mb-5">@t?.Marca</h4>;
+                                        <h4 class="mb-5">@t?.Modelo</h4>;
+                                        <h4 class="mb-5">@t?.Anio</h4>;
+                                    } 
+                                }
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <Button Color="ButtonColor.Primary" class="position-relative end-0">Ver detalle</Button>
+                    </div>
+                </div>
+            }
+            </div>
+            }
+    </Authorized>
+    <NotAuthorized>
+       @{NavManager.NavigateTo("/",true);} 
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+/*
+    
+    Ofreciste:                                      A cambio de:
+
+    (foto vehiculoEnviaOferta)           --->       (foto vehiculoRecibeOferta) 
+    TipoVehiculo, Marca, Modelo, Año                TipoVehiculo, Marca, Modelo, Año
+
+   [VER DETALLE OFERTA]
+
+*/
+
+    private Modal modal = default!;
+    private Modal DetalleModal = default!;
+
+    List<Oferta> SentOffers = new();
+
+    List<(Oferta,Vehiculo,Vehiculo)> VehiculosOfertas = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RecargarLista();
+    }
+
+    private async Task RecargarLista()
+    {
+        var Aut = await authStateProvider.GetAuthenticationStateAsync();
+        var MyEmail = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+
+
+        Usuario us = new Usuario() {Email = MyEmail};
+        var respSV = await HttpClient.PostAsJsonAsync("api/Oferta/ListarOfertasEnviadas", us);
+        SentOffers = await respSV.Content.ReadFromJsonAsync<List<Oferta>>() ?? new();
+
+        VehiculosOfertas.Clear();
+
+        foreach (Oferta o in SentOffers)
+        {
+
+            Vehiculo VehiculoRecibido = new Vehiculo() { Id = o.ID_VehiculoRecibeOferta};
+
+            Vehiculo recibe;
+            if (o.EsNavioRecibe){
+                var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetNavio", VehiculoRecibido) ?? new();
+                if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+                {
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del navío recibido es innexistente");
+                    return;
+                }
+                recibe = await resp1.Content.ReadFromJsonAsync<Maritimo>() ?? new();
+            }else{
+                var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoRecibido) ?? new();
+                if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+                {
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del terrestre recibido es innexistente");
+                    return;
+                }
+                recibe = await resp1.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+            }
+
+            Vehiculo envia;
+            if (o.EsNavioEnvia){
+                var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetNavio", VehiculoRecibido) ?? new();
+                if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+                {
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula navio enviado es innexistente");
+                    return;
+                }
+                envia = await resp1.Content.ReadFromJsonAsync<Maritimo>() ?? new();
+            }else{
+                var resp1 = await HttpClient.PostAsJsonAsync("api/vehiculos/GetVehiculo", VehiculoRecibido) ?? new();
+                if (resp1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+                {
+                    await JsRuntime.InvokeVoidAsync("alert", "Matricula del terrestre enviado es innexistente");
+                    return;
+                }
+                envia = await resp1.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+            }
+            
+            VehiculosOfertas.Add((o,recibe,envia));
+
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task closeModal()
+    {
+        await modal.ShowAsync();      // https://github.com/vikramlearning/blazorbootstrap/issues/393
+        await modal.HideAsync();
+        await RecargarLista();
+    }
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
+    
+
+    
+}
