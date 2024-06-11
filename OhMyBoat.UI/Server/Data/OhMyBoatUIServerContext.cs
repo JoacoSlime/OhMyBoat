@@ -7,7 +7,7 @@ using OhMyBoat.UI.Shared.Entidades;
 
 namespace OhMyBoat.UI.Server.Data
 {
-    public class OhMyBoatUIServerContext: DbContext
+    public class OhMyBoatUIServerContext : DbContext
     {
 #nullable disable
         /// <summary> asi pones el modelo en el EFC 

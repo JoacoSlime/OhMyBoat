@@ -18,12 +18,28 @@
                     <h4 class="mb-3">Eslora: @($"{Navio.Eslora}m.")</h4>
                     <h4 class="mb-3">Puntal: @Navio.Puntal km aproximadamente.</h4>
                     <h4 class="mb-3">Manga: @Navio.Manga km aproximadamente.</h4>
+                    <h4 class="mb-3">Antigüedad: @Navio.Antiguedad años aproximadamente.</h4>
+                    <h4 class="mb-3">Deuda: @deuda</h4>
                 </div>
             </div>
             <div class="d-flex flex-column">
                 <h3>Descripcion:</h3>
                 <div class="border rounded p-3 mb-3">
                     <p>@Navio.descripcion</p>
+                </div>
+                <div>
+                    @if (!mostrarMensajeConfirmacion)
+                    {
+                        <button @onclick="()=> mostrarMensajeConfirmacion=true" class="btn btn-outline-danger">Eliminar</button>
+                    }
+                    else
+                    {
+                        <div>
+                            Esta seguro que desea eliminar el vehiculo?
+                            <button @onclick="() => {mostrarMensajeConfirmacion = false; StateHasChanged();}" class="btn btn-outline-secondary">Cancelar</button>
+                            <button @onclick="() => {eliminarNavio(Navio);}" class="btn btn-outline-success"> Confirmar</button>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -34,16 +50,48 @@
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
     [Parameter] public int Id { get; set; }
     public Maritimo Navio {get; set;} = new();
-
+    public String deuda = "";
+    private bool mostrarMensajeConfirmacion = false;
 
     protected override async Task OnParametersSetAsync() {
+        
         Navio.Id = Id;
         var responseSV = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/GetNavio", Navio) ?? new();
+        
         if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
             await JsRuntime.InvokeVoidAsync("alert", "Id innexistente");
             await OnClickCallback.InvokeAsync();
             return;
         }
+
         Navio = await responseSV.Content.ReadFromJsonAsync<Maritimo>() ?? new();
+
+        if (Navio.Deuda == 0) {
+            deuda = "Libre de deudas.";
+        }else{
+            deuda =  Convert.ToString(Navio.Deuda);
+        }
+
+    }
+
+    private async Task eliminarNavio(Maritimo t)
+    {
+        var respuesta = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/EliminarMaritimo", t);
+        if (respuesta != null)
+        {
+            if (respuesta.IsSuccessStatusCode)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Se ha eliminado el vehiculo con exito");
+                await OnClickCallback.InvokeAsync();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", $"Error de api {respuesta.StatusCode}");
+            }
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Error de api (no llega el objeto del post)");
+        }
     }
 }

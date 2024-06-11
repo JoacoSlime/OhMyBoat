@@ -52,6 +52,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 await db.Usuarios.AddAsync(c);
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK, c);
+                
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
