@@ -135,7 +135,8 @@ else
                 ID_VehiculoEnviaOferta = patenteOfertado,
                 ID_VehiculoRecibeOferta = vehiculoOfertado.Id,
                 EsNavioEnvia = ofertado,
-                EsNavioRecibe = vehiculoOfertado?.GetType() == typeof(Maritimo)
+                EsNavioRecibe = vehiculoOfertado?.GetType() == typeof(Maritimo),
+                Estado = false
 
             };
 

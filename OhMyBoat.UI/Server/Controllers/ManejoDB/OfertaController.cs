@@ -47,6 +47,21 @@ namespace OhMyBoat.UI.Server.Controllers
         }
 
         [HttpPost]
+        [Route("SwitchEstado")]
+        public async Task<IActionResult> SwitchEstado([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var oferta = await db.Ofertas.Where(of => of.Id == o.Id).FirstOrDefaultAsync();
+            if (oferta != null){
+                oferta.Estado = ! oferta.Estado;
+                db.Ofertas.Update(oferta);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            else return StatusCode(StatusCodes.Status406NotAcceptable);
+        }
+
+        [HttpPost]
         [Route("ListarOfertasEnviadas")]
         public async Task<IActionResult> ListSentOffers([FromBody] Usuario Email){
             
