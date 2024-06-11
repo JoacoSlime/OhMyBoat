@@ -49,7 +49,7 @@ else
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Eslora: @nav.Eslora</li>
                 <li class="list-group-item">Puntal: @nav.Puntal</li>
-                <li class="list-group-item">Deuda: @nav.Deuda</li>
+                <li class="list-group-item">Manga: @nav.Manga</li>
             </ul>
             <CardBody>
                 <CardTitle>Deuda:</CardTitle>
@@ -125,7 +125,9 @@ else
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
-        await JsRuntime.InvokeVoidAsync("alert",  vehiculoOfertado.Id);
+        await JsRuntime.InvokeVoidAsync("alert", $"El ID del vehiculo del que recibe la oferta es: {vehiculoOfertado.Id} es navio? {vehiculoOfertado?.GetType() == typeof(Maritimo)}");
+        await JsRuntime.InvokeVoidAsync("alert", $"El ID del vehiculo del que envia la oferta es:{patenteOfertado} es navio? {ofertado}");
+        
         Oferta ofer = new Oferta
             {
                 ID_RecibeOferta = vehiculoOfertado?.IDCliente,
