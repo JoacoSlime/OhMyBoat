@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OhMyBoat.UI.Server.Data;
 using OhMyBoat.UI.Shared.Entidades;
+using Org.BouncyCastle.Asn1.Iana;
 using System.Security.Cryptography;
 
 namespace OhMyBoat.UI.Server.Controllers.ManejoDB
@@ -104,6 +106,19 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         }
 
         [HttpPost]
+        [Route("ObtenerSucursal")]
+        public async Task<IActionResult> ObtenerSucursal(Turno t)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var sucursales = await db.Sucursales.Where(s => s.Id == t.SucursalId).FirstOrDefaultAsync();
+            if (sucursales != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, sucursales);
+            }
+            else return StatusCode(StatusCodes.Status403Forbidden, null);
+        }
+
+        [HttpPost]
         [Route("VerificarDisponibilidadDia")]
         public async Task<IActionResult> ObtenerHorarios([FromBody] ConsultaHorariosDTO tapioca)
         {
@@ -158,6 +173,56 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             using var db = new OhMyBoatUIServerContext();
             var listTurnos = await db.Turno.Where( t => t.TruequeId != null).OrderBy(t => t.Id).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, listTurnos);
+        }
+        
+        [HttpPost]
+        [Route("GetTurnos")]
+        public async Task<IActionResult> GetTurnos(Oferta ofert) {
+            using var db = new OhMyBoatUIServerContext();
+            var turno = await db.Turno.Where(turno => turno.OfertaId == ofert.Id).ToListAsync();
+            if (turno.IsNullOrEmpty()) {
+                return StatusCode(403, null);
+            }
+            return StatusCode(200, turno);
+        }
+        
+        [HttpPost]
+        [Route("EliminarTurno")]
+        public async Task<IActionResult> EliminarOferta([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var turn = await db.Turno.Where(turn => turn.OfertaId == o.Id).ToListAsync();
+            if (turn != null)
+            {
+                foreach (Turno t in turn )
+                {
+                    db.Turno.Remove(t);
+                }
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, turn);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
+        [HttpPost]
+        [Route("SelectTurno")]
+        public async Task<IActionResult> SelectTurno([FromBody] Turno turno) {
+            using var db = new OhMyBoatUIServerContext();
+            var turn = await db.Turno.Where(turn => turn.OfertaId == turno.OfertaId).ToListAsync();
+            if (turn != null)
+            {
+                foreach (Turno t in turn)
+                {
+                    if (t.Id != turno.Id)
+                    db.Turno.Remove(t);
+                }
+                var turnoNuevo = turn.First();
+                turnoNuevo.TruequeId = turno.TruequeId;
+                db.Update(turnoNuevo);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, turn);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
 
     }

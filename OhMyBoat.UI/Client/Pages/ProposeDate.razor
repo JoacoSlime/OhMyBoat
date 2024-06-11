@@ -75,7 +75,7 @@
                         Turnos : 
                         @foreach(Turno t in turnosPropuestos)
                         {
-                            <div>@t.FechaTurno.ToString("dddd dd/MM HH:mm") a @t.FechaTurno.AddMinutes(30).ToString("HH:mm") <button @onclick="()=>turnosPropuestos.Remove(t)" class="btn btn-outline-danger">borrar</button></div>
+                            <div>El @t.FechaTurno.ToString("dddd dd/MM/yyyy") de las @t.FechaTurno.ToString("HH:mm") hasta las @t.FechaTurno.AddMinutes(30).ToString("HH:mm") <button @onclick="()=>turnosPropuestos.Remove(t)" class="btn btn-outline-danger">borrar</button></div>
                             <br>
                         }
                     </div>
@@ -138,13 +138,16 @@
             foreach(Turno t in turnosPropuestos)
             {
                 t.OfertaId = idOferta;
-                t.SucursalId = sucursalElegida.Id;
+                t.SucursalId = sucursalElegida?.Id ?? 0;
             }
             var cosito = await HttpClient.PostAsJsonAsync<List<Turno>>("api/turnos/EnviarTurnosPropuesta", turnosPropuestos);
             if (cosito.IsSuccessStatusCode)
             {
+                Oferta o = new Oferta(){Id = idOferta};
+                await HttpClient.PostAsJsonAsync("api/oferta/AceptarOferta", o);
                 await JsRuntime.InvokeVoidAsync("alert", "Se han registrado los turnos con exito");
                 await OnClickCallback.InvokeAsync();
+                StateHasChanged();
             }
             else
             {
@@ -160,7 +163,7 @@
     }
     private async void buscarTurnos()
     {
-        var consulta = new ConsultaHorariosDTO { dia = DiaQueVoyAVerSiTieneTurno, suc = sucursalElegida };
+        var consulta = new ConsultaHorariosDTO { dia = DiaQueVoyAVerSiTieneTurno, suc = sucursalElegida ?? new() };
         var respuestaServidor = await HttpClient.PostAsJsonAsync<ConsultaHorariosDTO>("api/turnos/VerificarDisponibilidadDia", consulta);
         turnosRecibidos = await respuestaServidor.Content.ReadFromJsonAsync<List<Turno>>();
         StateHasChanged();

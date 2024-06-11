@@ -61,12 +61,28 @@ namespace OhMyBoat.UI.Server.Controllers
             else return StatusCode(StatusCodes.Status406NotAcceptable);
         }
 
+
+        [HttpPost]
+        [Route("AceptarOferta")]
+        public async Task<IActionResult> AceptarOferta([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var oferta = await db.Ofertas.Where(of => of.Id == o.Id).FirstOrDefaultAsync();
+            if (oferta != null){
+                oferta.Estado = true;
+                db.Ofertas.Update(oferta);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            else return StatusCode(StatusCodes.Status406NotAcceptable);
+        }
+
         [HttpPost]
         [Route("ListarOfertasEnviadas")]
         public async Task<IActionResult> ListSentOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_EnviaOferta == Email.Email.ToLower() && o.Estado == false).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_EnviaOferta == Email.Email.ToLower()).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
@@ -76,7 +92,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> ListReceivedOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.Email.ToLower() && o.Estado == false).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => o.ID_RecibeOferta == Email.Email.ToLower()).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
@@ -86,7 +102,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> GetOferta([FromBody] Oferta o)
         {
             using var db = new OhMyBoatUIServerContext();
-            Oferta? offer = await db.Ofertas.Where(of => of.Id == o.Id && o.Estado == false).FirstOrDefaultAsync();
+            Oferta? offer = await db.Ofertas.Where(of => of.Id == o.Id).FirstOrDefaultAsync();
             if (offer != null)
             {
                 return StatusCode(StatusCodes.Status200OK, offer);

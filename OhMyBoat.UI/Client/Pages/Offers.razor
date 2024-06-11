@@ -124,16 +124,13 @@ else
     {
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
-
-        await JsRuntime.InvokeVoidAsync("alert", $"El ID del vehiculo del que recibe la oferta es: {vehiculoOfertado.Id} es navio? {vehiculoOfertado?.GetType() == typeof(Maritimo)}");
-        await JsRuntime.InvokeVoidAsync("alert", $"El ID del vehiculo del que envia la oferta es:{patenteOfertado} es navio? {ofertado}");
         
         Oferta ofer = new Oferta
             {
                 ID_RecibeOferta = vehiculoOfertado?.IDCliente,
                 ID_EnviaOferta = Email,
                 ID_VehiculoEnviaOferta = patenteOfertado,
-                ID_VehiculoRecibeOferta = vehiculoOfertado.Id,
+                ID_VehiculoRecibeOferta = vehiculoOfertado?.Id ?? 0,
                 EsNavioEnvia = ofertado,
                 EsNavioRecibe = vehiculoOfertado?.GetType() == typeof(Maritimo),
                 Estado = false

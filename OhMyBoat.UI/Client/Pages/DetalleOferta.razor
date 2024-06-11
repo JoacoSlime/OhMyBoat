@@ -7,12 +7,13 @@
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider authStateProvider
 @using System.Security.Claims
+@inject NavigationManager NavManager 
 
 <AuthorizeView>
     <Authorized>
         <Modal @ref="modal" IsScrollable="true" Size="ModalSize.ExtraLarge" />
-        <div class="d-flex p-5 flex-row align-items-center justify-content-between">
-            <div class="d-flex flex-column">
+        <div class="d-flex p-5 flex-column align-items-center justify-content-between">
+            <div class="d-flex flex-row">
                 @if (Vehiculo_Enviado is Maritimo) {
                     Maritimo mar = Vehiculo_Enviado as Maritimo ?? new();
                         <div class="d-flex">
@@ -21,8 +22,8 @@
                                 <h3>@mar.Tipo</h3>
                                 <h4 class="mb-5">@mar.Matricula</h4>
                                 <h4 class="mb-3">Eslora: @($"{mar.Eslora}m.")</h4>
-                                <h4 class="mb-3">Puntal: @mar.Puntal km aproximadamente.</h4>
-                                <h4 class="mb-3">Manga: @mar.Manga km aproximadamente.</h4>
+                                <h4 class="mb-3">Puntal: @mar.Puntal m aproximadamente.</h4>
+                                <h4 class="mb-3">Manga: @mar.Manga m aproximadamente.</h4>
                                 <h4 class="mb-3">Antigüedad: @mar.Antiguedad años aproximadamente.</h4>
                                 <h4 class="mb-3">Deuda: @(mar.Deuda==0? "Libre de deuda." : "$" + mar.Deuda.ToString())</h4>
                             </div>
@@ -61,10 +62,49 @@
                     </div>
                 }
             </div>
-            <div >
-                <Button @onclick="RechazarOferta" Color="ButtonColor.Danger">Rechazar Oferta</Button>
-                <Button @onclick="AceptarOferta" Color="ButtonColor.Success">Aceptar Oferta</Button>
-            </div>
+            @if (Oferta.Estado) {
+                <div class="d-flex flex-column border rounded mb-3">
+                @if (isReceiving) {
+                    @foreach (Turno turno in Turnos) {
+                        <div class="mb-3 p-2">
+                            <h3>A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
+                        </div>
+                    }
+                } else {
+                    @if (!hasTrueque){
+                        <h2>Seleccione el horario al que desea asistir:</h2>
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                        @foreach (Turno turno in Turnos) {
+                            <div class="mb-3 p-2">
+                                @if (turno.FechaTurno<DateTime.Today){
+                                    <Button Color="ButtonColor.Danger" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
+                                } else {
+                                    <Button Color="ButtonColor.Primary" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
+                                }
+                            </div>
+                        }
+                        </div>
+                    } else {
+                        <h2>Horario establecido:</h2> 
+                        <h3>A las @Turnos.First().FechaTurno.ToString("HH:mm") el @Turnos.First().FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
+
+                    }
+                }
+                </div>
+                <div class="d-flex flex-row">
+                @if (isReceiving && !(isTruqueMade??false)) {
+                     <Button @onclick="EditarHorario" Size="Size.ExtraLarge" Color="ButtonColor.Primary">Editar Horario</Button>
+                }
+                <Button class="ms-3" @onclick="CancelarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Danger">Cancelar Oferta</Button>
+                </div>
+            } else {
+                @if (isReceiving) {
+                    <div class="d-flex flex-row">
+                        <Button class="ms-3" @onclick="RechazarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Danger">Rechazar Oferta</Button>
+                        <Button class="ms-3" @onclick="AceptarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Success">Aceptar Oferta</Button>
+                    </div>
+                }
+            }
         </div>
     </Authorized>
 </AuthorizeView>
@@ -82,7 +122,11 @@
 
     public Oferta Oferta {get; set;} = new();
     [Parameter] public Modal modal {get;set;} = default!;
-
+    public List<Turno> Turnos {get;set;} = new();
+    public Sucursal Sucursal {get; set;} = new();
+    public bool isReceiving = false;
+    public bool hasTrueque = true;
+    public bool? isTruqueMade = true;
 
     protected override async Task OnParametersSetAsync() {
         Oferta.Id = Id_Oferta;
@@ -156,6 +200,46 @@
 
         Dueño_Recibe = await responseSV4.Content.ReadFromJsonAsync<Cliente>() ?? new();
         Dueño_Recibe.Contacto = Dueño_Recibe.Contacto == "" ? "No posee información de contacto." : Dueño_Recibe.Contacto;
+
+
+        var responseSVTurno = await HttpClient.PostAsJsonAsync("api/Turnos/GetTurnos", Oferta);
+        if (responseSVTurno.IsSuccessStatusCode) {
+            Turnos = await responseSVTurno.Content.ReadFromJsonAsync<List<Turno>>() ?? new();
+        }
+
+        Turno primerTurno = Turnos.FirstOrDefault<Turno>() ?? new();
+        var responseSVSucursal = await HttpClient.PostAsJsonAsync("api/Turnos/ObtenerSucursal", primerTurno);
+        if (responseSVSucursal.IsSuccessStatusCode) {
+            Sucursal = await responseSVSucursal.Content.ReadFromJsonAsync<Sucursal>() ?? new();
+        }
+
+        var coso = await authStateProvider.GetAuthenticationStateAsync();
+        var emailDatos = coso.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        var log = new LoginDTO();
+        log.Email = emailDatos;
+        var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log); // ver ese coso
+        var user = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
+        isReceiving = Dueño_Recibe.Id == user?.Id;
+
+        Maritimo maritimo;
+        Vehiculo vehiculo;
+        if (Oferta.EsNavioEnvia) {
+            maritimo = Vehiculo_Enviado as Maritimo ?? new();
+            vehiculo = Vehiculo_Recibido;
+        } else {
+            vehiculo = Vehiculo_Enviado;
+            maritimo = Vehiculo_Recibido as Maritimo ?? new();
+        }
+        Trueque parametro = new Trueque() {
+            MaritimoId = maritimo.Id,
+            VehiculoId = vehiculo.Id
+        };
+        var responseamela = await HttpClient.PostAsJsonAsync("api/Trueques/GetTrueque", parametro);
+        hasTrueque = responseamela.IsSuccessStatusCode;
+        if (hasTrueque) {
+            Trueque trueque = await responseamela.Content.ReadFromJsonAsync<Trueque>() ?? new();
+            isTruqueMade = trueque.Concreto;
+        }
     }
 
     async Task RechazarOferta() {
@@ -166,6 +250,7 @@
     private async Task hideModal(){
         await modal.ShowAsync();
         await modal.HideAsync();
+        await OnClickCallback.InvokeAsync();
     }
 
     private async Task AceptarOferta()
@@ -174,5 +259,68 @@
             parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
             parameters.Add("idOferta", Oferta.Id);      
         await modal.ShowAsync<ProposeDate>(title: "Enviar Oferta", parameters: parameters);
+    }
+
+    private async Task EditarHorario() {
+        var response = await HttpClient.PostAsJsonAsync<Oferta>("api/Turnos/EliminarTurno", Oferta);
+        StateHasChanged();
+        var parameters = new Dictionary<string, object>();
+            parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+            parameters.Add("idOferta", Oferta.Id);
+        await modal.ShowAsync<ProposeDate>(title: "Editar Oferta", parameters: parameters);
+    }
+
+    private async Task AceptarTurno(Turno turno) {
+        if (turno.FechaTurno>=DateTime.Today){
+            int Id_maritimo;
+            int Id_vehiculo;
+            if (Oferta.EsNavioEnvia) {
+                Id_maritimo = Vehiculo_Enviado.Id;
+                Id_vehiculo = Vehiculo_Recibido.Id;
+            } else {
+                Id_vehiculo = Vehiculo_Enviado.Id;
+                Id_maritimo = Vehiculo_Recibido.Id;
+            }
+            Trueque trueque = new Trueque(){
+                MaritimoId = Id_maritimo,
+                VehiculoId = Id_vehiculo,
+                
+            };
+            var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", trueque);
+            if (responseSV.IsSuccessStatusCode) {
+                trueque = await responseSV.Content.ReadFromJsonAsync<Trueque>() ?? new();
+                turno.TruequeId = trueque.Id;
+                responseSV = await HttpClient.PostAsJsonAsync("api/Turnos/SelectTurno", turno);
+                await OnClickCallback.InvokeAsync();
+                await JsRuntime.InvokeVoidAsync("alert", $"Turno aceptado con éxito, nos vemos el {turno.FechaTurno.ToString("dd/MM/yyyy")} a las {turno.FechaTurno.ToString("HH:mm")}");
+                StateHasChanged();
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", "Error al elegir trueque");
+            }
+        } else {
+            await JsRuntime.InvokeVoidAsync("alert", "Este turno está vencido.");
+        }
+    }
+
+    private async Task CancelarOferta() {
+        Maritimo maritimo;
+        Vehiculo vehiculo;
+        if (Oferta.EsNavioEnvia) {
+            maritimo = Vehiculo_Enviado as Maritimo ?? new();
+            vehiculo = Vehiculo_Recibido;
+        } else {
+            vehiculo = Vehiculo_Enviado;
+            maritimo = Vehiculo_Recibido as Maritimo ?? new();
+        }
+        Trueque parametro = new Trueque() {
+            MaritimoId = maritimo.Id,
+            VehiculoId = vehiculo.Id
+        };
+        var responseamela = await HttpClient.PostAsJsonAsync("api/Trueques/GetTrueque", parametro);
+        if (responseamela.IsSuccessStatusCode) {
+            Trueque trueque = await responseamela.Content.ReadFromJsonAsync<Trueque>() ?? new();
+            var responseamela2 = await HttpClient.PostAsJsonAsync("api/Trueques/DeleteTrueque", trueque);
+        }
+        await RechazarOferta();
     }
 }

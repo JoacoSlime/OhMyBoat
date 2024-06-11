@@ -11,7 +11,7 @@ namespace OhMyBoat.UI.Shared.Entidades
           public int Id { get; set; }
           public int MaritimoId {  get; set; }
           public int VehiculoId { get; set; }
-          public bool Concreto { get; set; }
+          public bool? Concreto { get; set; }
 
     }
 }

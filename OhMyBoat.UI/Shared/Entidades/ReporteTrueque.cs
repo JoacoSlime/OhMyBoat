@@ -13,7 +13,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         public int VehiculoId { get; set; }
         public String Sucursal { get; set; }
         public DateTime FechaTurno {  get; set; }
-        public bool Concreto { get; set; }
+        public bool? Concreto { get; set; }
 
     }
 }
