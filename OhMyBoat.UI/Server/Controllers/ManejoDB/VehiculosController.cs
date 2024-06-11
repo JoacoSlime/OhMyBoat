@@ -207,6 +207,19 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         }
 
         [HttpPost]
+        [Route("GetNavioPatente")]
+        public async Task<IActionResult> GetNavioPatente([FromBody] Maritimo m)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Maritimo? maritimo = await db.Maritimos.Where(mar => mar.Matricula == m.Matricula).FirstOrDefaultAsync();
+            if (maritimo != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, maritimo);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
+
+        [HttpPost]
         [Route("GetDueño")]
         public async Task<IActionResult> GetDueño([FromBody] Vehiculo v)
         {

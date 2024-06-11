@@ -14,29 +14,29 @@
 
 <AuthorizeView>
     <Authorized>
-<div class="d-flex flex-column justify-content-center p-5">
-    <div class="mb-3">
-        <h1>Editar deuda de un navio</h1>
-    </div>
+        <div class="d-flex flex-column justify-content-center p-5">
+            <div class="mb-3">
+                <h1>Editar deuda de un navio</h1>
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label" for="nombre"><h3>Matricula del navío</h3></label>
-        <input class="form-control" @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
-    </div>
-    <div class="mb-3">
-        <label class="form-label" for="nombre"><h3>Deuda del navio</h3></label>
-        <input class="form-control" @bind="Deuda" type="float"placeholder="12050" name="nombre" required />
-    </div>
-</div>
-
-<Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>OnClick()">Confirmar</Button>
-
+            <div class="mb-3">
+                <label class="form-label" for="nombre"><h3>Matricula del navío</h3></label>
+                <input class="form-control" @bind="matricula" type="text" placeholder="MO 122 RO" name="nombre" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="nombre"><h3>Deuda del navio</h3></label>
+                <input class="form-control" @bind="Deuda" type="number" placeholder="12050" name="nombre" required />
+            </div>
+        </div>
+        <div class = "d-flex justify-content-center">
+            <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>OnClick()">Confirmar</Button>
+        </div>
     </Authorized>
 </AuthorizeView>
 @code{
 
 private float Deuda;
-private string matricula;
+private string matricula = "";
 
 private async Task OnClick()
 {

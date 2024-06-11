@@ -73,8 +73,13 @@
                                 <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.FileEarmarkPersonFill" Size="IconSize.x3"></Icon> <span class="ms-2">Listar Clientes</span></div>
                             </NavLink>
                         </div>
-                     </Authorized>
-                  </AuthorizeView>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="edit-debt">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.PencilFill" Size="IconSize.x3"></Icon> <span class="ms-2">Editar Deuda</span></div>
+                            </NavLink>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
                 <AuthorizeView Roles="jefe" Context="innerContext">
                     <Authorized Context="innerContext">
                         <div class="nav-item px-3">
