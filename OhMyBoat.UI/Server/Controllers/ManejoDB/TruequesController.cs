@@ -42,7 +42,7 @@ namespace OhMyBoat.UI.Server.Controllers
             using var db = new OhMyBoatUIServerContext();
             await db.Trueques.AddAsync(t);
             await db.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status200OK, await GetTrueque(t));
+            return StatusCode(StatusCodes.Status200OK);
         }
 
         [HttpPost]
@@ -81,6 +81,89 @@ namespace OhMyBoat.UI.Server.Controllers
                 return StatusCode(StatusCodes.Status200OK);
             }
             else return StatusCode(StatusCodes.Status406NotAcceptable);
+        }
+
+        [HttpPost]
+        [Route("ActualizarEstadoTrueque")]
+        public async Task<IActionResult> DiosSoyYoDeNuevo([FromBody] ReporteTrueque reporte)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var trueque = await db.Trueques.Where(trueq => trueq.Id == reporte.IdTrueque).FirstOrDefaultAsync();
+
+            if (trueque != null) {
+                if (reporte.Concreto ?? false)
+                {
+
+                    trueque.Concreto= true;
+                    db.Update(trueque);
+                    await db.SaveChangesAsync();
+
+                    var turno = await db.Turno.Where(t => t.TruequeId == trueque.Id).FirstOrDefaultAsync();
+                    if (turno != null)
+                    {
+                        var oferta = await db.Ofertas.Where(o => o.Id == turno.OfertaId).FirstOrDefaultAsync();
+                        if (oferta != null)
+                        {
+                            if (oferta.EsNavioEnvia)
+                            {
+                                Maritimo? mari1 = await db.Maritimos.Where(m => m.Id == oferta.ID_VehiculoEnviaOferta).FirstOrDefaultAsync();
+                                if (mari1 != null)
+                                {
+                                    mari1.Deuda = 0;// parece medio de goma pero bueno
+                                    mari1.IDCliente = oferta.ID_RecibeOferta != null ? oferta.ID_RecibeOferta : "ERROR DE TRASLADO DE IDS";
+                                    db.Update(mari1);
+                                    await db.SaveChangesAsync();
+                                    
+                                }
+                            }
+                            else
+                            {
+                                Terrestre? ter1 = await db.Terrestres.Where(t => t.Id == oferta.ID_VehiculoEnviaOferta).FirstOrDefaultAsync();
+                                if (ter1 != null)
+                                {
+
+                                    ter1.IDCliente = oferta.ID_RecibeOferta != null ? oferta.ID_RecibeOferta : "ERROR DE TRASLADO DE IDS";
+                                    db.Update(ter1);
+                                    await db.SaveChangesAsync();
+                                    
+                                }
+                            }
+                            if (oferta.EsNavioRecibe)
+                            {
+                                Maritimo? mari2 = await db.Maritimos.Where(m => m.Id == oferta.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
+                                if (mari2 != null)
+                                {
+                                    mari2.Deuda = 0;
+                                    mari2.IDCliente = oferta.ID_EnviaOferta != null ? oferta.ID_EnviaOferta : "ERROR DE TRASLADO DE IDS";
+                                    db.Update(mari2);
+                                    await db.SaveChangesAsync();
+                                }
+                            }
+                            else
+                            {
+                                Terrestre? ter2 = await db.Terrestres.Where(t => t.Id == oferta.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
+                                if (ter2 != null)
+                                {
+                                    ter2.IDCliente = oferta.ID_EnviaOferta != null ? oferta.ID_EnviaOferta : "ERROR DE TRASLADO DE IDS";
+                                    db.Update(ter2);
+                                    await db.SaveChangesAsync();
+                                }
+                            }
+                            return StatusCode(StatusCodes.Status200OK);
+                        }
+                    }
+                }
+                else
+                {
+                    trueque.Concreto = false;
+                    db.Update(trueque);
+                    await db.SaveChangesAsync();
+                    return StatusCode(StatusCodes.Status200OK);
+                }
+                        
+                    
+            }
+            return StatusCode(StatusCodes.Status404NotFound);
         }
     }
 
