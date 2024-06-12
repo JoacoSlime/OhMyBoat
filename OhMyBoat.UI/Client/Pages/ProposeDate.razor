@@ -118,7 +118,7 @@
         {
             await JsRuntime.InvokeVoidAsync("alert", "Este horario ya fue seleccionado");
         }
-        else if (fechaValida(t) && turnosPropuestos.Count <= 2)
+        else if (turnosPropuestos.Count <= 2)
         {
             turnosPropuestos.Add(t);
             StateHasChanged();
@@ -126,10 +126,6 @@
         else         
             await JsRuntime.InvokeVoidAsync("alert", "Solo es posible ofrecer 3 horarios");
 
-    }
-
-    private bool fechaValida(Turno t) {
-        return t.FechaTurno>=DateTime.Today.AddDays(1);
     }
 
     private async void Enviar()
@@ -161,12 +157,18 @@
             await JsRuntime.InvokeVoidAsync("alert", "Debe seleccionar por lo menos un turno en una sede para completar la propuesta de reunion");
         }
     }
+    
     private async void buscarTurnos()
     {
+        @if (DiaQueVoyAVerSiTieneTurno<DateTime.Today) {
+            await JsRuntime.InvokeVoidAsync("alert", "Debe elegirse una fecha más alejada de la actual.");
+            return;
+        } 
         var consulta = new ConsultaHorariosDTO { dia = DiaQueVoyAVerSiTieneTurno, suc = sucursalElegida ?? new() };
         var respuestaServidor = await HttpClient.PostAsJsonAsync<ConsultaHorariosDTO>("api/turnos/VerificarDisponibilidadDia", consulta);
         turnosRecibidos = await respuestaServidor.Content.ReadFromJsonAsync<List<Turno>>();
         StateHasChanged();
+    
     }
     protected override async Task OnInitializedAsync()
     {
