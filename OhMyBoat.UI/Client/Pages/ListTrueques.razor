@@ -39,8 +39,8 @@
             <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concreto" SortKeySelector="@(item => item.Concreto)">
                  <div>
                     @if(@context.Concreto == null) {
-                        <button onclick="async () => await ConcretarTrueque(context)" class="btn btn-outline-success">Marcar como concretado</button>
-                        <button onclick="async () => await InconclusarTrueque(context)" class="btn btn-outline-danger">Marcar como inconcluso</button>                        
+                        <button @onclick="() => ConcretarTrueque(context)" class="btn btn-outline-success">Marcar como concretado</button>
+                        <button @onclick="() => InconclusarTrueque(context)" class="btn btn-outline-danger">Marcar como inconcluso</button>                        
                     } else if(@context.Concreto ?? true) {
                         <span class="text-success">Concretado</span>
                     } else {
