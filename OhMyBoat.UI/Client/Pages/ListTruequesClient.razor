@@ -80,12 +80,11 @@
             var trueque = Trueques.Where(t => t.Id == rt.IdTrueque).FirstOrDefault();
             if (trueque != null){
                 rt.MaritimoId = trueque.MaritimoId;
-                rt.VehiculoId = trueque.VehiculoId;
-                 await JsRuntime.InvokeVoidAsync("alert", trueque?.Concreto);
+                rt.VehiculoId = trueque.VehiculoId;                
                 rt.Concreto = trueque?.Concreto;
             }
             //sacar el trueque que me dara -> id_vehiculo_1 y id_vehiculo_2 para hacer el boton ver detalle vehiculo p/ c/ u/
-            await JsRuntime.InvokeVoidAsync("alert", rt.Concreto);
+           
             if (rt.Concreto != null)
             {
             ReporteTrueques.Add(rt);        
