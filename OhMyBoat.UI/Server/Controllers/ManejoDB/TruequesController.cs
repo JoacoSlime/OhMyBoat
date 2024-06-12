@@ -33,7 +33,7 @@ namespace OhMyBoat.UI.Server.Controllers
             using var db = new OhMyBoatUIServerContext();
             await db.Trueques.AddAsync(t);
             await db.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status200OK);
+            return StatusCode(StatusCodes.Status200OK, await GetTrueque(t));
         }
 
         [HttpPost]
