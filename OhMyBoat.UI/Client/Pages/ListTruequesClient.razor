@@ -39,7 +39,7 @@
                 <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concretado" SortKeySelector="@(item => item.Concreto)">
                     @if(@context.Concreto ?? false) {
                         <p>Concretado</p>
-                    } else {
+                    } else if(@context.Concreto == false){
                         <p>Inconcluso</p>
                     }
                 </GridColumn>
@@ -60,7 +60,7 @@
     }
 
     private async Task LoadTrueques() {
-        Trueques = await HttpClient.GetFromJsonAsync<List<Trueque>>("api/trueques/ListarTrueques") ?? new();
+        Trueques = await HttpClient.GetFromJsonAsync<List<Trueque>>("api/trueques/ListarTruequesCliente") ?? new();
         Turnos = await HttpClient.GetFromJsonAsync<List<Turno>>("api/turnos/ListarTurnos") ?? new();
         var Sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales") ?? new();
         
@@ -81,12 +81,17 @@
             if (trueque != null){
                 rt.MaritimoId = trueque.MaritimoId;
                 rt.VehiculoId = trueque.VehiculoId;
+                 await JsRuntime.InvokeVoidAsync("alert", trueque?.Concreto);
                 rt.Concreto = trueque?.Concreto;
             }
             //sacar el trueque que me dara -> id_vehiculo_1 y id_vehiculo_2 para hacer el boton ver detalle vehiculo p/ c/ u/
-            
-            ReporteTrueques.Add(rt);
+            await JsRuntime.InvokeVoidAsync("alert", rt.Concreto);
+            if (rt.Concreto != null)
+            {
+            ReporteTrueques.Add(rt);        
+            }            
         }
+        await JsRuntime.InvokeVoidAsync("alert", ReporteTrueques.Count());
     }
 
 

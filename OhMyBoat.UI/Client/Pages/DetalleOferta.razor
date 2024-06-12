@@ -288,7 +288,7 @@
             };
             var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", trueque);
             if (responseSV.IsSuccessStatusCode) {
-                trueque = await responseSV.Content.ReadFromJsonAsync<Trueque>() ?? new();
+                trueque = await responseSV.Content.ReadFromJsonAsync<Trueque>() ?? new(); 
                 turno.TruequeId = trueque.Id;
                 responseSV = await HttpClient.PostAsJsonAsync("api/Turnos/SelectTurno", turno);
                 await OnClickCallback.InvokeAsync();

@@ -26,6 +26,15 @@ namespace OhMyBoat.UI.Server.Controllers
             return StatusCode(StatusCodes.Status200OK, listTrueques);
         }
 
+        [HttpGet]
+        [Route("ListarTruequesCliente")]
+        public async Task<IActionResult> GetClientes()
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var listTrueques = await db.Trueques.Where(c => c.Concreto != null).OrderBy(c => c.Id).ToListAsync();
+            return StatusCode(StatusCodes.Status200OK, listTrueques);
+        }
+
         [HttpPost]
         [Route("AgregarTrueque")]
         public async Task<IActionResult> AgregarTrueque([FromBody] Trueque t)
