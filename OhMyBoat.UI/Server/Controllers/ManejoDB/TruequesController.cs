@@ -76,7 +76,6 @@ namespace OhMyBoat.UI.Server.Controllers
 
         [HttpPost]
         [Route("ActualizarEstadoTrueque")]
-
         public async Task<IActionResult> DiosSoyYoDeNuevo([FromBody] ReporteTrueque reporte)
         {
             using var db = new OhMyBoatUIServerContext();
