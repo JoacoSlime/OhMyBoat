@@ -12,7 +12,7 @@
 @inject NavigationManager Navegador
 @using System.ComponentModel.DataAnnotations
 
-<AuthorizeView>
+<AuthorizeView Roles="jefe,empleado">
     <Authorized>
         <div class="d-flex flex-column justify-content-center p-5">
             <div class="mb-3">
@@ -32,6 +32,9 @@
             <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>OnClick()">Confirmar</Button>
         </div>
     </Authorized>
+    <NotAuthorized>
+        @{Navegador.NavigateTo("/");}
+    </NotAuthorized>
 </AuthorizeView>
 @code{
 

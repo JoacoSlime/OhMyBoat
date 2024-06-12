@@ -8,7 +8,10 @@
 @using OhMyBoat.UI.Shared
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
+@inject NavigationManager Navegador
 
+<AuthorizeView Roles="cliente" Context="OuterContext">
+    <Authorized Context="OuterContext">
 <div> 
 
     @if(ReporteTrueques.Count() == 0){
@@ -46,6 +49,11 @@
         </Grid>
     }
 </div>
+    </Authorized>
+    <NotAuthorized Context="OuterContext">
+        @{Navegador.NavigateTo("/");}
+    </NotAuthorized>
+</AuthorizeView>
 
 
 @code {
