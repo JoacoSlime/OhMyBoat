@@ -52,7 +52,7 @@ namespace OhMyBoat.UI.Server.Controllers
         {
             using var db = new OhMyBoatUIServerContext();
             var trueque = await db.Trueques.Where(t => t.MaritimoId == tru.MaritimoId && t.VehiculoId == tru.VehiculoId).FirstOrDefaultAsync();
-            if (trueque == null) {
+            if (trueque == null || trueque == new Trueque()) {
                 return StatusCode(StatusCodes.Status406NotAcceptable);
             } else {
                 return StatusCode(StatusCodes.Status200OK, trueque);

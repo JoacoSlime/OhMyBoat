@@ -109,5 +109,21 @@ namespace OhMyBoat.UI.Server.Controllers
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
+        
+        [HttpPost]
+        [Route("ChekearOfertaExiste")]
+        public async Task<IActionResult> chekearExsiste([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Oferta? offer = await db.Ofertas.Where
+                (of => of.ID_VehiculoEnviaOferta == o.ID_VehiculoEnviaOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoRecibeOferta 
+                ||of.ID_VehiculoEnviaOferta == o.ID_VehiculoRecibeOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoEnviaOferta )
+                .FirstOrDefaultAsync();
+            if (offer != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, offer);
+            }
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+        }
     }
 }

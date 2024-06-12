@@ -124,7 +124,7 @@ else
     {
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
-        
+
         Oferta ofer = new Oferta
             {
                 ID_RecibeOferta = vehiculoOfertado?.IDCliente,
@@ -136,6 +136,14 @@ else
                 Estado = false
 
             };
+
+        var RespuestaSvExisteUnaOferta = HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/ChekearOfertaExiste", ofer);
+        if (RespuestaSvExisteUnaOferta.Ok)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "esa oferta ya existe");
+            return;
+        }
+
 
         var RespuestaSv = HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/RegistrarOferta", ofer);
         
