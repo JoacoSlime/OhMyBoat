@@ -1,0 +1,93 @@
+@page "/list-truques-cliente"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+<div> 
+
+    @if(ReporteTrueques.Count() == 0){
+        <h4> No hay trueques concretados</h4>
+    }else{
+
+            <Grid @ref="grid"
+                TItem="ReporteTrueque"
+                Class="table table-hover table-bordered table-striped"
+                Data="ReporteTrueques"
+                AllowFiltering="true"
+                PageSize="10"
+                Responsive="true"
+                AllowSorting="true">
+
+                <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="Sede" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Ascending" SortKeySelector="@(item => item.FechaTurno)">
+                    @context.FechaTurno
+                </GridColumn>
+                <GridColumn TItem="ReporteTrueque" HeaderText="Sede" PropertyName="Sede" SortKeySelector="@(item => item.Sucursal)">
+                    @context.Sucursal
+                </GridColumn>
+                <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 1" PropertyName="Matricula 1" SortKeySelector="@(item => item.MaritimoId)">
+                    @context.MaritimoId
+                </GridColumn>
+                <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="Matricula 2" SortKeySelector="@(item => item.VehiculoId)">
+                    @context.VehiculoId
+                </GridColumn>
+                <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concretado" SortKeySelector="@(item => item.Concreto)">
+                    @if(@context.Concreto ?? false) {
+                        <p>Concretado</p>
+                    } else {
+                        <p>Inconcluso</p>
+                    }
+                </GridColumn>
+        </Grid>
+    }
+</div>
+
+
+@code {
+
+    private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
+    private List<Trueque> Trueques = new();
+    private List<Turno> Turnos = new();
+    private List<ReporteTrueque> ReporteTrueques = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTrueques();
+    }
+
+    private async Task LoadTrueques() {
+        Trueques = await HttpClient.GetFromJsonAsync<List<Trueque>>("api/trueques/ListarTrueques") ?? new();
+        Turnos = await HttpClient.GetFromJsonAsync<List<Turno>>("api/turnos/ListarTurnos") ?? new();
+        var Sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales") ?? new();
+        
+        foreach (Turno t in Turnos)
+        {
+            ReporteTrueque rt = new();
+
+            rt.FechaTurno = t.FechaTurno;
+            var nombre_sede = Sucursales.Where( s => s.Id == t.SucursalId).FirstOrDefault();
+            if (nombre_sede != null){
+                rt.Sucursal = nombre_sede.NombreSuck;
+            }
+            if (t.TruequeId != null){
+                rt.IdTrueque = (int) t.TruequeId;
+            }
+
+            var trueque = Trueques.Where(t => t.Id == rt.IdTrueque).FirstOrDefault();
+            if (trueque != null){
+                rt.MaritimoId = trueque.MaritimoId;
+                rt.VehiculoId = trueque.VehiculoId;
+                rt.Concreto = trueque?.Concreto;
+            }
+            //sacar el trueque que me dara -> id_vehiculo_1 y id_vehiculo_2 para hacer el boton ver detalle vehiculo p/ c/ u/
+            
+            ReporteTrueques.Add(rt);
+        }
+    }
+
+
+    }
