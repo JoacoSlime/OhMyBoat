@@ -211,12 +211,14 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             var turn = await db.Turno.Where(turn => turn.OfertaId == turno.OfertaId).ToListAsync();
             if (turn != null)
             {
+                Turno turnoNuevo = new();
                 foreach (Turno t in turn)
                 {
                     if (t.Id != turno.Id)
                     db.Turno.Remove(t);
+                    else 
+                    turnoNuevo=t;
                 }
-                var turnoNuevo = turn.First();
                 turnoNuevo.TruequeId = turno.TruequeId;
                 db.Update(turnoNuevo);
                 await db.SaveChangesAsync();
