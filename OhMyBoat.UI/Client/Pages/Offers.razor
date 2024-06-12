@@ -137,10 +137,10 @@ else
 
             };
 
-        var RespuestaSvExisteUnaOferta = HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/ChekearOfertaExiste", ofer);
-        if (RespuestaSvExisteUnaOferta.Ok)
+        var RespuestaSvExisteUnaOferta = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/ChekearOfertaExiste", ofer);
+        if (RespuestaSvExisteUnaOferta.IsSuccessStatusCode)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "esa oferta ya existe");
+            await JsRuntime.InvokeVoidAsync("alert", "esa oferta ya exsiste");
             return;
         }
 
