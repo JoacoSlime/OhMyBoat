@@ -24,17 +24,17 @@
                 Responsive="true"
                 AllowSorting="true">
 
-                <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="Fechaturno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
-                    @context.FechaTurno
+                <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Ascending" SortKeySelector="@(item => item.FechaTurno)">
+                    @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
                 </GridColumn>
             <GridColumn TItem="ReporteTrueque" HeaderText="Sede" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
                     @context.Sucursal
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Maritimo" PropertyName="MaritimoId" SortKeySelector="@(item => item.MaritimoId)">
-                    @context.MaritimoId
+            <GridColumn TItem="ReporteTrueque" HeaderText="Maritimo" PropertyName="MaritimoId" SortKeySelector="@(item => item.MaritimoPatente)">
+                    @context.MaritimoPatente
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="VehiculoId" SortKeySelector="@(item => item.VehiculoId)">
-                    @context.VehiculoId
+            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="VehiculoId" SortKeySelector="@(item => item.VehiculoPatente)">
+                    @context.VehiculoPatente
                 </GridColumn>
             <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concreto" SortKeySelector="@(item => item.Concreto)">
                  <div>
