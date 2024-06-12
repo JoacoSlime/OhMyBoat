@@ -24,7 +24,7 @@
                 Responsive="true"
                 AllowSorting="true">
 
-                <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Ascending" SortKeySelector="@(item => item.FechaTurno)">
+                <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
                     @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
                 </GridColumn>
                 <GridColumn TItem="ReporteTrueque" HeaderText="Sede" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
