@@ -17,5 +17,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         public bool EsNavioEnvia { get; set; }
         public bool Estado {get;set;}
 
+        public bool archivada { get; set; } = false;
+
     }
 }
