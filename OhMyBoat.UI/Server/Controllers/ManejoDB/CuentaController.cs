@@ -39,7 +39,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 };
                 await db.TokenRecu.AddAsync(Token);
                 await db.SaveChangesAsync();
-                await _emailService.Send(
+                _ = _emailService.Send(
                         to: c.Email.ToLower(),
                         subject: "Aquí está tu clave para terminar de configurar tu cuenta.", 
                         html: $@"<h2>Verificación de cuenta</h2>
@@ -217,9 +217,9 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     await db.TokenRecu.AddAsync(Token);
                     await db.SaveChangesAsync();
                     // Enviar Mail
-                    await _emailService.Send(
+                    _ = _emailService.Send(
                         to: log.Email.ToLower(),
-                        subject: "Aquí está tu clave de recuperación de cuenta", 
+                        subject: "Aquí está tu clave de recuperación de cuenta",
                         html: $@"<h2>Verificación de cuenta</h2>
                         <p>Tu token de verificación de cuenta es: {Token.StringAleatorioDelMomento}<p/>
                         <p>Haz click <a href=""http://localhost:5047/recovery/{Token.StringAleatorioDelMomento}"">aquí</a> para ir directamente.<p/>

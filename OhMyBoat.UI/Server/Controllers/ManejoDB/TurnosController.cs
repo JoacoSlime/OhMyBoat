@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using OhMyBoat.UI.Server.Services;
 using OhMyBoat.UI.Server.Data;
 using OhMyBoat.UI.Shared.Entidades;
 using Org.BouncyCastle.Asn1.Iana;
@@ -13,6 +14,14 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
     public class TurnosController : Controller
     {
+
+        private readonly EmailService _emailService;
+
+        public TurnosController(EmailService emailService)
+        {
+            _emailService = emailService;
+        }
+
         private async Task<bool>VerificarTurnoDisponible(Turno turno) // tira false si no se superpone
         {
             if (turno == null)
@@ -222,6 +231,26 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 turnoNuevo.TruequeId = turno.TruequeId;
                 db.Update(turnoNuevo);
                 await db.SaveChangesAsync();
+
+                Oferta ofertaRelacionada = await db.Ofertas.Where(ofer => ofer.Id == turno.OfertaId).FirstOrDefaultAsync() ?? new(); 
+                String emailEnvia = ofertaRelacionada.ID_EnviaOferta ?? "";
+                String emailRecibe = ofertaRelacionada.ID_RecibeOferta ?? "";
+                _ = _emailService.Send(
+                    to: emailEnvia,
+                    subject: "¡Tu trueque tiene un turno preparado!",
+                    html: $@"<h2>Nuevo turno</h2>
+                    <p>Tu turno es el {turnoNuevo.FechaTurno.ToString("dd/mm/yyyy")} a las {turnoNuevo.FechaTurno.ToString("HH:mm")}<p/>
+                    <br/>
+                    <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Enviadas</p>"
+                );
+                _ = _emailService.Send(
+                    to: emailRecibe,
+                    subject: "¡Tu trueque tiene un turno preparado!",
+                    html: $@"<h2>Nuevo turno</h2>
+                    <p>Tu turno es el {turnoNuevo.FechaTurno.ToString("dd/mm/yyyy")} a las {turnoNuevo.FechaTurno.ToString("HH:mm")}<p/>
+                    <br/>
+                    <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Recibidas</p>"
+                );
                 return StatusCode(StatusCodes.Status200OK, turn);
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
