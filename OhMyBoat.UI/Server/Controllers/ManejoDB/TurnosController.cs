@@ -236,7 +236,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 String emailEnvia = ofertaRelacionada.ID_EnviaOferta ?? "";
                 String emailRecibe = ofertaRelacionada.ID_RecibeOferta ?? "";
                 String sucursalElegida = (await db.Sucursales.Where(s => s.Id == turno.SucursalId).FirstOrDefaultAsync() ?? new()).NombreSuck;
-                _ = _emailService.Send(
+                await _emailService.Send(
                     to: emailEnvia,
                     subject: "¡Tu trueque tiene un turno preparado!",
                     html: $@"<h2>Nuevo turno</h2>
@@ -244,7 +244,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     <br/>
                     <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Enviadas.</p>"
                 );
-                _ = _emailService.Send(
+                await _emailService.Send(
                     to: emailRecibe,
                     subject: "¡Tu trueque tiene un turno preparado!",
                     html: $@"<h2>Nuevo turno</h2>
@@ -257,5 +257,21 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
 
+        [HttpPost]
+        [Route("ArreglarTurno")]
+        public async Task<IActionResult> ArreglarTurno(Oferta o) {
+            using var db = new OhMyBoatUIServerContext();
+            String? contacto = (await db.Clientes.Where(c => c.Email == o.ID_RecibeOferta).FirstOrDefaultAsync())?.Contacto;
+            String extraContacto = String.IsNullOrEmpty(contacto) ? "" : $@"<p>O a su datos de contacto: {contacto}";
+            await _emailService.Send(
+                to: o.ID_RecibeOferta ?? "",
+                subject: "¡Un usuario quiere arreglar con vos!",
+                html: $@"<h2>Arreglo de turnos</h2>
+                <p>El receptor de una de tus ofertas quiere arreglar un turno con vos.</p>
+                <p>Comunicate con el a su email: {o.ID_RecibeOferta}</p>
+                {extraContacto}"
+            );
+            return StatusCode(StatusCodes.Status200OK);
+        }
     }
 }

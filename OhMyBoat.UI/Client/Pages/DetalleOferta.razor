@@ -79,10 +79,11 @@
                                 @if (turno.FechaTurno<DateTime.Today){
                                     <Button Color="ButtonColor.Danger" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
                                 } else {
-                                    <Button Color="ButtonColor.Primary" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
+                                    <Button Color="ButtonColor.Success" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
                                 }
                             </div>
                         }
+                        <Button Color="ButtonColor.Primary" @onclick="async () => await Arreglar()">Arreglar por privado</Button>
                         </div>
                     } else {
                         <h2>Horario establecido:</h2> 
@@ -323,5 +324,14 @@
             var responseamela2 = await HttpClient.PostAsJsonAsync("api/Trueques/DeleteTrueque", trueque);
         }
         await RechazarOferta();
+    }
+
+    private async Task Arreglar() {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "¿Desea enviar sus datos de contacto a el otro usuario para arreglar por privado?"))
+        if ((await HttpClient.PostAsJsonAsync("api/Trueques/ArreglarTurno", Oferta)).IsSuccessStatusCode) {
+            await JsRuntime.InvokeVoidAsync("confirm", "Se ha enviado sus datos de contacto al usuario.");
+        } else {
+            await JsRuntime.InvokeVoidAsync("confirm", "Ocurrió un error al enviar los datos.");            
+        }
     }
 }
