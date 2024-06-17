@@ -39,9 +39,9 @@
             <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="VehiculoId" SortKeySelector="@(item => item.VehiculoPatente)">
                     @context.VehiculoPatente
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concreto" SortKeySelector="@(item => item.Concreto)">
+            <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concreto" SortKeySelector="@(item => item.Estado)">
                  <div>
-                    @if(@context.Concreto == null) {
+                    @if(@context.Concreto == null) { // antiguo estado 
                         <button @onclick="() => ConcretarTrueque(context)" class="btn btn-outline-success">Marcar como concretado</button>
                         <button @onclick="() => InconclusarTrueque(context)" class="btn btn-outline-danger">Marcar como inconcluso</button>                        
                     } else if(@context.Concreto ?? true) {
