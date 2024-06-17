@@ -67,7 +67,7 @@
 @code {
 
     private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
-    private List<Trueque> Trueques = new();
+    private List<Oferta> Trueques = new();
     private List<Turno> Turnos = new();
     private List<ReporteTrueque> ReporteTrueques = new();
 
@@ -108,7 +108,7 @@
 
 
     private async Task LoadTrueques() {
-        Trueques = await HttpClient.GetFromJsonAsync<List<Trueque>>("api/trueques/ListarTrueques") ?? new();
+        Trueques = await HttpClient.GetFromJsonAsync<List<Oferta>>("api/ofertas/ListarTrueques") ?? new();
         Turnos = await HttpClient.GetFromJsonAsync<List<Turno>>("api/turnos/ListarTurnos") ?? new();
         var Sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales") ?? new();
         
@@ -121,22 +121,28 @@
             if (nombre_sede != null){
                 rt.Sucursal = nombre_sede.NombreSuck;
             }
-            if (t.TruequeId != null){
-                rt.IdTrueque = (int) t.TruequeId;
+            if (t.OfertaId != null){
+                rt.IdOferta = (int) t.OfertaId;
             }
 
-            var trueque = Trueques.Where(t => t.Id == rt.IdTrueque).FirstOrDefault();
+            var trueque = Trueques.Where(t => t.Id == rt.IdOferta).FirstOrDefault();
             if (trueque != null){
-                rt.MaritimoId = trueque.MaritimoId;
-                rt.VehiculoId = trueque.VehiculoId;
-                rt.Concreto = trueque?.Concreto;
+                if (trueque.EsNavioEnvia){
+                    rt.MaritimoId = trueque.ID_VehiculoEnviaOferta;
+                    rt.VehiculoId = trueque.ID_VehiculoRecibeOferta;
+                }else{
+                    rt.MaritimoId = trueque.ID_VehiculoRecibeOferta;
+                    rt.VehiculoId = trueque.ID_VehiculoEnviaOferta;
+                }
+                rt.Estado = trueque.EstadoOferta;
+
             }
             //sacar el trueque que me dara -> id_vehiculo_1 y id_vehiculo_2 para hacer el boton ver detalle vehiculo p/ c/ u/
             
             ReporteTrueques.Add(rt);
         }
     }
-
+/*
     private async Task SwitchConcretar(Trueque trueque) {
         var RespuestaSV = await HttpClient.PostAsJsonAsync("api/turnos/SwitchConcretar", trueque);
         
@@ -148,4 +154,5 @@
             await JsRuntime.InvokeVoidAsync("alert", "El trueque no fue encontrado.");
         }
     }
+    */
 }

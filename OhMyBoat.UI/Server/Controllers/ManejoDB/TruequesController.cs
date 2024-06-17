@@ -17,44 +17,6 @@ namespace OhMyBoat.UI.Server.Controllers
 
     public class TruequesController : ControllerBase {
 
-        [HttpGet]
-        [Route("ListarTrueques")]
-        public async Task<IActionResult> Get()
-        {
-            using var db = new OhMyBoatUIServerContext();
-            var listTrueques = await db.Trueques.OrderBy(c => c.Id).ToListAsync();
-            return StatusCode(StatusCodes.Status200OK, listTrueques);
-        }
-
-        [HttpGet]
-        [Route("ListarTruequesCliente")]
-        public async Task<IActionResult> GetClientes()
-        {
-            using var db = new OhMyBoatUIServerContext();
-            var listTrueques = await db.Trueques.Where(c => c.Concreto != null).OrderBy(c => c.Id).ToListAsync();
-            return StatusCode(StatusCodes.Status200OK, listTrueques);
-        }
-
-        [HttpPost]
-        [Route("AgregarTrueque")]
-        public async Task<IActionResult> AgregarTrueque([FromBody] Trueque t)
-        {
-            using var db = new OhMyBoatUIServerContext();
-            await db.Trueques.AddAsync(t);
-            await db.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status200OK);
-        }
-
-        [HttpPost]
-        [Route("DeleteTrueque")]
-        public async Task<IActionResult> AgregDeleteTruequearTrueque([FromBody] Trueque t)
-        {
-            using var db = new OhMyBoatUIServerContext();
-            db.Trueques.Remove(t);
-            await db.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status200OK);
-        }
-
         [HttpPost]
         [Route("GetTrueque")]
         public async Task<IActionResult> GetTrueque([FromBody] Trueque tru)
