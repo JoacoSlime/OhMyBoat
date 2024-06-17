@@ -235,21 +235,22 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 Oferta ofertaRelacionada = await db.Ofertas.Where(ofer => ofer.Id == turno.OfertaId).FirstOrDefaultAsync() ?? new(); 
                 String emailEnvia = ofertaRelacionada.ID_EnviaOferta ?? "";
                 String emailRecibe = ofertaRelacionada.ID_RecibeOferta ?? "";
+                String sucursalElegida = (await db.Sucursales.Where(s => s.Id == turno.SucursalId).FirstOrDefaultAsync() ?? new()).NombreSuck;
                 _ = _emailService.Send(
                     to: emailEnvia,
                     subject: "¡Tu trueque tiene un turno preparado!",
                     html: $@"<h2>Nuevo turno</h2>
-                    <p>Tu turno es el {turnoNuevo.FechaTurno.ToString("dd/mm/yyyy")} a las {turnoNuevo.FechaTurno.ToString("HH:mm")}<p/>
+                    <p>Tu turno es el {turnoNuevo.FechaTurno.ToString("dd/mm/yyyy")} a las {turnoNuevo.FechaTurno.ToString("HH:mm")} en la sucursal de {sucursalElegida}.<p/>
                     <br/>
-                    <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Enviadas</p>"
+                    <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Enviadas.</p>"
                 );
                 _ = _emailService.Send(
                     to: emailRecibe,
                     subject: "¡Tu trueque tiene un turno preparado!",
                     html: $@"<h2>Nuevo turno</h2>
-                    <p>Tu turno es el {turnoNuevo.FechaTurno.ToString("dd/mm/yyyy")} a las {turnoNuevo.FechaTurno.ToString("HH:mm")}<p/>
+                    <p>Tu turno es el {turnoNuevo.FechaTurno.ToString("dd/mm/yyyy")} a las {turnoNuevo.FechaTurno.ToString("HH:mm")} en la sucursal de {sucursalElegida}.<p/>
                     <br/>
-                    <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Recibidas</p>"
+                    <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Recibidas.</p>"
                 );
                 return StatusCode(StatusCodes.Status200OK, turn);
             }
