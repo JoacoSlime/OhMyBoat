@@ -93,9 +93,9 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <h1>Estado: @if (vo.Item1.Estado) {
+                        <h1>Estado: @if (vo.Item1.EstadoOferta.Equals(EstadoOferta.Aceptada)) {
                                 <span class="text-success">Aceptada</span>
-                            } else {
+                            } else if(vo.Item1.EstadoOferta.Equals(EstadoOferta.Enviada)){
                                 <span class="text-warning">Pendiente</span>
                             }</h1>
                         <Button Color="ButtonColor.Primary" class="position-relative end-0" 

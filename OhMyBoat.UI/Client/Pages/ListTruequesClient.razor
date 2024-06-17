@@ -59,7 +59,7 @@
 @code {
 
     private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
-    private List<Trueque> Trueques = new();
+    private List<Oferta> Trueques = new();
     private List<Turno> Turnos = new();
     private List<ReporteTrueque> ReporteTrueques = new();
     protected override async Task OnInitializedAsync()
@@ -68,7 +68,7 @@
     }
 
     private async Task LoadTrueques() {
-        Trueques = await HttpClient.GetFromJsonAsync<List<Trueque>>("api/trueques/ListarTruequesCliente") ?? new();
+        Trueques = await HttpClient.GetFromJsonAsync<List<Trueque>>("api/ofertas/ListarTrueques") ?? new();
         Turnos = await HttpClient.GetFromJsonAsync<List<Turno>>("api/turnos/ListarTurnos") ?? new();
         var Sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales") ?? new();
         
