@@ -32,7 +32,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             {
                 using (var db = new OhMyBoatUIServerContext())
                 {
-                    return await db.Turno.Where(t => (t.TruequeId != null && 
+                    return await db.Turno.Where(t => (t.OfertaId != null && 
                                                         t.SucursalId == turno.SucursalId && 
                                                         t.FechaTurno.Year == turno.FechaTurno.Year && 
                                                         t.FechaTurno.Month == turno.FechaTurno.Month && 
@@ -46,7 +46,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         {
             using ( var db = new OhMyBoatUIServerContext())
             {
-                return await db.Turno.Where(t => (t.TruequeId != null && t.SucursalId == suc.Id && t.FechaTurno.Year == dia.Year && t.FechaTurno.Month == dia.Month && t.FechaTurno.Day == dia.Day)).ToListAsync();          
+                return await db.Turno.Where(t => (t.OfertaId != null && t.SucursalId == suc.Id && t.FechaTurno.Year == dia.Year && t.FechaTurno.Month == dia.Month && t.FechaTurno.Day == dia.Day)).ToListAsync();          
             }
            // si no funciona hacer que esto devuelva null y listo            
         }
@@ -180,7 +180,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async Task<IActionResult> Get()
         {
             using var db = new OhMyBoatUIServerContext();
-            var listTurnos = await db.Turno.Where( t => t.TruequeId != null).OrderBy(t => t.Id).ToListAsync();
+            var listTurnos = await db.Turno.Where( t => t.OfertaId != null).OrderBy(t => t.Id).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, listTurnos);
         }
         
@@ -228,7 +228,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     else 
                     turnoNuevo=t;
                 }
-                turnoNuevo.TruequeId = turno.TruequeId;
+                turnoNuevo.OfertaId = turno.OfertaId;
                 db.Update(turnoNuevo);
                 await db.SaveChangesAsync();
 

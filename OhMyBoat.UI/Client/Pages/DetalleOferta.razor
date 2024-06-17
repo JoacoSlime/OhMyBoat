@@ -62,7 +62,7 @@
                     </div>
                 }
             </div>
-            @if (Oferta.Estado) {
+            @if (Oferta.EstadoOferta.Equals(EstadoOferta.Aceptada)) {
                 <div class="d-flex flex-column border rounded mb-3">
                 @if (isReceiving) {
                     @foreach (Turno turno in Turnos) {
@@ -222,24 +222,16 @@
         var user = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
         isReceiving = Dueño_Recibe.Id == user?.Id;
 
-        Maritimo maritimo;
-        Vehiculo vehiculo;
-        if (Oferta.EsNavioEnvia) {
-            maritimo = Vehiculo_Enviado as Maritimo ?? new();
-            vehiculo = Vehiculo_Recibido;
-        } else {
-            vehiculo = Vehiculo_Enviado;
-            maritimo = Vehiculo_Recibido as Maritimo ?? new();
-        }
-        Trueque parametro = new Trueque() {
-            MaritimoId = maritimo.Id,
-            VehiculoId = vehiculo.Id
-        };
-        var responseamela = await HttpClient.PostAsJsonAsync("api/Trueques/GetTrueque", parametro);
+        Oferta oferta;
+            oferta = new Oferta() {
+                Id = Oferta.Id,
+            };
+
+        var responseamela = await HttpClient.PostAsJsonAsync("api/ofertas/GetOfertaVehiculos", oferta);
         hasTrueque = responseamela.IsSuccessStatusCode;
         if (hasTrueque) {
-            Trueque trueque = await responseamela.Content.ReadFromJsonAsync<Trueque>() ?? new();
-            isTruqueMade = trueque.Concreto;
+            Oferta trueque = await responseamela.Content.ReadFromJsonAsync<Oferta>() ?? new();
+            isTruqueMade = trueque.EstadoOferta.Equals(EstadoOferta.Concretada) || trueque.EstadoOferta.Equals(EstadoOferta.Inconclusa);
         }
     }
 
@@ -273,25 +265,15 @@
 
     private async Task AceptarTurno(Turno turno) {
         if (turno.FechaTurno>=DateTime.Today){
-            int Id_maritimo;
-            int Id_vehiculo;
-            if (Oferta.EsNavioEnvia) {
-                Id_maritimo = Vehiculo_Enviado.Id;
-                Id_vehiculo = Vehiculo_Recibido.Id;
-            } else {
-                Id_vehiculo = Vehiculo_Enviado.Id;
-                Id_maritimo = Vehiculo_Recibido.Id;
-            }
-            Trueque trueque = new Trueque(){
-                MaritimoId = Id_maritimo,
-                VehiculoId = Id_vehiculo,
-                
+
+            Oferta oferta;
+            oferta = new Oferta() {
+                Id = Oferta.Id,
             };
-            var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", trueque);
+
+            var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", oferta);
             if (responseSV.IsSuccessStatusCode) {
-                responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/GetTrueque", trueque);
-                trueque = await responseSV.Content.ReadFromJsonAsync<Trueque>() ?? new();
-                turno.TruequeId = trueque.Id;
+
                 responseSV = await HttpClient.PostAsJsonAsync("api/Turnos/SelectTurno", turno);
                 await OnClickCallback.InvokeAsync();
                 await JsRuntime.InvokeVoidAsync("alert", $"Turno aceptado con éxito, nos vemos el {turno.FechaTurno.ToString("dd/MM/yyyy")} a las {turno.FechaTurno.ToString("HH:mm")}");
@@ -305,23 +287,16 @@
     }
 
     private async Task CancelarOferta() {
-        Maritimo maritimo;
-        Vehiculo vehiculo;
-        if (Oferta.EsNavioEnvia) {
-            maritimo = Vehiculo_Enviado as Maritimo ?? new();
-            vehiculo = Vehiculo_Recibido;
-        } else {
-            vehiculo = Vehiculo_Enviado;
-            maritimo = Vehiculo_Recibido as Maritimo ?? new();
-        }
-        Trueque parametro = new Trueque() {
-            MaritimoId = maritimo.Id,
-            VehiculoId = vehiculo.Id
-        };
-        var responseamela = await HttpClient.PostAsJsonAsync("api/Trueques/GetTrueque", parametro);
+
+            Oferta oferta;
+            oferta = new Oferta() {
+                Id = Oferta.Id,
+            };
+
+        var responseamela = await HttpClient.PostAsJsonAsync("api/ofertas/GetOfertaVehiculos", oferta);
         if (responseamela.IsSuccessStatusCode) {
-            Trueque trueque = await responseamela.Content.ReadFromJsonAsync<Trueque>() ?? new();
-            var responseamela2 = await HttpClient.PostAsJsonAsync("api/Trueques/DeleteTrueque", trueque);
+            Oferta trueque = await responseamela.Content.ReadFromJsonAsync<Oferta>() ?? new();
+            var responseamela2 = await HttpClient.PostAsJsonAsync("api/ofertas/RechazarOferta", trueque);
         }
         await RechazarOferta();
     }

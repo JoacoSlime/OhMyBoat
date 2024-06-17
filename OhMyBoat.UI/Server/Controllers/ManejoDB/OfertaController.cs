@@ -47,6 +47,22 @@ namespace OhMyBoat.UI.Server.Controllers
         }
 
         [HttpPost]
+        [Route("AgregarTrueque")]
+        public async Task<IActionResult> AgregarTrueque([FromBody] Oferta o)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var oferta = await db.Ofertas.Where(of => of.Id == o.Id).FirstOrDefaultAsync();
+            if (oferta != null){
+                oferta.EstadoOferta = EstadoOferta.Programada;
+                db.Ofertas.Update(oferta);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            else return StatusCode(StatusCodes.Status406NotAcceptable);
+            
+        }
+
+        [HttpPost]
         [Route("AceptarOferta")]
         public async Task<IActionResult> AceptarOferta([FromBody] Oferta o)
         {
@@ -103,6 +119,34 @@ namespace OhMyBoat.UI.Server.Controllers
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
+
+        [HttpPost]
+        [Route("GetOfertaVehiculos")]
+        public async Task<IActionResult> GetTrueque([FromBody] Oferta tru)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            var trueque = await db.Ofertas.Where(t => t.Id == tru.Id).FirstOrDefaultAsync();
+            if (trueque == null || trueque == new Oferta()) {
+                return StatusCode(StatusCodes.Status406NotAcceptable);
+            } else {
+                return StatusCode(StatusCodes.Status200OK, trueque);
+            }
+        }
+
+        [HttpPost]
+        [Route ("RechazarOferta")]
+        public async Task<IActionResult> RechazarOferta([FromBody] Oferta o){
+            using var bd = new OhMyBoatUIServerContext();
+            Oferta? offer = await bd.Ofertas.Where( of => of.Id == o.Id).FirstOrDefaultAsync();
+            if (offer != null) {
+                offer.EstadoOferta = EstadoOferta.Rechazada;
+                bd.Ofertas.Update(offer);
+                await bd.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK, offer);
+            }else{
+                return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+            }
+        }
         
         [HttpPost]
         [Route("ChekearOfertaExiste")]
@@ -119,6 +163,7 @@ namespace OhMyBoat.UI.Server.Controllers
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
+
 
         [HttpPost]
         [Route("ActualizarEstadoOferta")]

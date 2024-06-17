@@ -30,20 +30,7 @@ namespace OhMyBoat.UI.Server.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("SwitchConcretar")]
-        public async Task<IActionResult> SwitchConcretar([FromBody] Trueque t)
-        {
-            using var db = new OhMyBoatUIServerContext();
-            var trueque = await db.Trueques.Where(tr => tr.Id == t.Id).FirstOrDefaultAsync();
-            if (trueque != null){
-                trueque.Concreto = !trueque.Concreto;
-                db.Trueques.Update(trueque);
-                await db.SaveChangesAsync();
-                return StatusCode(StatusCodes.Status200OK);
-            }
-            else return StatusCode(StatusCodes.Status406NotAcceptable);
-        }
+
 
         [HttpPost]
         [Route("ActualizarEstadoTrueque")]
