@@ -39,17 +39,20 @@
             <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="VehiculoId" SortKeySelector="@(item => item.VehiculoPatente)">
                     @context.VehiculoPatente
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concreto" SortKeySelector="@(item => item.Estado)">
+            <GridColumn TItem="ReporteTrueque" HeaderText="Estado" PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
                  <div>
-                    @if(@context.Concreto == null) { // antiguo estado 
+                    @if(@context.Estado == EstadoOferta.Programada) { // antiguo estado 
                         <button @onclick="() => ConcretarTrueque(context)" class="btn btn-outline-success">Marcar como concretado</button>
                         <button @onclick="() => InconclusarTrueque(context)" class="btn btn-outline-danger">Marcar como inconcluso</button>                        
-                    } else if(@context.Concreto ?? true) {
+                    } else if(@context.Estado == EstadoOferta.Concretada) {
                         <span class="text-success">Concretado</span>
-                    } else {
-                        <span class="text-danger">Inconcluso</span>
-                    }
-                </div>
+                    } else if(context.Estado == EstadoOferta.Rechazada){
+                                <span class="text-danger">Inconcluso</span>
+                    } else
+                            {
+                                <span class="text-info">Estado indeterminado (@context.Estado.ToString())</span>
+                            }
+                 </div>
                 </GridColumn>
         </Grid>
     }
