@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 namespace OhMyBoat.UI.Shared.Entidades
 {
     public class ReporteTrueque
-    {
+    {   
         public int IdOferta { get; set; }
-        public int MaritimoId {  get; set; }
-        public string MaritimoPatente { get; set; } = "";
-        public string VehiculoPatente { get; set; } = "";
-        public int VehiculoId { get; set; }
-        public String Sucursal { get; set; }
+        public string? ID_RecibeOferta { get; set; }
+        public string? ID_EnviaOferta { get; set; }
+        public int ID_VehiculoRecibeOferta { get; set; }
+        public int ID_VehiculoEnviaOferta { get; set; }        
+        public String Patente_VehiculoRecibeOferta { get; set; } = "";
+        public String Patente_VehiculoEnviaOferta { get; set; } = "";
+        public bool EsNavioRecibe { get; set; }
+        public bool EsNavioEnvia { get; set; }
+        public String Sucursal { get; set; } = "";
         public DateTime FechaTurno {  get; set; }
         public EstadoOferta? Estado { get; set; }
 
