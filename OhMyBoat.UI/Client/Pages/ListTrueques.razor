@@ -33,7 +33,7 @@
             <GridColumn TItem="ReporteTrueque" HeaderText="Sede" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
                     @context.Sucursal
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Maritimo" PropertyName="MaritimoId" SortKeySelector="@(item => item.Patente_VehiculoRecibeOferta)">
+            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 1" PropertyName="Patente_VehiculoRecibeOferta" SortKeySelector="@(item => item.Patente_VehiculoRecibeOferta)">
                     @context.Patente_VehiculoRecibeOferta
                 </GridColumn>
             <GridColumn TItem="ReporteTrueque" HeaderText="Tipo Vehiculo" PropertyName="EsNavioRecibe" SortKeySelector="@(item => item.EsNavioRecibe )">
@@ -50,14 +50,14 @@
             <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="VehiculoId" SortKeySelector="@(item => item.Patente_VehiculoEnviaOferta)">
                     @context.Patente_VehiculoEnviaOferta
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concreto" SortKeySelector="@(item => item.Concreto)">
+            <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
                  <div>
-                    @if(@context.Concreto == null) {
+                    @if(@context.Estado == EstadoOferta.Programada) {
                         <button @onclick="() => ConcretarTrueque(context)" class="btn btn-outline-success">Marcar como concretado</button>
                         <button @onclick="() => InconclusarTrueque(context)" class="btn btn-outline-danger">Marcar como inconcluso</button>                        
-                    } else if(@context.Concreto ?? true) {
+                    } else if(context.Estado == EstadoOferta.Concretada) {
                         <span class="text-success">Concretado</span>
-                    } else {
+                    } else if(context.Estado == EstadoOferta.Inconclusa ){
                         <span class="text-danger">Inconcluso</span>
                     }
                 </div>
@@ -87,7 +87,7 @@
     }
     private async Task InconclusarTrueque(ReporteTrueque reporte)
     {
-        reporte.Concreto = false;
+        reporte.Estado = EstadoOferta.Inconclusa;
         var respuesta = await HttpClient.PostAsJsonAsync<ReporteTrueque>("api/trueques/ActualizarEstadoTrueque", reporte);
         if (respuesta.IsSuccessStatusCode)
         {
@@ -102,7 +102,7 @@
 
     private async Task ConcretarTrueque(ReporteTrueque reporte)
     {
-        reporte.Concreto = true;
+        reporte.Estado = EstadoOferta.Concretada;
         var respuesta = await HttpClient.PostAsJsonAsync<ReporteTrueque>("api/trueques/ActualizarEstadoTrueque", reporte);
         if (respuesta.IsSuccessStatusCode)
         {
@@ -117,8 +117,8 @@
 
 
     private async Task LoadTrueques() {
-            var respSV = await HttpClient.PostAsJsonAsync("api/Trueque/GetReportes");
-            ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();
+         //   var respSV = await HttpClient.PostAsJsonAsync("api/Trueque/GetReportes" , null);
+         //   ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();
     }
         
         

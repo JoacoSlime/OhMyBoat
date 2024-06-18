@@ -9,7 +9,7 @@
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
 @inject NavigationManager Navegador
-
+@using System.Security.Claims
 <AuthorizeView Roles="cliente" Context="OuterContext">
     <Authorized Context="OuterContext">
 <div> 
@@ -51,9 +51,9 @@
                     @context.Patente_VehiculoEnviaOferta
                 </GridColumn>
                 <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
-                    @if(@context.Estado == EstadoOferta.Concretada ) {
+                    @if(context.Estado == EstadoOferta.Concretada ) {
                         <p>Concretado</p>
-                    } else if(@context.Estado == EstadoOferta.Inconclusa ){
+                    } else if(context.Estado == EstadoOferta.Inconclusa ){
                         <p>Inconcluso</p>
                     }
                 </GridColumn>
@@ -79,8 +79,8 @@
 
     private async Task LoadTrueques() 
     {
-        Auth = await authStateProvider.GetAuthenticationStateAsync();
-        Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+    var Auth = await authStateProvider.GetAuthenticationStateAsync();
+    var  Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
 
         var respSV = await HttpClient.PostAsJsonAsync("api/Trueque/GetReportesCliente", Email);
         ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();

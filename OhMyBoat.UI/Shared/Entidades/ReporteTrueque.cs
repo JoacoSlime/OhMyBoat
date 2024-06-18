@@ -19,7 +19,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         public bool EsNavioEnvia { get; set; }
         public String Sucursal { get; set; } = "";
         public DateTime FechaTurno {  get; set; }
-        public EstadoOferta? Estado { get; set; }
+        public EstadoOferta Estado { get; set; } = EstadoOferta.Enviada;
 
     }
 }

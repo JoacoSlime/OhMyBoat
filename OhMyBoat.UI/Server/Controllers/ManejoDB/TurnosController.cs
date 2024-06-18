@@ -32,7 +32,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             {
                 using (var db = new OhMyBoatUIServerContext())
                 {
-                    return await db.Turno.Where(t => (t.OfertaId != null && 
+                    return await db.Turno.Where(t => (
                                                         t.SucursalId == turno.SucursalId && 
                                                         t.FechaTurno.Year == turno.FechaTurno.Year && 
                                                         t.FechaTurno.Month == turno.FechaTurno.Month && 

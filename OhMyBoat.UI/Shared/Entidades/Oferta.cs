@@ -15,7 +15,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         public int ID_VehiculoEnviaOferta {  get; set; }
         public bool EsNavioRecibe { get; set; }
         public bool EsNavioEnvia { get; set; }
-        public EstadoOferta? EstadoOferta { get; set; }
+        public EstadoOferta EstadoOferta { get; set; } = EstadoOferta.Enviada;
 
     }
 }

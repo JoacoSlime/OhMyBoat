@@ -164,7 +164,7 @@ namespace OhMyBoat.UI.Server.Controllers
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
         }
 
-
+    /*
         [HttpPost]
         [Route("ActualizarEstadoOferta")]
         public async Task<IActionResult> DiosSoyYoDeNuevo([FromBody] ReporteTrueque reporte)
@@ -248,12 +248,14 @@ namespace OhMyBoat.UI.Server.Controllers
                     await db.SaveChangesAsync();
                     return StatusCode(StatusCodes.Status200OK);
                 }
-                */
+               
                         
                     
             }
             return StatusCode(StatusCodes.Status404NotFound);
         }
+         */
     }
+  
 }
 
