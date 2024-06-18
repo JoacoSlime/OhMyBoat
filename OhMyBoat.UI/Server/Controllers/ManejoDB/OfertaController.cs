@@ -82,7 +82,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> ListSentOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => (!o.EstadoOferta.Equals(EstadoOferta.Concretada) || !o.EstadoOferta.Equals(EstadoOferta.Inconclusa)) && o.ID_EnviaOferta == Email.Email.ToLower()).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => (o.EstadoOferta != EstadoOferta.Concretada || o.EstadoOferta != EstadoOferta.Inconclusa) && o.ID_EnviaOferta == Email.Email.ToLower()).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
@@ -92,7 +92,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> ListReceivedOffers([FromBody] Usuario Email){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => (!o.EstadoOferta.Equals(EstadoOferta.Concretada) || !o.EstadoOferta.Equals(EstadoOferta.Inconclusa)) && o.ID_RecibeOferta == Email.Email.ToLower()).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => (o.EstadoOferta != EstadoOferta.Concretada || o.EstadoOferta != EstadoOferta.Inconclusa) && o.ID_RecibeOferta == Email.Email.ToLower()).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
@@ -102,7 +102,7 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> ListOffers(){
             
             using var bd = new OhMyBoatUIServerContext();
-            List<Oferta> offers = await bd.Ofertas.Where(o => (o.EstadoOferta.Equals(EstadoOferta.Concretada) || o.EstadoOferta.Equals(EstadoOferta.Inconclusa) || o.EstadoOferta.Equals(EstadoOferta.Programada))).ToListAsync();
+            List<Oferta> offers = await bd.Ofertas.Where(o => (o.EstadoOferta == (EstadoOferta.Concretada) || o.EstadoOferta == (EstadoOferta.Inconclusa) || o.EstadoOferta == (EstadoOferta.Programada))).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, offers);
 
         }
@@ -154,7 +154,7 @@ namespace OhMyBoat.UI.Server.Controllers
         {
             using var db = new OhMyBoatUIServerContext();
             Oferta? offer = await db.Ofertas.Where
-                (of =>!of.EstadoOferta.Equals(EstadoOferta.Enviada) && ((of.ID_VehiculoEnviaOferta == o.ID_VehiculoEnviaOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoRecibeOferta) ||
+                (of =>of.EstadoOferta != (EstadoOferta.Enviada) && ((of.ID_VehiculoEnviaOferta == o.ID_VehiculoEnviaOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoRecibeOferta) ||
                 (of.ID_VehiculoEnviaOferta == o.ID_VehiculoRecibeOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoEnviaOferta )))
                 .FirstOrDefaultAsync();
             if (offer != null)
