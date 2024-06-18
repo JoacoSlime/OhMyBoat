@@ -79,10 +79,11 @@
 
     private async Task LoadTrueques() 
     {
-    var Auth = await authStateProvider.GetAuthenticationStateAsync();
-    var  Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        var Auth = await authStateProvider.GetAuthenticationStateAsync();
+        var  ema = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        LoginDTO necesitoEstoSinoExplotaElBack = new LoginDTO { Email = ema };
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/Trueque/GetReportesCliente", Email);
+        var respSV = await HttpClient.PostAsJsonAsync("api/Trueque/GetReportesCliente", necesitoEstoSinoExplotaElBack);
         ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();
     }
     

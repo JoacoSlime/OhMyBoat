@@ -10,6 +10,7 @@ namespace OhMyBoat.UI.Shared.Entidades
     {
             public int Id { get; set; }
             public int VehiculoId { get; set; }
+            public bool EsNavio { get; set; }
             public int ClienteId { get; set; }
 
     }
