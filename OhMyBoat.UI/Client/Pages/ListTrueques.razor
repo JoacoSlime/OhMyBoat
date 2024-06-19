@@ -117,8 +117,7 @@
 
 
     private async Task LoadTrueques() {
-         //   var respSV = await HttpClient.PostAsJsonAsync("api/Trueque/GetReportes" , null);
-         //   ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();
+        ReporteTrueques = await HttpClient.GetFromJsonAsync<List<ReporteTrueque>>("api/Trueques/GetReporte") ?? new ();    
     }
         
         

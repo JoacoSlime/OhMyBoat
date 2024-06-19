@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OhMyBoat.UI.Shared.Entidades;
-
 using OhMyBoat.UI.Shared;
 using OhMyBoat.UI.Server.Data;
 using Microsoft.AspNetCore.Components.Forms;
@@ -18,7 +17,7 @@ namespace OhMyBoat.UI.Server.Controllers
     public class TruequesController : ControllerBase
     {
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetReporte")]
         public async Task<IActionResult> GetReportes()
         {
@@ -58,7 +57,7 @@ namespace OhMyBoat.UI.Server.Controllers
 
             }
 
-            return Ok(reportes);
+           return StatusCode(StatusCodes.Status200OK,reportes); 
         }
 
 
