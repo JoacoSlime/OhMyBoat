@@ -271,7 +271,7 @@
                 Id = Oferta.Id,
             };
 
-            var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", oferta);
+            var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", oferta); // marca la oferta como aceptada y en espera al dia
             if (responseSV.IsSuccessStatusCode) {
 
                 responseSV = await HttpClient.PostAsJsonAsync("api/Turnos/SelectTurno", turno);

@@ -16,6 +16,24 @@ namespace OhMyBoat.UI.Server.Controllers
 
     public class TruequesController : ControllerBase
     {
+        //AgregarTrueque
+        [HttpPost]
+        [Route("AgregarTrueque")]
+        public async Task<IActionResult> AgregarTrueque([FromBody] Oferta ofe){
+            using var db = new OhMyBoatUIServerContext();
+            var ofeDB = await db.Ofertas.Where(o => o.Id == ofe.Id).FirstOrDefaultAsync();
+            if (ofeDB != null)
+            {
+                ofeDB.EstadoOferta = EstadoOferta.Programada;
+                db.Update(ofeDB);
+                await db.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
+        }
 
         [HttpGet]
         [Route("GetReporte")]
@@ -42,7 +60,7 @@ namespace OhMyBoat.UI.Server.Controllers
                 reportesito.Patente_VehiculoEnviaOferta = vehiculoEnvia?.Matricula ?? "";
 
                 Vehiculo? vehiculoRecibe = o.EsNavioRecibe ? await db.Maritimos.Where(x => x.Id == o.ID_VehiculoRecibeOferta).FirstOrDefaultAsync() : await db.Terrestres.Where(x => x.Id == o.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
-                reportesito.Patente_VehiculoEnviaOferta = vehiculoRecibe?.Matricula ?? "";
+                reportesito.Patente_VehiculoRecibeOferta = vehiculoRecibe?.Matricula ?? "";
 
                 Turno? turnito = await db.Turno.Where( t => t.OfertaId == o.Id).FirstOrDefaultAsync();
 
@@ -90,7 +108,7 @@ namespace OhMyBoat.UI.Server.Controllers
                 reportesito.Patente_VehiculoEnviaOferta = vehiculoEnvia?.Matricula ?? "";
 
                 Vehiculo? vehiculoRecibe = o.EsNavioRecibe ? await db.Maritimos.Where(x => x.Id == o.ID_VehiculoRecibeOferta).FirstOrDefaultAsync() : await db.Terrestres.Where(x => x.Id == o.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
-                reportesito.Patente_VehiculoEnviaOferta = vehiculoRecibe?.Matricula ?? "";
+                reportesito.Patente_VehiculoRecibeOferta = vehiculoRecibe?.Matricula ?? "";
 
                 Turno? turnito = await db.Turno.Where(t => t.OfertaId == o.Id).FirstOrDefaultAsync();
 
@@ -105,101 +123,82 @@ namespace OhMyBoat.UI.Server.Controllers
 
             }
 
-            return Ok(reportes);
+            return StatusCode(StatusCodes.Status200OK, reportes);
         }
-        /*
+        
         [HttpPost]
         [Route("ActualizarEstadoTrueque")]
         public async Task<IActionResult> DiosSoyYoDeNuevo([FromBody] ReporteTrueque reporte)
         {
             using var db = new OhMyBoatUIServerContext();
-            var trueque = await db.Trueques.Where(trueq => trueq.Id == reporte.IdTrueque).FirstOrDefaultAsync();
-
-            if (trueque != null)
-            {
-
-                var turno = await db.Turno.Where(t => t.TruequeId == trueque.Id).FirstOrDefaultAsync();
-                if (turno != null)
-                {
-                    var oferta = await db.Ofertas.Where(o => o.Id == turno.OfertaId).FirstOrDefaultAsync();
-                    if (oferta != null)
+            
+                    var oferta = await db.Ofertas.Where(o =>(o.Id == reporte.IdOferta) && (o.EstadoOferta==EstadoOferta.Programada)).FirstOrDefaultAsync();
+                    if (oferta == null)
+                        return StatusCode(StatusCodes.Status200OK);
+                    if (reporte.Estado == EstadoOferta.Concretada)
                     {
-                        oferta.archivada = true;
+                        oferta.EstadoOferta = EstadoOferta.Concretada;
                         db.Update(oferta);
                         await db.SaveChangesAsync();
-
-                        trueque.Concreto = reporte.Concreto ?? false;
-                        db.Update(trueque);
-                        await db.SaveChangesAsync();
-
-                        if (reporte.Concreto ?? false)
-                        {
-                            if (oferta.EsNavioEnvia)
+                      
+                            if (reporte.EsNavioEnvia)
                             {
-                                Maritimo? mari1 = await db.Maritimos.Where(m => m.Id == oferta.ID_VehiculoEnviaOferta).FirstOrDefaultAsync();
+                                Maritimo? mari1 = await db.Maritimos.Where(m => m.Id == reporte.ID_VehiculoEnviaOferta).FirstOrDefaultAsync();
                                 if (mari1 != null)
                                 {
                                     mari1.Deuda = 0;// parece medio de goma pero bueno
-                                    mari1.IDCliente = oferta.ID_RecibeOferta != null ? oferta.ID_RecibeOferta : "ERROR DE TRASLADO DE IDS";
+                                    mari1.IDCliente = reporte.ID_RecibeOferta != null ? reporte.ID_RecibeOferta : "ERROR DE TRASLADO DE IDS";
                                     db.Update(mari1);
                                     await db.SaveChangesAsync();
-
                                 }
                             }
                             else
                             {
-                                Terrestre? ter1 = await db.Terrestres.Where(t => t.Id == oferta.ID_VehiculoEnviaOferta).FirstOrDefaultAsync();
+                                Terrestre? ter1 = await db.Terrestres.Where(t => t.Id == reporte.ID_VehiculoEnviaOferta).FirstOrDefaultAsync();
                                 if (ter1 != null)
                                 {
 
-                                    ter1.IDCliente = oferta.ID_RecibeOferta != null ? oferta.ID_RecibeOferta : "ERROR DE TRASLADO DE IDS";
+                                    ter1.IDCliente = reporte.ID_RecibeOferta != null ? reporte.ID_RecibeOferta : "ERROR DE TRASLADO DE IDS";
                                     db.Update(ter1);
                                     await db.SaveChangesAsync();
 
                                 }
                             }
-                            if (oferta.EsNavioRecibe)
+                            if (reporte.EsNavioRecibe)
                             {
-                                Maritimo? mari2 = await db.Maritimos.Where(m => m.Id == oferta.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
+                                Maritimo? mari2 = await db.Maritimos.Where(m => m.Id == reporte.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
                                 if (mari2 != null)
                                 {
                                     mari2.Deuda = 0;
-                                    mari2.IDCliente = oferta.ID_EnviaOferta != null ? oferta.ID_EnviaOferta : "ERROR DE TRASLADO DE IDS";
+                                    mari2.IDCliente = reporte.ID_EnviaOferta != null ? reporte.ID_EnviaOferta : "ERROR DE TRASLADO DE IDS";
                                     db.Update(mari2);
                                     await db.SaveChangesAsync();
                                 }
                             }
                             else
                             {
-                                Terrestre? ter2 = await db.Terrestres.Where(t => t.Id == oferta.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
+                                Terrestre? ter2 = await db.Terrestres.Where(t => t.Id == reporte.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
                                 if (ter2 != null)
                                 {
-                                    ter2.IDCliente = oferta.ID_EnviaOferta != null ? oferta.ID_EnviaOferta : "ERROR DE TRASLADO DE IDS";
+                                    ter2.IDCliente = reporte.ID_EnviaOferta != null ? reporte.ID_EnviaOferta : "ERROR DE TRASLADO DE IDS";
                                     db.Update(ter2);
                                     await db.SaveChangesAsync();
                                 }
                             }
                             return StatusCode(StatusCodes.Status200OK);
-                        }
-                        return StatusCode(StatusCodes.Status200OK);
+                    }else
+                    {
+                        oferta.EstadoOferta = EstadoOferta.Inconclusa;
+                        db.Update(oferta);
+                        await db.SaveChangesAsync();
                     }
-                }
-                /*
-                else
-                {
-                    trueque.Concreto = false;
-                    db.Update(trueque);
-                    await db.SaveChangesAsync();
-                    return StatusCode(StatusCodes.Status200OK);
-                }
-                
+           return StatusCode(StatusCodes.Status200OK);
+        }                       
 
 
-            }
-            return StatusCode(StatusCodes.Status404NotFound);
+         
+            
         }
     }
-        */
+        
 
-    }
-}

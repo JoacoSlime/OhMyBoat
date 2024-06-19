@@ -30,13 +30,13 @@
                 <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
                     @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
                 </GridColumn>
-                <GridColumn TItem="ReporteTrueque" HeaderText="Sede" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Sede" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
                     @context.Sucursal
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 1" PropertyName="Patente_VehiculoRecibeOferta" SortKeySelector="@(item => item.Patente_VehiculoRecibeOferta )">
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 1" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Patente_VehiculoRecibeOferta" SortKeySelector="@(item => item.Patente_VehiculoRecibeOferta )">
                     @context.Patente_VehiculoRecibeOferta
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Tipo Vehiculo" PropertyName="EsNavioRecibe" SortKeySelector="@(item => item.EsNavioRecibe )">
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Tipo Vehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="EsNavioRecibe" SortKeySelector="@(item => item.EsNavioRecibe )">
                    @if(context.EsNavioRecibe)
                    {
                         <p>Navio</p>
@@ -46,16 +46,15 @@
                         <p>Terrestre</p>
                    }
                    
-            </GridColumn>    
-            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="Patente_VehiculoEnviaOferta" SortKeySelector="@(item => item.Patente_VehiculoEnviaOferta )">
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Patente_VehiculoEnviaOferta" SortKeySelector="@(item => item.Patente_VehiculoEnviaOferta )">
                     @context.Patente_VehiculoEnviaOferta
-                </GridColumn>
-                <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
-                    @if(context.Estado == EstadoOferta.Concretada ) {
-                        <p>Concretado</p>
-                    } else if(context.Estado == EstadoOferta.Inconclusa ){
-                        <p>Inconcluso</p>
-                    }
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" >
+                        <button @onclick="() => verDetalle(context)" class="btn btn-primary">Ver Detalle</button>
+                    </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
+                        <span>@context.Estado</span>
                 </GridColumn>
         </Grid>
     }
@@ -83,12 +82,16 @@
         var  ema = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
         LoginDTO necesitoEstoSinoExplotaElBack = new LoginDTO { Email = ema };
 
-        var respSV = await HttpClient.PostAsJsonAsync("api/Trueque/GetReportesCliente", necesitoEstoSinoExplotaElBack);
+        var respSV = await HttpClient.PostAsJsonAsync("api/Trueques/GetReporteCliente", necesitoEstoSinoExplotaElBack);
         ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();
     }
-    
 
-    
+    private void verDetalle(ReporteTrueque reporte)
+   
+    {
+        // aca haces lo del modal y tenes todos los datos que se te canten desde reporte, un salu2
+    }
+
 
 
 

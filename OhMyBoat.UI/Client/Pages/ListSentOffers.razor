@@ -94,10 +94,15 @@
                     </div>
                     <div class="d-flex justify-content-between">
                         <h1>Estado: @if (vo.Item1.EstadoOferta.Equals(EstadoOferta.Aceptada)) {
-                                <span class="text-success">Aceptada</span>
-                            } else if(vo.Item1.EstadoOferta.Equals(EstadoOferta.Enviada)){
-                                <span class="text-warning">Pendiente</span>
-                            }</h1>
+                                    <span class="text-success">Aceptada</span>
+                                } else if(vo.Item1.EstadoOferta.Equals(EstadoOferta.Enviada)){
+                                    <span class="text-warning">Pendiente</span>
+                                }
+                                else
+                                {
+                                     <span class="text-info">@vo.Item1.EstadoOferta</span>
+                                }
+                                </h1>
                         <Button Color="ButtonColor.Primary" class="position-relative end-0" 
                             @onclick="(async () => await (VerOferta(vo.Item1)))">Ver detalle
                         </Button>

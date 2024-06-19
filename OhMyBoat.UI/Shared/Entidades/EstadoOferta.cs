@@ -13,7 +13,6 @@ namespace OhMyBoat.UI.Shared.Entidades
         Rechazada,
         Programada,
         Concretada,
-        Inconclusa,   
-        
+        Inconclusa,           
     }
 }
