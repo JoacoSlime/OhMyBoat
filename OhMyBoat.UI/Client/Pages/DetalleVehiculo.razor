@@ -46,8 +46,14 @@
                 </AuthorizeView>
             </div>
         </div>
+        <AuthorizeView Roles="jefe" Context="blockContext">
+            <Authorized Context="blockContext">
+                <Button Color="ButtonColor.Danger" @onclick="(async() => await BloquearUsuario(Dueño))">Bloquear Usuario</Button>
+            </Authorized>
+        </AuthorizeView>
     </Authorized>
 </AuthorizeView>
+
 
 @code {
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
@@ -98,5 +104,23 @@
             parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
             parameters.Add("vehiculoOfertado" , Vehiculo);      
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
+    }
+
+    private async Task BloquearUsuario(Cliente dueño)
+    {
+        if (dueño.Bloqueado){
+            await JsRuntime.InvokeVoidAsync("alert", "Este usuario ya se encuentra bloqueado.");
+        } else {
+            var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", dueño);
+            if (RespuestaSV.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+                //y borrar la publicación correspondiente al detalle? Hay medio un conflicto entre
+                //la HU Bloquear Usuario por publicación Indebida y Eliminar publicación indebida
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
+            }
+        }
+
     }
 }
