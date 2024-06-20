@@ -40,7 +40,7 @@
                 <AuthorizeView Roles="cliente" Context="clientContext">
                     <Authorized Context="clientContext">
                         @if (!isSameClient) {
-                            <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
                         }
                     </Authorized>
                 </AuthorizeView>
