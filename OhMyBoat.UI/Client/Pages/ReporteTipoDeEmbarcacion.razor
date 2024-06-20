@@ -1,0 +1,61 @@
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject NavigationManager Navegador
+
+<div>
+    <PieChart @ref="pieChart" Class="mb-5" />
+</div>
+
+@code {
+    private PieChart pieChart = default!;
+    private PieChartOptions pieChartOptions = default!;
+    private ChartData chartData = default!;
+    private string[]? backgroundColors;
+
+    private int datasetsCount = 0;
+    private int dataLabelsCount = 0;
+
+    private Random random = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        backgroundColors = ColorUtility.CategoricalTwelveColors;
+        chartData = new ChartData { Labels = GetDataLabels(), Datasets = await GetDataSets() };
+
+        pieChartOptions = new();
+        pieChartOptions.Responsive = true;
+        pieChartOptions.Plugins.Legend.Position = "right";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await pieChart.InitializeAsync(chartData, pieChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+    #region Data Preparation
+
+    private async Task<List<IChartDataset>> GetDataSets()
+    {
+        var datasets = new List<IChartDataset>();
+
+        return await HttpClient.GetFromJsonAsync<List<IChartDataset>>("api/reportes/GetReporteTipoDeEmbarcacion") ?? new();
+    }
+
+    private List<string> GetDataLabels()
+    {
+        return Enum.GetNames(typeof(TipoEmbarcacion)).ToList();
+    }
+
+    #endregion  Data Preparation
+}
