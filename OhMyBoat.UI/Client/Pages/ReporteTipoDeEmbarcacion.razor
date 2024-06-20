@@ -9,7 +9,12 @@
 @inject NavigationManager Navegador
 
 <div>
-    <PieChart @ref="pieChart" Class="mb-5" />
+    @if (hasLoadedNavios) {
+        <h2>No se pudo realizar el informe</h2>
+        <p>No hay navios registrados.</p>
+    } else {
+        <PieChart @ref="pieChart" Width="500" Class="mb-5" />
+    }
 </div>
 
 @code {
@@ -17,29 +22,19 @@
     private PieChartOptions pieChartOptions = default!;
     private ChartData chartData = default!;
     private string[]? backgroundColors;
-
-    private int datasetsCount = 0;
-    private int dataLabelsCount = 0;
-
-    private Random random = new();
+    private List<IChartDataset> chartDataSets = default!;
+    private bool hasLoadedNavios = false;
 
     protected override async Task OnInitializedAsync()
     {
+        chartDataSets = await GetDataSets();
         backgroundColors = ColorUtility.CategoricalTwelveColors;
-        chartData = new ChartData { Labels = GetDataLabels(), Datasets = await GetDataSets() };
+        chartData = new ChartData { Labels = GetDataLabels(), Datasets = chartDataSets};
 
         pieChartOptions = new();
         pieChartOptions.Responsive = true;
         pieChartOptions.Plugins.Legend.Position = "right";
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await pieChart.InitializeAsync(chartData, pieChartOptions);
-        }
-        await base.OnAfterRenderAsync(firstRender);
+        await pieChart.InitializeAsync(chartData, pieChartOptions);
     }
 
 
@@ -48,13 +43,29 @@
     private async Task<List<IChartDataset>> GetDataSets()
     {
         var datasets = new List<IChartDataset>();
-
-        return await HttpClient.GetFromJsonAsync<List<IChartDataset>>("api/reportes/GetReporteTipoDeEmbarcacion") ?? new();
+        var dataList = await HttpClient.GetFromJsonAsync<List<double>>("api/Reportes/GetReporteTipoDeEmbarcacion") ?? new();
+        hasLoadedNavios = dataList.All(d => d==0d);
+        datasets.Add(
+            new PieChartDataset() {
+                Label = "data",
+                Data = dataList,
+            }
+        );
+        return datasets;
     }
 
     private List<string> GetDataLabels()
     {
         return Enum.GetNames(typeof(TipoEmbarcacion)).ToList();
+    }
+
+    private List<string> GetRandomDataBackgroundColor() {
+        var colors = new List<string>();
+        for (var index = 0; index < GetDataLabels().Count(); index++)
+        {
+            colors.Add(backgroundColors![index]);
+        }
+        return colors;
     }
 
     #endregion  Data Preparation
