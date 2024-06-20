@@ -12,7 +12,6 @@ namespace OhMyBoat.UI.Shared.Entidades
         public float Eslora {  get; set; }
         public float Puntal {  get; set; }
         public float Manga {  get; set; }
-
         public float Deuda {  get; set; }
         public TipoEmbarcacion Tipo {  get; set; }
     }

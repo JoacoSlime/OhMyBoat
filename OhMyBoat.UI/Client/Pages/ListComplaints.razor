@@ -1,0 +1,81 @@
+﻿@page "/admin/complaints"
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@using System.Security.Cryptography
+@using System.Text
+@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
+@attribute [Authorize(Roles = "jefe")]
+
+<AuthorizeView Context="cremoso">
+    <Authorized Context="cremoso">
+        @if(denuncias.Count>=1){
+            <Grid @ref="grid"
+                  TItem="DenunciasDTO"
+                  Class="table table-hover table-bordered table-striped"
+                  Data="denuncias"
+                  AllowFiltering="true"
+                  PageSize="10"
+                  Responsive="true"
+                  AllowSorting="true">
+
+                <GridColumn TItem="DenunciasDTO" HeaderText="Id Vehiculo" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
+                    @context.VehiculoId
+                </GridColumn>
+
+                <GridColumn TItem="DenunciasDTO" HeaderText="Tipo Vehiculo" PropertyName="EsNavio" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.EsNavio)">
+                    @(context.EsNavio?"Maritimo":"Terrestre")                   
+                </GridColumn>
+
+                <GridColumn TItem="DenunciasDTO" HeaderText="Cantidad de denuncias" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" PropertyName="Cantidad" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.Cantidad)">
+                    @context.Cantidad
+                </GridColumn>
+
+                <GridColumn TItem="DenunciasDTO" HeaderText="Detalles" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
+                    <button @onclick="() => pinsheBotonModaljuasjuas(context.VehiculoId,context.EsNavio)" class="btn btn-primary">Ver Detalle</button>
+                </GridColumn>
+                
+            </Grid>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                <strong>Oh My Boat!</strong>, parece ser que no hay denuncias en el sitio</div>
+        }
+
+       
+    </Authorized>
+    <NotAuthorized Context="cremoso">
+        <p>Nuh uh.</p>
+        @{
+            Navegador.NavigateTo("/");
+        }
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    private BlazorBootstrap.Grid<DenunciasDTO> grid = default!;
+    private List<DenunciasDTO> denuncias = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ListarDenuncias();
+    }
+    private async Task ListarDenuncias(){
+        denuncias = await HttpClient.GetFromJsonAsync<List<DenunciasDTO>>("api/denuncias/GetDenuncias") ?? new();
+    }
+
+    private void pinsheBotonModaljuasjuas(int idVehiculo,bool esNavio)
+    {
+        
+    }
+
+
+
+   
+}
