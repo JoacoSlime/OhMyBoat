@@ -61,6 +61,8 @@
         var parameters = new Dictionary<string, object>();
         parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
         parameters.Add("Id", Id);
+        parameters.Add("modal", DetalleModal);        
+        await hideModal();
         await DetalleModal.ShowAsync<DetalleNavio>(title: "Detalles", parameters: parameters);
     }
 } 

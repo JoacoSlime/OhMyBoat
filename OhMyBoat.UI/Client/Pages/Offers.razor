@@ -49,7 +49,7 @@ else
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Eslora: @nav.Eslora</li>
                 <li class="list-group-item">Puntal: @nav.Puntal</li>
-                <li class="list-group-item">Deuda: @nav.Deuda</li>
+                <li class="list-group-item">Manga: @nav.Manga</li>
             </ul>
             <CardBody>
                 <CardTitle>Deuda:</CardTitle>
@@ -58,12 +58,11 @@ else
                 <CardText>@nav.Antiguedad</CardText>
             </CardBody>
             <CardFooter class="text-end">
-                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>OnClick(nav.Matricula)">Ofertar Navio</Button>
+                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success"
+                @onclick="()=>OnClick(nav.Id, true)">Ofertar Navio</Button>
             </CardFooter>
         </Card>
     }
-</div>
-<div class="d-flex flex-row flex-wrap">
     @foreach (var vec in MisRodados)
     {
         <Card Class="me-4 mb-4" Style="width:auto;">
@@ -81,7 +80,7 @@ else
             </CardBody>
             <CardFooter class="text-end">
                 <Button Size="Size.ExtraLarge" Color="ButtonColor.Success"
-                    @onclick="()=>OnClickVehiculo(vec.Matricula)">Ofertar Vehiculo</Button>
+                    @onclick="()=>OnClickVehiculo(vec.Id)">Ofertar Vehiculo</Button>
             </CardFooter>
         </Card>
     }
@@ -93,6 +92,7 @@ else
 {
     [Parameter] public Vehiculo? vehiculoOfertado { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    
 
     List<Maritimo> MisBarcos = new();
     List<Terrestre> MisRodados = new();
@@ -120,7 +120,7 @@ else
         StateHasChanged();
     }
 
-    private async Task OnClick(string patenteOfertado)
+    private async Task OnClick(int patenteOfertado, bool ofertado)
     {
         var Aut = await authStateProvider.GetAuthenticationStateAsync();
         var Email = Aut.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
@@ -129,11 +129,21 @@ else
             {
                 ID_RecibeOferta = vehiculoOfertado?.IDCliente,
                 ID_EnviaOferta = Email,
-                PatenteVehiculoEnviaOferta = patenteOfertado,
-                PatenteVehiculoRecibeOferta = vehiculoOfertado?.Matricula ?? ""
+                ID_VehiculoEnviaOferta = patenteOfertado,
+                ID_VehiculoRecibeOferta = vehiculoOfertado?.Id ?? 0,
+                EsNavioEnvia = ofertado,
+                EsNavioRecibe = vehiculoOfertado?.GetType() == typeof(Maritimo),
+                EstadoOferta = EstadoOferta.Enviada
+
             };
 
-            // aca va lo de tipo vec (necesito el tipo nada mas)
+        var RespuestaSvExisteUnaOferta = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/ChekearOfertaExiste", ofer);
+        if (RespuestaSvExisteUnaOferta.IsSuccessStatusCode)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Esa oferta ya existe");
+            return;
+        }
+
 
         var RespuestaSv = HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/RegistrarOferta", ofer);
         
@@ -144,16 +154,14 @@ else
 
 
 
-    private async Task OnClickVehiculo(string patenteOfertado)
+    private async Task OnClickVehiculo(int patenteOfertado)
     {
-        Terrestre ter = new Terrestre() { Matricula = this.vehiculoOfertado.Matricula };
-        var RespuestaAfirmativa = await HttpClient.PostAsJsonAsync<Terrestre>("api/vehiculos/GetTerrestrePatente", ter);        //verifico que no sea un terrestre // cosa que pasa que en la realidad no deberia pasar: si hay un navio y un vehiculo con la misma patente falla 
-        if (RespuestaAfirmativa.StatusCode == System.Net.HttpStatusCode.OK)
+        if (vehiculoOfertado is Terrestre)
         {
             await JsRuntime.InvokeVoidAsync("alert", "la oferta debe contener al menos un navío.");
-            return;
+            return;         
         }
-        await OnClick( patenteOfertado);
+        await OnClick( patenteOfertado, false);
     }
 
     private async Task NoHayVehiculos()

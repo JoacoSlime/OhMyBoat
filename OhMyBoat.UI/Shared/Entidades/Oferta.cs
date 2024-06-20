@@ -11,10 +11,11 @@ namespace OhMyBoat.UI.Shared.Entidades
         public int Id { get; set; }
         public string? ID_RecibeOferta {  get; set; }
         public string? ID_EnviaOferta {  get; set; }
-        public string PatenteVehiculoRecibeOferta  {  get; set; }
-        public string  PatenteVehiculoEnviaOferta {  get; set; }
-
-        public bool Estado {get;set;}
+        public int ID_VehiculoRecibeOferta  {  get; set; }
+        public int ID_VehiculoEnviaOferta {  get; set; }
+        public bool EsNavioRecibe { get; set; }
+        public bool EsNavioEnvia { get; set; }
+        public EstadoOferta EstadoOferta { get; set; } = EstadoOferta.Enviada;
 
     }
 }

@@ -6,6 +6,8 @@
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
 @inject NavigationManager Navegador
+@inject AuthenticationStateProvider authStateProvider
+@using System.Security.Claims
 
 <AuthorizeView>
     <Authorized>
@@ -37,7 +39,9 @@
             <div class="d-flex justify-content-end">
                 <AuthorizeView Roles="cliente" Context="clientContext">
                     <Authorized Context="clientContext">
-                        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                        @if (!isSameClient) {
+                            <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                        }
                     </Authorized>
                 </AuthorizeView>
             </div>
@@ -51,7 +55,7 @@
     public Terrestre Vehiculo {get; set;} = new();
     public Cliente Dueño {get; set;} = new();
     private Modal modal = default!;
-
+    private bool isSameClient = true;
 
     protected override async Task OnParametersSetAsync() {
         Vehiculo.Id = Id;
@@ -71,6 +75,14 @@
         }
         Dueño = await responseSV.Content.ReadFromJsonAsync<Cliente>() ?? new();
         Dueño.Contacto = Dueño.Contacto == "" ? "No posee información de contacto." : Dueño.Contacto;
+
+        var coso = await authStateProvider.GetAuthenticationStateAsync();
+        var emailDatos = coso.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        var log = new LoginDTO();
+        log.Email = emailDatos;
+        var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log); // ver ese coso
+        var user = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
+        isSameClient = Dueño.Id == user?.Id;
     }
 
 
@@ -80,12 +92,11 @@
         await modal.HideAsync();
     }
 
-        private async Task EnviarOferta()
+    private async Task EnviarOferta()
     {
-        Vehiculo vec = new Vehiculo() {IDCliente = this.Vehiculo.IDCliente , Matricula = this.Vehiculo.Matricula};
         var parameters = new Dictionary<string, object>();
             parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
-            parameters.Add("vehiculoOfertado" , vec);      
+            parameters.Add("vehiculoOfertado" , Vehiculo);      
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 }

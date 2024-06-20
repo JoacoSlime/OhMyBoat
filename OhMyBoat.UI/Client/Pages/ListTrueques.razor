@@ -1,0 +1,148 @@
+@page "/list-permutations"
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject AuthenticationStateProvider authStateProvider
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+@inject NavigationManager Navegador
+
+<AuthorizeView Roles="jefe,empleado" Context="OuterContext">
+    <Authorized Context="OuterContext">
+<div> 
+
+    @if(ReporteTrueques.Count() == 0){
+        <h4> No hay trueques </h4>
+    }else{
+
+            <Grid @ref="grid"
+                TItem="ReporteTrueque"
+                Class="table table-hover table-bordered table-striped"
+                Data="ReporteTrueques"
+                AllowFiltering="true"
+                PageSize="10"
+                Responsive="true"
+                AllowSorting="true">
+
+                <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
+                    @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
+                </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Sede" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
+                    @context.Sucursal
+                </GridColumn>
+            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 1" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Patente_VehiculoRecibeOferta" SortKeySelector="@(item => item.Patente_VehiculoRecibeOferta)">
+                    @context.Patente_VehiculoRecibeOferta
+                </GridColumn>
+            <GridColumn TItem="ReporteTrueque" HeaderText="Tipo Vehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="EsNavioRecibe" SortKeySelector="@(item => item.EsNavioRecibe )">
+                   @if(context.EsNavioRecibe)
+                   {
+                        <p>Navio</p>
+                   }   
+                   else
+                   {
+                        <p>Terrestre</p>
+                   }
+                   
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="VehiculoId" SortKeySelector="@(item => item.Patente_VehiculoEnviaOferta)">
+                    @context.Patente_VehiculoEnviaOferta
+            </GridColumn>
+
+                    <GridColumn TItem="ReporteTrueque" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        <button @onclick="() => verDetalle(context)" class="btn btn-primary">Ver Detalle</button>
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
+                 <div>
+                    @if(@context.Estado == EstadoOferta.Programada) {
+                        <span class="text-info">@EstadoOferta.Programada :</span>
+                        <button @onclick="() => ConcretarTrueque(context)" class="btn btn-outline-success">Concretado</button>
+                        <button @onclick="() => InconclusarTrueque(context)" class="btn btn-outline-danger">Inconcluso</button>                        
+                    } else if(context.Estado == EstadoOferta.Concretada) {
+                        <span class="text-success">Concretado</span>
+                    } else if(context.Estado == EstadoOferta.Inconclusa ){
+                        <span class="text-danger">Inconcluso</span>
+                    }
+                </div>
+                </GridColumn>
+        </Grid>
+    }
+
+
+
+</div>
+    </Authorized>
+    <NotAuthorized Context="OuterContext">
+        @{Navegador.NavigateTo("/");}
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
+    private List<ReporteTrueque> ReporteTrueques = new();
+
+    private void verDetalle(ReporteTrueque reporte)
+
+    {
+        // aca haces lo del modal y tenes todos los datos que se te canten desde reporte, un salu2
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTrueques();
+    }
+    private async Task InconclusarTrueque(ReporteTrueque reporte)
+    {
+        reporte.Estado = EstadoOferta.Inconclusa;
+        var respuesta = await HttpClient.PostAsJsonAsync<ReporteTrueque>("api/trueques/ActualizarEstadoTrueque", reporte);
+        if (respuesta.IsSuccessStatusCode)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Se ha marcado el trueque como inconcluso");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"Exploto la api, error :{respuesta.StatusCode}");
+        }
+        StateHasChanged();
+    }
+
+    private async Task ConcretarTrueque(ReporteTrueque reporte)
+    {
+        reporte.Estado = EstadoOferta.Concretada;
+        var respuesta = await HttpClient.PostAsJsonAsync<ReporteTrueque>("api/trueques/ActualizarEstadoTrueque", reporte);
+        if (respuesta.IsSuccessStatusCode)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Se ha concretado el intercambio y se saldo la deuda");
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"Exploto la api, error :{respuesta.StatusCode}");
+        }
+        StateHasChanged();
+    }
+
+
+    private async Task LoadTrueques() {
+        ReporteTrueques = await HttpClient.GetFromJsonAsync<List<ReporteTrueque>>("api/Trueques/GetReporte") ?? new ();    
+    }
+        
+        
+    
+/*
+    private async Task SwitchConcretar(Trueque trueque) {
+        var RespuestaSV = await HttpClient.PostAsJsonAsync("api/turnos/SwitchConcretar", trueque);
+        
+        if (RespuestaSV.IsSuccessStatusCode)
+        {
+            await LoadTrueques();
+            StateHasChanged();
+        } else {
+            await JsRuntime.InvokeVoidAsync("alert", "El trueque no fue encontrado.");
+        }
+    }
+*/
+}

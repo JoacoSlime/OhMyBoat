@@ -60,7 +60,7 @@ namespace OhMyBoat.UI.Shared
             return char.IsAsciiLetterUpper(c);
         }
         public static bool IsSymbol(char c){
-            return !char.IsLetterOrDigit(c);
+            return !char.IsAsciiLetterOrDigit(c);
         }
 
         public static async Task<string> GetImageBase64(IBrowserFile file) {        

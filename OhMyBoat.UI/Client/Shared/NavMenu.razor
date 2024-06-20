@@ -45,8 +45,18 @@
                         </NavLink>
                         </div>
                         <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="mis-ofertas">
-                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.CartFill" Size="IconSize.x3"></Icon> <span class="ms-2">Mis Ofertas</span></div>
+                            <NavLink class="nav-link" href="received-offers">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.EnvelopeArrowDownFill" Size="IconSize.x3"></Icon> <span class="ms-2">Ofertas Recibidas</span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="sent-offers">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.EnvelopeArrowUpFill" Size="IconSize.x3"></Icon> <span class="ms-2">Ofertas Enviadas</span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="list-truques-cliente">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.ArchiveFill" Size="IconSize.x3"></Icon> <span class="ms-2">Trueques Realizados</span></div>
                             </NavLink>
                         </div>
                       </Authorized>
@@ -68,8 +78,18 @@
                                 <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.FileEarmarkPersonFill" Size="IconSize.x3"></Icon> <span class="ms-2">Listar Clientes</span></div>
                             </NavLink>
                         </div>
-                     </Authorized>
-                  </AuthorizeView>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="list-permutations">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.ArrowRepeat" Size="IconSize.x3"></Icon> <span class="ms-2">Listar Trueques</span></div>
+                            </NavLink>
+                        </div>
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="edit-debt">
+                                <div class="d-flex flex-row align-items-center ms-2"><Icon Name="IconName.PencilFill" Size="IconSize.x3"></Icon> <span class="ms-2">Editar Deuda</span></div>
+                            </NavLink>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
                 <AuthorizeView Roles="jefe" Context="innerContext">
                     <Authorized Context="innerContext">
                         <div class="nav-item px-3">

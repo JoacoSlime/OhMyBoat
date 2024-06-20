@@ -17,7 +17,6 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        <button class="btn btn-secondary ms-2" @onclick=ShowNotifications><Icon Name="IconName.EnvelopeFill" Size="IconSize.x4"></Icon></button>
                         @if (isOnAccountPage) {
                             <button class="btn account-button ms-2" @onclick=ShowAccount><Icon Name="IconName.PersonFill" Size="IconSize.x4"></Icon></button>
                         } else {
@@ -56,12 +55,5 @@
         var parameters = new Dictionary<string, object>();
         parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, HideOffcanvas));
         await offcanvas.ShowAsync<AccountPopUp>(title: "Mi Cuenta", parameters: parameters);
-    }
-
-    private async Task ShowNotifications()
-    {
-        var parameters = new Dictionary<string, object>();
-        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, HideOffcanvas));
-        await offcanvas.ShowAsync<Notifications>(title: "Notificaciones", parameters: parameters);
     }
 }
