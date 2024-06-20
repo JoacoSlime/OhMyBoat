@@ -29,6 +29,8 @@ namespace OhMyBoat.UI.Server.Data
         public DbSet<Sucursal> Sucursales { get; set; }
         public DbSet<TokenRecu> TokenRecu { get; set; }
         public DbSet<Oferta> Ofertas { get; set; }
+        public DbSet<Denuncia> denuncias { get; set; }
+
 
 
 

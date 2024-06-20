@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace OhMyBoat.UI.Shared.Entidades
 {
     public class Denuncia
-    {
+    {       
             public int Id { get; set; }
             public int VehiculoId { get; set; }
             public bool EsNavio { get; set; }
