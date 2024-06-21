@@ -126,6 +126,10 @@
         
     }
     private async Task IgnorarDenuncias() {
-        
+        var responseSV = await HttpClient.PostAsJsonAsync("api/Denuncias/EliminarDenunciasVehiculo",Vehiculo); 
+        if(!responseSV.IsSuccessStatusCode){
+            await JsRuntime.InvokeVoidAsync("alert","No se encontraron las denuncias a eliminar");
+        }
+        await OnClickCallback.InvokeAsync();
     }
 }

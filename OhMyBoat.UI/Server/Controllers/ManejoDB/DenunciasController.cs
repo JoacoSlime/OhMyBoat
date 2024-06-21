@@ -95,5 +95,39 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 ).CountAsync();
             return StatusCode(StatusCodes.Status200OK, result);
         }
+
+        [HttpPost]
+        [Route("EliminarDenunciasNavio")]
+        public async Task<IActionResult> EliminarDenunciasNavio([FromBody] Maritimo nav)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Maritimo? encontrado = await db.Maritimos.Where(mar => mar.Id == nav.Id).FirstOrDefaultAsync();
+            if (encontrado==null){
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
+            await db.Denuncias.Where(
+                denuncia => denuncia.EsNavio == true &&
+                denuncia.VehiculoId == nav.Id
+                // && denuncia.ClienteId == nav.IDCliente // NO PUEDO CHECKEAR ESTO PORQUE TERRESTRE TIENE EMAIL EN VEZ DE ID AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            ).ExecuteDeleteAsync();
+            return StatusCode(StatusCodes.Status200OK);
+        }
+
+        [HttpPost]
+        [Route("EliminarDenunciasVehiculo")]
+        public async Task<IActionResult> EliminarDenunciasVehiculo([FromBody] Terrestre ter)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            Terrestre? encontrado = await db.Terrestres.Where(terrestre => terrestre.Id == ter.Id).FirstOrDefaultAsync();
+            if (encontrado==null){
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
+            await db.Denuncias.Where(
+                denuncia => denuncia.EsNavio == false &&
+                denuncia.VehiculoId == ter.Id
+                // && denuncia.ClienteId == nav.IDCliente // NO PUEDO CHECKEAR ESTO PORQUE TERRESTRE TIENE EMAIL EN VEZ DE ID AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            ).ExecuteDeleteAsync();
+            return StatusCode(StatusCodes.Status200OK);
+        }
     }
 }
