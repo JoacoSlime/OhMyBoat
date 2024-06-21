@@ -13,6 +13,8 @@
 @inject NavigationManager Navegador;
 @attribute [Authorize(Roles = "jefe")]
 
+<Modal @ref="modal" Size="ModalSize.ExtraLarge"/>
+
 <AuthorizeView Context="cremoso">
     <Authorized Context="cremoso">
         @if(denuncias.Count>=1){
@@ -42,7 +44,7 @@
                         </GridColumn>
 
                             <GridColumn TItem="DenunciasDTO" Filterable="false" HeaderText="Detalles" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
-                            <button @onclick="() => pinsheBotonModaljuasjuas(context.VehiculoId,context.EsNavio)" class="btn btn-primary">Ver Detalle</button>
+                            <button @onclick="() => VerDetalle(context.VehiculoId,context.EsNavio)" class="btn btn-primary">Ver Detalle</button>
                         </GridColumn>
                 
                     </Grid>
@@ -67,6 +69,7 @@
 @code {
     private BlazorBootstrap.Grid<DenunciasDTO> grid = default!;
     private List<DenunciasDTO> denuncias = new();
+    private Modal modal = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -76,11 +79,23 @@
         denuncias = await HttpClient.GetFromJsonAsync<List<DenunciasDTO>>("api/denuncias/GetDenuncias") ?? new();
     }
 
-    private void pinsheBotonModaljuasjuas(int idVehiculo,bool esNavio)
+    private async Task VerDetalle(int idVehiculo,bool esNavio)
     {
-        
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, HideModalAsync));
+        parameters.Add("Id", idVehiculo);
+        if(esNavio) {
+            await modal.ShowAsync<DetalleNavio>(title: "Oferta denunciada", parameters: parameters);
+        } else {
+            await modal.ShowAsync<DetalleVehiculo>(title: "Oferta denunciada", parameters: parameters);
+        }
     }
 
+    private async Task HideModalAsync() {
+        await modal.ShowAsync();
+        await modal.HideAsync();
+        StateHasChanged();
+    }
 
 
    

@@ -6,6 +6,7 @@ using OhMyBoat.UI.Server.Data;
 using OhMyBoat.UI.Server.Services;
 using OhMyBoat.UI.Shared;
 using OhMyBoat.UI.Shared.Entidades;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace OhMyBoat.UI.Server.Controllers.ManejoDB
@@ -69,6 +70,30 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             return StatusCode(StatusCodes.Status404NotFound);
         }
 
+        [HttpPost]
+        [Route("GetCantidadDenunciasVehiculo")]
+        public async Task<IActionResult> GetCantidadDenunciasVehiculo([FromBody] Terrestre ter)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            int result = await db.Denuncias.Where(
+                denuncia => denuncia.VehiculoId == ter.Id
+                && denuncia.EsNavio == false
+                // && denuncia.ClienteId == ter.IDCliente // NO PUEDO CHECKEAR ESTO PORQUE TERRESTRE TIENE EMAIL EN VEZ DE ID AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                ).CountAsync();
+            return StatusCode(StatusCodes.Status200OK, result);
+        }
 
+        [HttpPost]
+        [Route("GetCantidadDenunciasNavio")]
+        public async Task<IActionResult> GetCantidadDenunciasNavio([FromBody] Maritimo nav)
+        {
+            using var db = new OhMyBoatUIServerContext();
+            int result = await db.Denuncias.Where(
+                denuncia => denuncia.VehiculoId == nav.Id
+                && denuncia.EsNavio == true
+                // && denuncia.ClienteId == ter.IDCliente // NO PUEDO CHECKEAR ESTO PORQUE TERRESTRE TIENE EMAIL EN VEZ DE ID AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                ).CountAsync();
+            return StatusCode(StatusCodes.Status200OK, result);
+        }
     }
 }
