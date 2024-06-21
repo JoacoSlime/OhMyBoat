@@ -94,6 +94,7 @@
     private async Task HideModalAsync() {
         await modal.ShowAsync();
         await modal.HideAsync();
+        await ListarDenuncias();
         StateHasChanged();
     }
 
