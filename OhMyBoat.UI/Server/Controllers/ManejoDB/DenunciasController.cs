@@ -91,7 +91,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             int result = await db.Denuncias.Where(
                 denuncia => denuncia.VehiculoId == nav.Id
                 && denuncia.EsNavio == true
-                // && denuncia.ClienteId == ter.IDCliente // NO PUEDO CHECKEAR ESTO PORQUE TERRESTRE TIENE EMAIL EN VEZ DE ID AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                // && denuncia.ClienteId == nav.IDCliente // NO PUEDO CHECKEAR ESTO PORQUE TERRESTRE TIENE EMAIL EN VEZ DE ID AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 ).CountAsync();
             return StatusCode(StatusCodes.Status200OK, result);
         }
