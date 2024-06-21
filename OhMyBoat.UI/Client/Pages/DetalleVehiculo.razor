@@ -36,15 +36,27 @@
                     <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@Vehiculo.descripcion</div></li>
                 </ul>
             </div>
-            <div class="d-flex justify-content-end">
                 <AuthorizeView Roles="cliente" Context="clientContext">
                     <Authorized Context="clientContext">
                         @if (!isSameClient) {
-                            <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            <div class="d-flex justify-content-end">
+                            <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            </div>
                         }
                     </Authorized>
                 </AuthorizeView>
-            </div>
+                <AuthorizeView Roles="jefe" Context="adminContext">
+                    <Authorized Context="adminContext">
+                        <div class="d-flex flex-row justify-content-between align-items-center text-center">
+                            <h3>Cantidad de denuncias: @cantidadDenuncias</h3>
+                            <div>
+                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Danger" @onclick="async ()=> await BloquearUsuario()">Bloquear usuario</Button>
+                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Warning" @onclick="async ()=> await EliminarPublicacion()">Eliminar publicación</Button>
+                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Primary" @onclick="async ()=> await IgnorarDenuncias()">Ignorar denuncias</Button>
+                            </div>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
         </div>
         <AuthorizeView Roles="jefe" Context="blockContext">
             <Authorized Context="blockContext">
@@ -62,6 +74,7 @@
     public Cliente Dueño {get; set;} = new();
     private Modal modal = default!;
     private bool isSameClient = true;
+    private int cantidadDenuncias = 0;
 
     protected override async Task OnParametersSetAsync() {
         Vehiculo.Id = Id;
@@ -89,6 +102,12 @@
         var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log); // ver ese coso
         var user = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
         isSameClient = Dueño.Id == user?.Id;
+
+        responseSV = await HttpClient.PostAsJsonAsync("api/Denuncias/GetCantidadDenunciasVehiculo", Vehiculo) ?? new();
+        if(!responseSV.IsSuccessStatusCode) {
+            await JsRuntime.InvokeVoidAsync("alert", "Esto no debería de explotar,\nen serio, es imposible.");
+        }
+        cantidadDenuncias = await responseSV.Content.ReadFromJsonAsync<int>();
     }
 
 
@@ -120,5 +139,15 @@
                 await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
             }
         }
+    }
+
+    private async Task BloquearUsuario() {
+
+    }
+    private async Task EliminarPublicacion() {
+        
+    }
+    private async Task IgnorarDenuncias() {
+        
     }
 }
