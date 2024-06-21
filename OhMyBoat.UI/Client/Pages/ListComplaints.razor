@@ -16,32 +16,38 @@
 <AuthorizeView Context="cremoso">
     <Authorized Context="cremoso">
         @if(denuncias.Count>=1){
-            <Grid @ref="grid"
-                  TItem="DenunciasDTO"
-                  Class="table table-hover table-bordered table-striped"
-                  Data="denuncias"
-                  AllowFiltering="true"
-                  PageSize="10"
-                  Responsive="true"
-                  AllowSorting="true">
-
-                <GridColumn TItem="DenunciasDTO" HeaderText="Id Vehiculo" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
-                    @context.VehiculoId
-                </GridColumn>
-
-                <GridColumn TItem="DenunciasDTO" HeaderText="Tipo Vehiculo" PropertyName="EsNavio" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.EsNavio)">
-                    @(context.EsNavio?"Maritimo":"Terrestre")                   
-                </GridColumn>
-
-                <GridColumn TItem="DenunciasDTO" HeaderText="Cantidad de denuncias" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" PropertyName="Cantidad" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.Cantidad)">
-                    @context.Cantidad
-                </GridColumn>
-
-                <GridColumn TItem="DenunciasDTO" HeaderText="Detalles" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
-                    <button @onclick="() => pinsheBotonModaljuasjuas(context.VehiculoId,context.EsNavio)" class="btn btn-primary">Ver Detalle</button>
-                </GridColumn>
+            <Card Style="min-width:fit-content; ">
+                <CardBody>
+                    <Grid @ref="grid"
+                          TItem="DenunciasDTO"
+                          Class="mb-0 table table-hover table-striped"
+                          Data="denuncias"
+                          AllowFiltering="true"
+                          PageSize="10"
+                          Responsive="true"
+                          AllowSorting="true"
+                          HeaderRowCssClass="bg-secondary text-white border-bottom-0"
+                          FiltersRowCssClass="bg-secondary text-white bg-opacity-25 border-bottom-0">
                 
-            </Grid>
+                            <GridColumn TItem="DenunciasDTO" Filterable="false"  HeaderText="Id Vehiculo" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
+                            @context.VehiculoId
+                        </GridColumn>
+
+                        <GridColumn TItem="DenunciasDTO" HeaderText="Tipo Vehiculo" PropertyName="EsNavio" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.EsNavio)">
+                            @(context.EsNavio?"Maritimo":"Terrestre")                   
+                        </GridColumn>
+
+                        <GridColumn TItem="DenunciasDTO" HeaderText="Cantidad de denuncias" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" PropertyName="Cantidad" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.Cantidad)">
+                            @context.Cantidad
+                        </GridColumn>
+
+                            <GridColumn TItem="DenunciasDTO" Filterable="false" HeaderText="Detalles" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
+                            <button @onclick="() => pinsheBotonModaljuasjuas(context.VehiculoId,context.EsNavio)" class="btn btn-primary">Ver Detalle</button>
+                        </GridColumn>
+                
+                    </Grid>
+                </CardBody>
+            </Card>
         }
         else
         {
