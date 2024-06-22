@@ -76,8 +76,6 @@
         </Card>
     }
 
-
-
 </div>
     </Authorized>
     <NotAuthorized Context="OuterContext">
@@ -90,11 +88,21 @@
 
     private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
     private List<ReporteTrueque> ReporteTrueques = new();
+    private Modal DetalleModal = default!;
 
-    private void verDetalle(ReporteTrueque reporte)
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
 
-    {
+    private async Task verDetalle(ReporteTrueque reporte) {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+        parameters.Add("Reporte", reporte);
+        await DetalleModal.ShowAsync<DetalleTrueque>(title: "Detalles", parameters: parameters);
+
         // aca haces lo del modal y tenes todos los datos que se te canten desde reporte, un salu2
+
     }
 
     protected override async Task OnInitializedAsync()
