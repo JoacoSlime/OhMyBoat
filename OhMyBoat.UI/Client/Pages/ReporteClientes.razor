@@ -1,0 +1,59 @@
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@using System.Security.Cryptography
+@using System.Text
+@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
+
+
+
+<div class="mb-6">
+   <strong>Ingrese un rango de fechas</strong>
+    <div class="mb-3">
+        <strong>Inicio</strong>:
+        <DateInput TValue="DateOnly" @bind-Value="@inicio" EnableMinMax="true" Max="@fin" Placeholder="Enter Date" />
+    </div>
+    <div class="mb-3">
+        <strong>Fin</strong>:
+        <DateInput TValue="DateOnly" @bind-Value="@fin" Placeholder="Enter Date" />
+    </div>
+    <div>
+        <Button @onclick="async () => await traerDatos()"Color="ButtonColor.Primary">Generar reporte</Button>
+    </div>
+
+
+@if (TrajeDatos)
+{
+    @if (hayDatos)
+    {
+
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            <strong>Oh My Boat!</strong>, parece que no hay trueques en este rango de fechas
+        </div>
+    }
+
+}
+</div>
+
+
+
+
+@code{
+    private DateOnly inicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+    private DateOnly fin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+    bool TrajeDatos, hayDatos=false;
+    private async Task traerDatos()
+    {
+        var resp = 
+        TrajeDatos = true;
+    }
+}
