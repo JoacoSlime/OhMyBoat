@@ -102,7 +102,6 @@
             {
                 papaya = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
 
-                foreach (var coso in papaya)
                 {
                     labels.Add(coso.Key);
                     datos.Add(coso.Value);
