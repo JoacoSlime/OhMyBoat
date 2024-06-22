@@ -108,15 +108,14 @@
 
     private async Task BloquearUsuario(Cliente dueño)
     {
-        if (dueño.Bloqueado){
+        if (dueño.Bloqueado == true){
             await JsRuntime.InvokeVoidAsync("alert", "Este usuario ya se encuentra bloqueado.");
         } else {
             var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", dueño);
             if (RespuestaSV.IsSuccessStatusCode)
             {
                 StateHasChanged();
-                //y borrar la publicación correspondiente al detalle? Hay medio un conflicto entre
-                //la HU Bloquear Usuario por publicación Indebida y Eliminar publicación indebida
+                await JsRuntime.InvokeVoidAsync("alert", "El usuario ha sido bloqueado.");
             } else {
                 await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
             }
