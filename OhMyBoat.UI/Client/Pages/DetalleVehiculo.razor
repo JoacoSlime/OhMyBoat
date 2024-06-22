@@ -108,7 +108,7 @@
 
     private async Task BloquearUsuario(Cliente dueño)
     {
-        if (dueño.Bloqueado == true){
+        if (dueño.Bloqueado){
             await JsRuntime.InvokeVoidAsync("alert", "Este usuario ya se encuentra bloqueado.");
         } else {
             var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", dueño);
@@ -120,6 +120,5 @@
                 await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
             }
         }
-
     }
 }
