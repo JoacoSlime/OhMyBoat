@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OhMyBoat.UI.Server.Data;
@@ -63,6 +64,15 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                         await db.SaveChangesAsync();
                     }
                 }
+
+                var denuncias = await db.Denuncias.Where(d => d.VehiculoId == dto.VehiculoId && d.EsNavio == dto.EsNavio).ToListAsync();
+                if(denuncias !=null)
+                    foreach(Denuncia d in denuncias)
+                    {
+                        db.Remove(d);
+                        await db.SaveChangesAsync();
+                    }
+
                 db.Remove(vehiculo);
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK);
