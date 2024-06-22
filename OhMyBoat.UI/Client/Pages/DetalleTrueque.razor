@@ -138,7 +138,6 @@
     public Vehiculo Vehiculo_Enviado {get; set;} = new();
     public Vehiculo Vehiculo_Recibido {get; set;} = new();
 
-
     protected override async Task OnParametersSetAsync() {
         if (reporte != null){
 
@@ -205,6 +204,8 @@
             Dueño_Recibe = await responseSV_4.Content.ReadFromJsonAsync<Cliente>() ?? new();
             Dueño_Recibe.Contacto = Dueño_Recibe.Contacto == "" ? "No posee información de contacto." : Dueño_Recibe.Contacto;
 
+        } else {
+            await JsRuntime.InvokeVoidAsync("alert", "Me vino un null?!");
         }
     
     }
