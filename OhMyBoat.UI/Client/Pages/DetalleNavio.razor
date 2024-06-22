@@ -80,18 +80,18 @@
 
 
     protected override async Task OnParametersSetAsync() {
-        
+
         Navio.Id = Id;
         var responseSV = await HttpClient.PostAsJsonAsync<Maritimo>("api/Vehiculos/GetNavio", Navio) ?? new();
-        
+
         if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
-            
+
             await JsRuntime.InvokeVoidAsync("alert", "Id innexistente");
             await OnClickCallback.InvokeAsync();
-            
+
             return;
         }
-        
+
         Navio = await responseSV.Content.ReadFromJsonAsync<Maritimo>() ?? new();
 
         if (Navio.Deuda == 0) {
@@ -101,11 +101,11 @@
         }
 
         responseSV = await HttpClient.PostAsJsonAsync<Vehiculo>("api/Vehiculos/GetDueño", Navio) ?? new();
-            
-            if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
             await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
             await OnClickCallback.InvokeAsync();
-            
+
             return;
         }
 
@@ -131,15 +131,15 @@
     {
         await modal.ShowAsync();
         await modal.HideAsync();
-       
+
     }
 
     private async Task EnviarOferta()
     {
         var parameters = new Dictionary<string, object>();           
-            parameters.Add("vehiculoOfertado" , Navio);     
-            parameters.Add("OnClickCallback",EventCallback.Factory.Create<MouseEventArgs>(this, hideModal)); 
-        
+        parameters.Add("vehiculoOfertado" , Navio);     
+        parameters.Add("OnClickCallback",EventCallback.Factory.Create<MouseEventArgs>(this, hideModal)); 
+
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 
@@ -160,9 +160,26 @@
 
     
     private async Task EliminarPublicacion() {
-        
+        DenunciasDTO merequetengue = new() { EsNavio = true, VehiculoId = Navio.Id };
+        var resp = await HttpClient.PostAsJsonAsync<DenunciasDTO>("api/denuncias/EliminarPublicacion", merequetengue);
+        if (resp.IsSuccessStatusCode)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Se ha eliminado el navio con exito");
+            await hideModal();
+            await OnClickCallback.InvokeAsync();
+            Navegador.NavigateTo(Navegador.Uri, true);
+            StateHasChanged();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"Error de API (codigo {resp.StatusCode})");
+            await OnClickCallback.InvokeAsync();
+            Navegador.NavigateTo(Navegador.Uri, true);
+        }
+
     }
-    private async Task IgnorarDenuncias() {
-        
+    private async Task IgnorarDenuncias() {        
+        await hideModal();
+        StateHasChanged();
     }
 }
