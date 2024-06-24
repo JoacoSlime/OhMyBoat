@@ -15,27 +15,45 @@
 
 <div class="mb-6">
    <strong>Ingrese un rango de fechas</strong>
+    <br>
     <div class="mb-3">
         <strong>Inicio</strong>:
-        <DateInput TValue="DateOnly" @bind-Value="@inicio" EnableMinMax="true" Max="@fin" Placeholder="Enter Date" />
+        <DateInput TValue="DateOnly" @bind-Value="@Inicio" EnableMinMax="true" Max="@Fin" Placeholder="Enter Date" />
     </div>
+    <br>
     <div class="mb-3">
         <strong>Fin</strong>:
-        <DateInput TValue="DateOnly" @bind-Value="@fin" Placeholder="Enter Date" />
+        <DateInput TValue="DateOnly" @bind-Value="@Fin" Placeholder="Enter Date" />
     </div>
+    <br>
+
+    @if (error)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh My Boat!</strong>, parece que no entendes como funcionan los rangos, intenta ingresar una fecha de inicio menor a la fecha de fin
+        </div>
+        <br>
+    }
+   
     <div>
         <Button @onclick="async () => await traerDatos()"Color="ButtonColor.Primary">Generar reporte</Button>
     </div>
 
-
+    <br>
 @if (TrajeDatos)
 {
     @if (hayDatos)
     {
-
+        <div>
+            @foreach(var elemento in papaya)
+            {
+                <h1>@elemento.Key  :  @elemento.Value</h1>
+            }
+         </div>
     }
     else
     {
+        
         <div class="alert alert-info" role="alert">
             <strong>Oh My Boat!</strong>, parece que no hay trueques en este rango de fechas
         </div>
@@ -48,12 +66,37 @@
 
 
 @code{
-    private DateOnly inicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
-    private DateOnly fin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
-    bool TrajeDatos, hayDatos=false;
+    private DateOnly Inicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+    private DateOnly Fin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+    private bool TrajeDatos, hayDatos=false;
+    private bool error = false;
+
+    private Dictionary<String, int> papaya = new();
+
     private async Task traerDatos()
     {
-        var resp = 
-        TrajeDatos = true;
+        RangoDTO rango = new RangoDTO() { inicio = Inicio, fin = Fin };
+        if(Inicio <= Fin){
+            error = false;
+            await JsRuntime.InvokeVoidAsync("alert", $"inicio : {rango.inicio}/n fin {rango.fin}");
+            var resp = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/ReporteCliente", rango);
+            if (resp.IsSuccessStatusCode)
+            {
+                papaya = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
+            }
+            TrajeDatos = true;
+            hayDatos = papaya.Count() >= 1;
+        }
+        else
+        {
+            hayDatos = false;
+            TrajeDatos = false;
+            error = true;
+        }
+
     }
 }
