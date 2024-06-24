@@ -101,8 +101,9 @@
             if (resp.IsSuccessStatusCode)
             {
                 papaya = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+                
 
-                foreach (var coso in papaya)
+                foreach (var coso in papaya.OrderByDescending(ccccccccc => ccccccccc.Value))
                 {
                     labels.Add(coso.Key);
                     datos.Add(coso.Value);
