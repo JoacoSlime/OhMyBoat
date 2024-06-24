@@ -45,10 +45,15 @@
         @if (hayDatos)
         { 
             <div>
-                @foreach (var elemento in papaya)
-                {
-                    <h1>@elemento.Key  :  @elemento.Value</h1>
-                }
+                <BarChart @ref="barChart" Width="500" Height="300"/>
+                <br>
+                <div class="alert alert-info" role="alert">
+                    @foreach (var elemento in papaya)
+                    {                    
+                       <span>@elemento.Key  :  @elemento.Value</span>
+                       <br>
+                    }
+                </div>
             </div>
         }
         else
@@ -73,9 +78,19 @@
 
     private Dictionary<String, int> papaya = new();
 
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+
+
     private async Task traerDatos()
     {
         RangoDTO rango = new RangoDTO() { inicio = Inicio, fin = Fin };
+        var labels = new List<string>();
+        var datos = new List<double>();
+        var datasets = new List<IChartDataset>();
+
+
         if (Inicio <= Fin)
         {
             error = false;
@@ -83,14 +98,23 @@
             var resp = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/ReportarNaviosMasUsados", rango);
             if (resp.IsSuccessStatusCode)
             {
-                papaya = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+                papaya = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();       
+
+                foreach(var coso in papaya)
+                {
+                    labels.Add(coso.Key);
+                    datos.Add(coso.Value);
+                }
+
             }
             else
             {
                 await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
             }
             TrajeDatos = true;
-            hayDatos = papaya.Count() >= 1;
+            hayDatos = !papaya.All(c => c.Value == 0);
+            StateHasChanged();
+
         }
         else
         {
@@ -98,6 +122,33 @@
             TrajeDatos = false;
             error = true;
         }
+        var dataset1 = new BarChartDataset()
+            {
+                Data = datos,
+                BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BorderWidth = new List<double> { 0 },
+            };
+        datasets.Add(dataset1);
+
+        chartData = new ChartData { Labels = labels, Datasets = datasets };
+
+        barChartOptions = new BarChartOptions();
+        barChartOptions.Responsive = true;
+        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Y };
+        barChartOptions.IndexAxis = "y";
+
+        barChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = "Cantidad Trueques", Display = true };
+        barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Tipo Navios", Display = true };
+
+        barChartOptions.Plugins.Legend.Display = false;
+  
+
+        await barChart.InitializeAsync(chartData, barChartOptions);
+        await barChart.UpdateAsync(chartData, barChartOptions);
+       
 
     }
+   
+    
 }
