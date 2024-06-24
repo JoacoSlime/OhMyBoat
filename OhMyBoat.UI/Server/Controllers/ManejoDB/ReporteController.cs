@@ -112,5 +112,63 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
             return StatusCode(StatusCodes.Status200OK, diccionarioCremoso);
         }
+
+
+        [HttpGet]
+        [Route("GetReporteIntercambiosVehiculosMasUsados")]
+        public async Task<IActionResult> GetReporteIntercambiosVehiculosMasUsados([FromBody] RangoDTO rango)
+        {
+            DateTime inicio = new DateTime(rango.inicio.Year, rango.inicio.Month, rango.inicio.Day);
+            DateTime fin = new DateTime(rango.fin.Year, rango.fin.Month, rango.fin.Day);
+
+            using var db = new OhMyBoatUIServerContext();
+            var turnosQueVan = await db.Turno.Where(turno => (turno.FechaTurno.Year > inicio.Year || (turno.FechaTurno.Year == inicio.Year && (turno.FechaTurno.Month > inicio.Month || (turno.FechaTurno.Month == inicio.Month && turno.FechaTurno.Day >= inicio.Day)))) &&
+            (turno.FechaTurno.Year < fin.Year || (turno.FechaTurno.Year == fin.Year && (turno.FechaTurno.Month < fin.Month || (turno.FechaTurno.Month == fin.Month && turno.FechaTurno.Day <= fin.Day))))).ToListAsync(); // este filtrado demencial lo tengo que hacer si o si porque sino el entity framework explota pq no puedo usar operadores de fechas ni llamar a una funcion, que paja
+            List<Oferta> ofertasFiltradas = new();
+            var ofertasSinFiltrar = await db.Ofertas.Where(o => o.EstadoOferta == EstadoOferta.Concretada ||
+            o.EstadoOferta == EstadoOferta.Inconclusa || o.EstadoOferta == EstadoOferta.Programada).ToListAsync();
+            if (ofertasSinFiltrar != null)
+                foreach (Turno t in turnosQueVan)
+                {
+                    Oferta? o = ofertasSinFiltrar.Where(o => o.Id == t.OfertaId).FirstOrDefault();
+                    if (o != null)
+                        ofertasFiltradas.Add(o);
+                }
+            Dictionary<String, int> DiccionarioDatos = new();
+            foreach (var t in Enum.GetNames(typeof(TipoVehiculo))) 
+            {
+                if (t != null)
+                    DiccionarioDatos.Add(t, 0);// agrego todo en 0
+            }
+
+            foreach (Oferta o in ofertasFiltradas)
+            {
+                if (!o.EsNavioEnvia) 
+                {
+                    Terrestre? si = await db.Terrestres.Where(m => m.Id == o.ID_VehiculoEnviaOferta).FirstOrDefaultAsync(); 
+                    if (si != null)
+                    {
+                        if (DiccionarioDatos.ContainsKey(si.Tipo.ToString()))
+                        {
+                            DiccionarioDatos[si.Tipo.ToString()] = DiccionarioDatos[si.Tipo.ToString()] + 1;
+                        }
+                    }
+                }
+                if (!o.EsNavioRecibe)
+                {
+                    Terrestre? si = await db.Terrestres.Where(m => m.Id == o.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
+                    if (si != null)
+                    {
+                        if (DiccionarioDatos.ContainsKey(si.Tipo.ToString()))
+                        {
+                            DiccionarioDatos[si.Tipo.ToString()] = DiccionarioDatos[si.Tipo.ToString()] + 1;
+                        }
+                    }
+                }
+            }
+            return StatusCode(StatusCodes.Status200OK, DiccionarioDatos);
+        }
+
+
     }
 }
