@@ -112,7 +112,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
             return StatusCode(StatusCodes.Status200OK, diccionarioCremoso);
         }
-<<<<<<< HEAD
 
 
         [HttpGet]
@@ -169,9 +168,5 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
             return StatusCode(StatusCodes.Status200OK, DiccionarioDatos);
         }
-
-
-=======
->>>>>>> 78180c9 (Hay filtro funcional por fecha gente pero si fuera bueno)
     }
 }
