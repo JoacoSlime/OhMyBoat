@@ -14,7 +14,7 @@
 
 
 <div class="mb-6">
-   <strong>Ingrese un rango de fechas</strong>
+    <strong>Ingrese un rango de fechas para buscar los clientes con mas trueques (programados/concretados/inconclusos)</strong>
     <br>
     <div class="mb-3">
         <strong>Inicio</strong>:
@@ -34,41 +34,41 @@
         </div>
         <br>
     }
-   
+
     <div>
-        <Button @onclick="async () => await traerDatos()"Color="ButtonColor.Primary">Generar reporte</Button>
+        <Button @onclick="async () => await traerDatos()" Color="ButtonColor.Primary">Generar reporte</Button>
     </div>
 
     <br>
-@if (TrajeDatos)
-{
-    @if (hayDatos)
+    @if (TrajeDatos)
     {
-        <div>
-            @foreach(var elemento in papaya)
-            {
-                <h1>@elemento.Key  :  @elemento.Value</h1>
-            }
-         </div>
-    }
-    else
-    {
-        
-        <div class="alert alert-info" role="alert">
-            <strong>Oh My Boat!</strong>, parece que no hay trueques en este rango de fechas
-        </div>
-    }
+        @if (hayDatos)
+        {
+            <div>
+                @foreach (var elemento in papaya)
+                {
+                    <h1>@elemento.Key  :  @elemento.Value</h1>
+                }
+            </div>
+        }
+        else
+        {
 
-}
+            <div class="alert alert-info" role="alert">
+                <strong>Oh My Boat!</strong>, parece que no hay trueques en este rango de fechas
+            </div>
+        }
+
+    }
 </div>
 
 
 
 
-@code{
+@code {
     private DateOnly Inicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
     private DateOnly Fin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
-    private bool TrajeDatos, hayDatos=false;
+    private bool TrajeDatos, hayDatos = false;
     private bool error = false;
 
     private Dictionary<String, int> papaya = new();
@@ -76,9 +76,10 @@
     private async Task traerDatos()
     {
         RangoDTO rango = new RangoDTO() { inicio = Inicio, fin = Fin };
-        if(Inicio <= Fin){
+        if (Inicio <= Fin)
+        {
             error = false;
-            await JsRuntime.InvokeVoidAsync("alert", $"inicio : {rango.inicio}/n fin {rango.fin}");
+            // await JsRuntime.InvokeVoidAsync("alert", $"inicio : {rango.inicio}/n fin {rango.fin}");
             var resp = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/ReporteCliente", rango);
             if (resp.IsSuccessStatusCode)
             {
