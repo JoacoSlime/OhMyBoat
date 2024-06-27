@@ -139,6 +139,17 @@
     public Vehiculo Vehiculo_Recibido {get; set;} = new();
 
     protected override async Task OnParametersSetAsync() {
+        /*
+        crit: Microsoft.AspNetCore.Components.WebAssembly.Rendering.WebAssemblyRenderer[100]
+            Unhandled exception rendering component: Object reference not set to an instance of an object.
+        System.NullReferenceException: Object reference not set to an instance of an object.
+        at OhMyBoat.UI.Client.Pages.ListTrueques.verDetalle(ReporteTrueque reporte)
+        at Microsoft.AspNetCore.Components.ComponentBase.CallStateHasChangedOnAsyncCompletion(Task task)
+        at Microsoft.AspNetCore.Components.RenderTree.Renderer.GetErrorHandledTask(Task taskToHandle, ComponentState owningComponentState)
+        */
+
+        await JsRuntime.InvokeVoidAsync("alert", "Entrando");
+
         if (reporte != null){
 
             rep = reporte;
