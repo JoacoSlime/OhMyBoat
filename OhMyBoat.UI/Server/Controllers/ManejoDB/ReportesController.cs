@@ -12,6 +12,17 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     [ApiController]
     public class ReportesController : ControllerBase
     {
+
+        [HttpGet]
+        [Route("GetReporteTipoDeTerrestre")]
+        public async Task<IActionResult> GetReporteTipoDeTerrestre() {
+            using var db = new OhMyBoatUIServerContext();
+            List<double> dataList = new();
+            foreach(TipoVehiculo tipo in Enum.GetValues(typeof(TipoVehiculo))) {
+                dataList.Add(await db.Terrestres.Where(t => t.Tipo == tipo).CountAsync());
+            }
+            return StatusCode(StatusCodes.Status200OK, dataList);
+        }
         
     }
 }
