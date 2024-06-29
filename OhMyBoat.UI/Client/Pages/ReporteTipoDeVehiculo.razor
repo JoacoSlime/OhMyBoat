@@ -10,10 +10,10 @@
 
 <div>
     @if (hayTerrestres) {
+        <PieChart @ref="pieChart" Width="500" Class="mb-5" />
+    } else {
         <h2>No se pudo realizar el informe</h2>
         <p>No hay vehículos terrestres registrados.</p>
-    } else {
-        <PieChart @ref="pieChart" Width="500" Class="mb-5" />
     }
 </div>
 
@@ -43,7 +43,7 @@
     {
         var datasets = new List<IChartDataset>();
         var dataList = await HttpClient.GetFromJsonAsync<List<double>>("api/Reportes/GetReporteTipoDeTerrestre") ?? new();
-        hasTerrestres = dataList.All(d => d==0d);
+        hayTerrestres = dataList.All(d => d==0d);
         datasets.Add(
             new PieChartDataset() {
                 Label = "data",
