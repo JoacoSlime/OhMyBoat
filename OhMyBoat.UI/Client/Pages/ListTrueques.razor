@@ -17,8 +17,7 @@
     @if(ReporteTrueques.Count() == 0){
         <h4> No hay trueques </h4>
     }else{
-        <Card Style="min-width:fit-content; ">
-           <CardBody>
+
             <Grid @ref="grid"
                 TItem="ReporteTrueque"
                 Class="table table-hover table-bordered table-striped"
@@ -26,12 +25,10 @@
                 AllowFiltering="true"
                 PageSize="10"
                 Responsive="true"
-                AllowSorting="true"
-                HeaderRowCssClass="bg-secondary text-white border-bottom-0"
-                FiltersRowCssClass="bg-secondary text-white bg-opacity-25 border-bottom-0">
+                AllowSorting="true">
 
                 <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
-                    @context.FechaTurno.ToString("yyyy/MM/dd HH:mm")
+                    @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
                 </GridColumn>
                     <GridColumn TItem="ReporteTrueque" HeaderText="Sede" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
                     @context.Sucursal
@@ -71,9 +68,6 @@
                 </div>
                 </GridColumn>
         </Grid>
-       
-        </CardBody>
-        </Card>
     }
 
 

@@ -143,15 +143,15 @@
                 </div>
                 <div class="d-flex flex-row">
                 @if (isReceiving && !(isTruqueMade??false)) {
-                     <Button @onclick="EditarHorario" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Primary">Editar Horarios</Button>
+                     <Button @onclick="EditarHorario" Size="Size.ExtraLarge" Color="ButtonColor.Primary">Editar Horarios</Button>
                 }
-                <Button class="ms-3" @onclick="CancelarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Danger">Cancelar Oferta</Button>
+                <Button class="ms-3" @onclick="CancelarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Danger">Cancelar Oferta</Button>
                 </div>
             } else {
                 @if (isReceiving) {
                     <div class="d-flex flex-row">
-                        <Button class="ms-3" @onclick="RechazarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Danger">Rechazar Oferta</Button>
-                        <Button class="ms-3" @onclick="AceptarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success">Aceptar Oferta</Button>
+                        <Button class="ms-3" @onclick="RechazarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Danger">Rechazar Oferta</Button>
+                        <Button class="ms-3" @onclick="AceptarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Success">Aceptar Oferta</Button>
                     </div>
                 }
             }
