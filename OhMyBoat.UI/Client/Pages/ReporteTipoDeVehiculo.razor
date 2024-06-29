@@ -9,11 +9,11 @@
 @inject NavigationManager Navegador
 
 <div>
-    @if (hayTerrestres) {
-        <PieChart @ref="pieChart" Width="500" Class="mb-5" />
-    } else {
+    @if (NoHayTerrestres) {
         <h2>No se pudo realizar el informe</h2>
         <p>No hay vehículos terrestres registrados.</p>
+    } else {
+        <PieChart @ref="pieChart" Width="500" Class="mb-5" />
     }
 </div>
 
@@ -23,7 +23,7 @@
     private ChartData chartData = default!;
     private string[]? backgroundColors;
     private List<IChartDataset> chartDataSets = default!;
-    private bool hayTerrestres = false;
+    private bool NoHayTerrestres = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,7 +43,7 @@
     {
         var datasets = new List<IChartDataset>();
         var dataList = await HttpClient.GetFromJsonAsync<List<double>>("api/Reportes/GetReporteTipoDeTerrestre") ?? new();
-        hayTerrestres = dataList.All(d => d==0d);
+        NoHayTerrestres = dataList.All(d => d==0d);
         datasets.Add(
             new PieChartDataset() {
                 Label = "data",
