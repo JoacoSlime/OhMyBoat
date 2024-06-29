@@ -38,12 +38,12 @@
 
     <br>
     @if (TrajeDatos) {
-        @if (HayDatos) {
+        @if (HayInconclusos) {
             <div>
                 <BarChart @ref="barChart" Width="500" Height="300"/>
                 <br>
                 <div class="alert alert-info" role="alert">
-                    @foreach (var elemento in DiccionarioDatos) {                    
+                    @foreach (var elemento in DiccionarioInconclusos) {                    
                        <span>@elemento.Key  :  @elemento.Value</span>
                        <br>
                     }
@@ -51,9 +51,29 @@
             </div>
         } else {
             <div class="alert alert-info" role="alert">
-                <strong>Oh My Boat!</strong>, no hay trueques registrados en este rango de fechas.
+                <strong>Oh My Boat!</strong> No hay trueques inconclusos registrados en este rango de fechas.
             </div>
         }
+        @if (HayConcretados) {
+            <div>
+                <BarChart @ref="barChart" Width="500" Height="300"/>
+                <br>
+                <div class="alert alert-info" role="alert">
+                    @foreach (var elemento in DiccionarioConcretados) {                    
+                        <span>@elemento.Key  :  @elemento.Value</span>
+                        <br>
+                    }
+                </div>
+            </div>
+        } else {
+            <div class="alert alert-info" role="alert">
+                <strong>Oh My Boat!</strong> No hay trueques concretados registrados en este rango de fechas.
+            </div>
+        }
+    } else {
+        <div class="alert alert-info" role="alert">
+            <strong>Oh My Boat!</strong> No hay trueques registrados en este rango de fechas.
+        </div>
     }
 </div>
 
@@ -61,10 +81,11 @@
     private DateOnly FechaInicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
     private DateOnly FechaFin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
     private DateOnly FechaHoy = DateOnly.FromDateTime(DateTime.Now);
-    private bool TrajeDatos, HayDatos = false;
+    private bool TrajeDatos, HayInconclusos, HayConcretados = false;
     private bool error = false;
 
-    private Dictionary<String, int> DiccionarioDatos = new();
+    private Dictionary<String, int> DiccionarioInconclusos = new();
+    private Dictionary<String, int> DiccionarioConcretados = new();
 
     private BarChart barChart = default!;
     private BarChartOptions barChartOptions = default!;
@@ -86,23 +107,41 @@
             
             if (resp.IsSuccessStatusCode) {
 
-                DiccionarioDatos = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+                DiccionarioInconclusos = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
                 
-                foreach (var tupla in DiccionarioDatos.OrderByDescending(dd => dd.Value)) {
+                foreach (var tupla in DiccionarioInconclusos.OrderByDescending(d => d.Value)) {
                     labels.Add(tupla.Key);
                     datos.Add(tupla.Value);
                 }
+
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
+            }
+
+            var resp_2 = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/TruequesConcretadosPorSede", rango);
+            
+            if (resp_2.IsSuccessStatusCode) {
+
+                DiccionarioConcretados = await resp_2.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+                
+                foreach (var tupla in DiccionarioConcretados.OrderByDescending(d => d.Value)) {
+                    labels.Add(tupla.Key);
+                    datos.Add(tupla.Value);
+                }
+                
             } else {
                 await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
             }
 
             TrajeDatos = true;
-            HayDatos = !DiccionarioDatos.All(c => c.Value == 0);
+            HayInconclusos = !DiccionarioInconclusos.All(c => c.Value == 0);
+            HayConcretados = !DiccionarioConcretados.All(c => c.Value == 0);
             StateHasChanged();
 
         } else {
         
-            HayDatos = false;
+            HayInconclusos = false;
+            HayConcretados = false;
             TrajeDatos = false;
             error = true;
         }
