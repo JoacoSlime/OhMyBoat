@@ -75,6 +75,54 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         }
 
 
+        [HttpPost]
+        [Route("TruequesConcretadosPorSede")]
+        public async Task<IActionResult> TruequesConcretadosPorSede([FromBody] RangoDTO rango)
+        {
+            DateTime inicio = new DateTime(rango.inicio.Year, rango.inicio.Month, rango.inicio.Day);
+            DateTime fin = new DateTime(rango.fin.Year, rango.fin.Month, rango.fin.Day);
+
+            using var db = new OhMyBoatUIServerContext();
+
+            var TurnosTotales = await db.Turno.Where
+            (t => (t.FechaTurno >= inicio) && (t.FechaTurno <= fin)).ToListAsync();
+            
+            var TruequesConcretados = await db.Ofertas.Where
+            (o => o.EstadoOferta == EstadoOferta.Concretada).ToListAsync();
+
+            List<Turno> TurnosOfertasConcretadas = new();
+
+            if (TruequesConcretados != null) {
+                foreach (Oferta concretado in TruequesConcretados)
+                {
+                    Turno? t = TurnosTotales.Where(turno => turno.OfertaId == concretado.Id).FirstOrDefault();
+                    if (t != null) TurnosOfertasConcretadas.Add(t);
+                }
+            }
+
+            List<Sucursal> SucursalesTotales = new();
+            SucursalesTotales = await db.Sucursales.ToListAsync();
+
+            Dictionary<String, int> diccionario = new();
+            foreach (var s in SucursalesTotales)
+            {
+                diccionario.Add(s.NombreSuck, 0);
+            }
+
+            foreach (Turno t in TurnosOfertasConcretadas)
+            {
+                var mi_sucursal = SucursalesTotales.Where(s => s.Id == t.SucursalId).FirstOrDefault();
+                if (mi_sucursal != null){
+                    if (diccionario.ContainsKey(mi_sucursal.NombreSuck)) {
+                            diccionario[mi_sucursal.NombreSuck] = diccionario[mi_sucursal.NombreSuck] + 1;
+                    }
+                }
+            }
+
+            return StatusCode(StatusCodes.Status200OK, diccionario);
+        }
+
+
 
 
 
