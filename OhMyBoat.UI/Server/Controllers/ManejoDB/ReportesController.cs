@@ -12,6 +12,71 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     [ApiController]
     public class ReportesController : ControllerBase
     {
-        
+
+        [HttpPost]
+        [Route("TruequesInconclusosPorSede")]
+        public async Task<IActionResult> TruequesNoConcluidosPorSede([FromBody] RangoDTO rango)
+        {
+            DateTime inicio = new DateTime(rango.inicio.Year, rango.inicio.Month, rango.inicio.Day);
+            DateTime fin = new DateTime(rango.fin.Year, rango.fin.Month, rango.fin.Day);
+
+            using var db = new OhMyBoatUIServerContext();
+
+        /*
+            var TurnosTotales = await db.Turno.Where
+            (t => (t.FechaTurno.Year > inicio.Year || (t.FechaTurno.Year == inicio.Year && (t.FechaTurno.Month > inicio.Month || (t.FechaTurno.Month == inicio.Month && t.FechaTurno.Day >= inicio.Day))))
+            && (t.FechaTurno.Year < fin.Year || (t.FechaTurno.Year == fin.Year && (t.FechaTurno.Month < fin.Month || (t.FechaTurno.Month == fin.Month && t.FechaTurno.Day <= fin.Day))))).ToListAsync();
+            // este filtrado demencial lo tengo que hacer si o si porque sino el entity framework explota pq no puedo usar operadores de fechas ni llamar a una funcion, que paja
+        */
+
+            //y no funca asi?
+            var TurnosTotales = await db.Turno.Where
+            (t => (t.FechaTurno >= inicio) && (t.FechaTurno <= fin)).ToListAsync();
+            
+            var TruequesInconclusos = await db.Ofertas.Where
+            (o => o.EstadoOferta == EstadoOferta.Inconclusa).ToListAsync();
+
+            List<Turno> TurnosOfertasInconclusas = new();
+
+            //Simulo un Inner Join OFERTA_INCONCLUSA x TURNO_EN_RANGO
+            if (TruequesInconclusos != null) {
+                foreach (Oferta inconcluso in TruequesInconclusos)
+                {
+                    Turno? t = TurnosTotales.Where(turno => turno.OfertaId == inconcluso.Id).FirstOrDefault();
+                    if (t != null) TurnosOfertasInconclusas.Add(t);
+                }
+            }
+
+        /*
+            Hay que conseguir los TURNOS de OFERTAS INCONCLUSAS, porque es TURNOS
+            el que tiene el IDSucursal que nos llevara al nombre de la SUCURSAL
+        */
+
+            List<Sucursal> SucursalesTotales = new();
+            SucursalesTotales = await db.Sucursales.ToListAsync();
+
+            Dictionary<String, int> diccionario = new();
+            foreach (var s in SucursalesTotales)
+            {
+                diccionario.Add(s.NombreSuck, 0);
+            }
+
+            foreach (Turno t in TurnosOfertasInconclusas)
+            {
+                var mi_sucursal = SucursalesTotales.Where(s => s.Id == t.SucursalId).FirstOrDefault();
+                if (mi_sucursal != null){
+                    if (diccionario.ContainsKey(mi_sucursal.NombreSuck)) {
+                            diccionario[mi_sucursal.NombreSuck] = diccionario[mi_sucursal.NombreSuck] + 1;
+                    }
+                }
+            }
+
+            return StatusCode(StatusCodes.Status200OK, diccionario);
+        }
+
+
+
+
+
     }
 }
