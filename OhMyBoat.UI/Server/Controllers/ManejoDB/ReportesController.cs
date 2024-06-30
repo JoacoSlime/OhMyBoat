@@ -13,6 +13,17 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     public class ReportesController : ControllerBase
     {
 
+        [HttpGet]
+        [Route("GetReporteTipoDeTerrestre")]
+        public async Task<IActionResult> GetReporteTipoDeTerrestre() {
+            using var db = new OhMyBoatUIServerContext();
+            List<double> dataList = new();
+            foreach(TipoVehiculo tipo in Enum.GetValues(typeof(TipoVehiculo))) {
+                dataList.Add(await db.Terrestres.Where(t => t.Tipo == tipo).CountAsync());
+            }
+            return StatusCode(StatusCodes.Status200OK, dataList);
+        }
+        
         [HttpPost]
         [Route("TruequesInconclusosPorSede")]
         public async Task<IActionResult> TruequesNoConcluidosPorSede([FromBody] RangoDTO rango)
@@ -121,10 +132,5 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
             return StatusCode(StatusCodes.Status200OK, diccionario);
         }
-
-
-
-
-
     }
 }
