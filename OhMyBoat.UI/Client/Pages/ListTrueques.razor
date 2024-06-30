@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
-
+@inject AuthenticationStateProvider authStateProvider
 @inject HttpClient HttpClient
 @using OhMyBoat.UI.Client.Extensions
 @using OhMyBoat.UI.Shared
@@ -17,7 +17,8 @@
     @if(ReporteTrueques.Count() == 0){
         <h4> No hay trueques </h4>
     }else{
-
+        <Card Style="min-width:fit-content; ">
+           <CardBody>
             <Grid @ref="grid"
                 TItem="ReporteTrueque"
                 Class="table table-hover table-bordered table-striped"
@@ -25,39 +26,55 @@
                 AllowFiltering="true"
                 PageSize="10"
                 Responsive="true"
-                AllowSorting="true">
+                AllowSorting="true"
+                HeaderRowCssClass="bg-secondary text-white border-bottom-0"
+                FiltersRowCssClass="bg-secondary text-white bg-opacity-25 border-bottom-0">
 
                 <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
-                    @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
+                    @context.FechaTurno.ToString("yyyy/MM/dd HH:mm")
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Sede" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Sede" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
                     @context.Sucursal
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Maritimo" PropertyName="MaritimoId" SortKeySelector="@(item => item.MaritimoPatente)">
-                    @context.MaritimoPatente
+            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 1" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Patente_VehiculoRecibeOferta" SortKeySelector="@(item => item.Patente_VehiculoRecibeOferta)">
+                    @context.Patente_VehiculoRecibeOferta
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="VehiculoId" SortKeySelector="@(item => item.VehiculoPatente)">
-                    @context.VehiculoPatente
-                </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Estado" PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
+            <GridColumn TItem="ReporteTrueque" HeaderText="Tipo Vehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="EsNavioRecibe" SortKeySelector="@(item => item.EsNavioRecibe )">
+                   @if(context.EsNavioRecibe)
+                   {
+                        <p>Navio</p>
+                   }   
+                   else
+                   {
+                        <p>Terrestre</p>
+                   }
+                   
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="VehiculoId" SortKeySelector="@(item => item.Patente_VehiculoEnviaOferta)">
+                    @context.Patente_VehiculoEnviaOferta
+            </GridColumn>
+
+                    <GridColumn TItem="ReporteTrueque" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        <button @onclick="() => verDetalle(context)" class="btn btn-primary">Ver Detalle</button>
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
                  <div>
-                    @if(@context.Estado == EstadoOferta.Programada) { // antiguo estado 
-                        <button @onclick="() => ConcretarTrueque(context)" class="btn btn-outline-success">Marcar como concretado</button>
-                        <button @onclick="() => InconclusarTrueque(context)" class="btn btn-outline-danger">Marcar como inconcluso</button>                        
-                    } else if(@context.Estado == EstadoOferta.Concretada) {
+                    @if(@context.Estado == EstadoOferta.Programada) {
+                        <span class="text-info">@EstadoOferta.Programada :</span>
+                        <button @onclick="() => ConcretarTrueque(context)" class="btn btn-outline-success">Concretado</button>
+                        <button @onclick="() => InconclusarTrueque(context)" class="btn btn-outline-danger">Inconcluso</button>                        
+                    } else if(context.Estado == EstadoOferta.Concretada) {
                         <span class="text-success">Concretado</span>
-                    } else if(context.Estado == EstadoOferta.Rechazada){
-                                <span class="text-danger">Inconcluso</span>
-                    } else
-                            {
-                                <span class="text-info">Estado indeterminado (@context.Estado.ToString())</span>
-                            }
-                 </div>
+                    } else if(context.Estado == EstadoOferta.Inconclusa ){
+                        <span class="text-danger">Inconcluso</span>
+                    }
+                </div>
                 </GridColumn>
         </Grid>
+       
+        </CardBody>
+        </Card>
     }
-
-
 
 </div>
     </Authorized>
@@ -70,10 +87,23 @@
 @code {
 
     private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
-    private List<Oferta> Trueques = new();
-    private List<Turno> Turnos = new();
     private List<ReporteTrueque> ReporteTrueques = new();
+    private Modal DetalleModal = default!;
 
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
+
+    private async Task verDetalle(ReporteTrueque reporte) {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+        parameters.Add("Reporte", reporte);
+        await DetalleModal.ShowAsync<DetalleTrueque>(title: "Detalles", parameters: parameters);
+
+        // aca haces lo del modal y tenes todos los datos que se te canten desde reporte, un salu2
+
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,7 +111,7 @@
     }
     private async Task InconclusarTrueque(ReporteTrueque reporte)
     {
-        reporte.Concreto = false;
+        reporte.Estado = EstadoOferta.Inconclusa;
         var respuesta = await HttpClient.PostAsJsonAsync<ReporteTrueque>("api/trueques/ActualizarEstadoTrueque", reporte);
         if (respuesta.IsSuccessStatusCode)
         {
@@ -96,7 +126,7 @@
 
     private async Task ConcretarTrueque(ReporteTrueque reporte)
     {
-        reporte.Concreto = true;
+        reporte.Estado = EstadoOferta.Concretada;
         var respuesta = await HttpClient.PostAsJsonAsync<ReporteTrueque>("api/trueques/ActualizarEstadoTrueque", reporte);
         if (respuesta.IsSuccessStatusCode)
         {
@@ -111,40 +141,11 @@
 
 
     private async Task LoadTrueques() {
-        Trueques = await HttpClient.GetFromJsonAsync<List<Oferta>>("api/ofertas/ListarTrueques") ?? new();
-        Turnos = await HttpClient.GetFromJsonAsync<List<Turno>>("api/turnos/ListarTurnos") ?? new();
-        var Sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales") ?? new();
-        
-        foreach (Turno t in Turnos)
-        {
-            ReporteTrueque rt = new();
-
-            rt.FechaTurno = t.FechaTurno;
-            var nombre_sede = Sucursales.Where( s => s.Id == t.SucursalId).FirstOrDefault();
-            if (nombre_sede != null){
-                rt.Sucursal = nombre_sede.NombreSuck;
-            }
-            if (t.OfertaId != null){
-                rt.IdOferta = (int) t.OfertaId;
-            }
-
-            var trueque = Trueques.Where(t => t.Id == rt.IdOferta).FirstOrDefault();
-            if (trueque != null){
-                if (trueque.EsNavioEnvia){
-                    rt.MaritimoId = trueque.ID_VehiculoEnviaOferta;
-                    rt.VehiculoId = trueque.ID_VehiculoRecibeOferta;
-                }else{
-                    rt.MaritimoId = trueque.ID_VehiculoRecibeOferta;
-                    rt.VehiculoId = trueque.ID_VehiculoEnviaOferta;
-                }
-                rt.Estado = trueque.EstadoOferta;
-
-            }
-            //sacar el trueque que me dara -> id_vehiculo_1 y id_vehiculo_2 para hacer el boton ver detalle vehiculo p/ c/ u/
-            
-            ReporteTrueques.Add(rt);
-        }
+        ReporteTrueques = await HttpClient.GetFromJsonAsync<List<ReporteTrueque>>("api/Trueques/GetReporte") ?? new ();    
     }
+        
+        
+    
 /*
     private async Task SwitchConcretar(Trueque trueque) {
         var RespuestaSV = await HttpClient.PostAsJsonAsync("api/turnos/SwitchConcretar", trueque);

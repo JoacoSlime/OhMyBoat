@@ -62,7 +62,56 @@
                     </div>
                 }
             </div>
-            @if (Oferta.EstadoOferta.Equals(EstadoOferta.Aceptada)) {
+            <div class="d-flex flex-row">
+                @if (Vehiculo_Recibido is Maritimo) {
+                    Maritimo mar = Vehiculo_Recibido as Maritimo ?? new();
+                        <div class="d-flex">
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <div class="d-flex flex-column">
+                                <h3>@mar.Tipo</h3>
+                                <h4 class="mb-5">@mar.Matricula</h4>
+                                <h4 class="mb-3">Eslora: @($"{mar.Eslora}m.")</h4>
+                                <h4 class="mb-3">Puntal: @mar.Puntal m aproximadamente.</h4>
+                                <h4 class="mb-3">Manga: @mar.Manga m aproximadamente.</h4>
+                                <h4 class="mb-3">Antigüedad: @mar.Antiguedad años aproximadamente.</h4>
+                                <h4 class="mb-3">Deuda: @(mar.Deuda==0? "Libre de deuda." : "$" + mar.Deuda.ToString())</h4>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <ul>
+                                <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                    <h3>@Dueño_Recibe.Nombre</h3>
+                                    <h4>@Dueño_Recibe.Email</h4>
+                                    <h4>@Dueño_Recibe.Contacto</h4>
+                                </div></li>
+                                <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@mar.descripcion</div></li>
+                            </ul>
+                        </div>
+                } else {
+                    Terrestre ter = Vehiculo_Recibido as Terrestre ?? new();
+                    <div class="d-flex">
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <div class="d-flex flex-column">
+                            <h3>@ter.Tipo</h3>
+                            <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
+                            <h4 class="mb-5">@ter.Matricula</h4>
+                            <h4 class="mb-3">Antiguedad: @ter.Antiguedad años.</h4>
+                            <h4 class="mb-3">Kilometraje: @ter.Kilometraje km aproximadamente.</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <ul>
+                            <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                <h3>@Dueño_Recibe.Nombre</h3>
+                                <h4>@Dueño_Recibe.Email</h4>
+                                <h4>@Dueño_Recibe.Contacto</h4>
+                            </div></li>
+                            <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@ter.descripcion</div></li>
+                        </ul>
+                    </div>
+                }
+            </div>
+            @if (Oferta.EstadoOferta == (EstadoOferta.Aceptada)) {
                 <div class="d-flex flex-column border rounded mb-3">
                 @if (isReceiving) {
                     @foreach (Turno turno in Turnos) {
@@ -94,15 +143,15 @@
                 </div>
                 <div class="d-flex flex-row">
                 @if (isReceiving && !(isTruqueMade??false)) {
-                     <Button @onclick="EditarHorario" Size="Size.ExtraLarge" Color="ButtonColor.Primary">Editar Horarios</Button>
+                     <Button @onclick="EditarHorario" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Primary">Editar Horarios</Button>
                 }
-                <Button class="ms-3" @onclick="CancelarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Danger">Cancelar Oferta</Button>
+                <Button class="ms-3" @onclick="CancelarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Danger">Cancelar Oferta</Button>
                 </div>
             } else {
                 @if (isReceiving) {
                     <div class="d-flex flex-row">
-                        <Button class="ms-3" @onclick="RechazarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Danger">Rechazar Oferta</Button>
-                        <Button class="ms-3" @onclick="AceptarOferta" Size="Size.ExtraLarge" Color="ButtonColor.Success">Aceptar Oferta</Button>
+                        <Button class="ms-3" @onclick="RechazarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Danger">Rechazar Oferta</Button>
+                        <Button class="ms-3" @onclick="AceptarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success">Aceptar Oferta</Button>
                     </div>
                 }
             }
@@ -231,7 +280,7 @@
         hasTrueque = responseamela.IsSuccessStatusCode;
         if (hasTrueque) {
             Oferta trueque = await responseamela.Content.ReadFromJsonAsync<Oferta>() ?? new();
-            isTruqueMade = trueque.EstadoOferta.Equals(EstadoOferta.Concretada) || trueque.EstadoOferta.Equals(EstadoOferta.Inconclusa);
+            isTruqueMade = (trueque.EstadoOferta == (EstadoOferta.Concretada)) || (trueque.EstadoOferta == (EstadoOferta.Inconclusa));
         }
     }
 
@@ -271,7 +320,7 @@
                 Id = Oferta.Id,
             };
 
-            var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", oferta);
+            var responseSV = await HttpClient.PostAsJsonAsync("api/Trueques/AgregarTrueque", oferta); // marca la oferta como aceptada y en espera al dia
             if (responseSV.IsSuccessStatusCode) {
 
                 responseSV = await HttpClient.PostAsJsonAsync("api/Turnos/SelectTurno", turno);

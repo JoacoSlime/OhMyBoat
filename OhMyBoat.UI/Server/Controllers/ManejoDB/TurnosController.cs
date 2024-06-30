@@ -32,7 +32,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             {
                 using (var db = new OhMyBoatUIServerContext())
                 {
-                    return await db.Turno.Where(t => (t.OfertaId != null && 
+                    return await db.Turno.Where(t => (
                                                         t.SucursalId == turno.SucursalId && 
                                                         t.FechaTurno.Year == turno.FechaTurno.Year && 
                                                         t.FechaTurno.Month == turno.FechaTurno.Month && 
@@ -174,7 +174,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
             return StatusCode(StatusCodes.Status412PreconditionFailed, null); // si mandan  0 o 30 turnos porque si
         }
-
         [HttpGet]
         [Route("ListarTurnos")]
         public async Task<IActionResult> Get()
@@ -200,8 +199,10 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async Task<IActionResult> EliminarOferta([FromBody] Oferta o)
         {
             using var db = new OhMyBoatUIServerContext();
+
             var turn = await db.Turno.Where(turn => turn.OfertaId == o.Id).ToListAsync();
             if (turn != null)
+
             {
                 foreach (Turno t in turn )
                 {
@@ -252,6 +253,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                     <br/>
                     <p>Para revisar tus trueque pendiente, ingresa a tus Ofertas Recibidas.</p>"
                 );
+
                 return StatusCode(StatusCodes.Status200OK, turn);
             }
             return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
@@ -273,5 +275,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             );
             return StatusCode(StatusCodes.Status200OK);
         }
+
     }
 }

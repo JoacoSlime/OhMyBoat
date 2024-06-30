@@ -1,0 +1,229 @@
+@using OhMyBoat.UI.Shared.Entidades
+@inject HttpClient HttpClient
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@inject IJSRuntime JsRuntime
+@inject AuthenticationStateProvider authStateProvider
+@using System.Security.Claims
+@inject NavigationManager NavManager 
+
+
+<AuthorizeView>
+    <Authorized>
+        <Modal @ref="modal" IsScrollable="true" Size="ModalSize.ExtraLarge" />
+
+        <div class="d-flex flex-column">
+        <div class="d-flex">
+            <div class="d-flex flex-column">
+                <h4 class="mb-3">Sucursal: @rep.Sucursal </h4>
+                <h4 class="mb-3">Fecha del turno: @rep.FechaTurno </h4>
+                <h4 class="mb-3">Estado: @rep.Estado </h4>
+            </div>
+        </div>
+        </div>
+        
+        <div class="d-flex p-5 flex-column align-items-center justify-content-between">
+            <div class="d-flex flex-row">
+                @if (Vehiculo_Enviado is Maritimo) {
+                    Maritimo mar = Vehiculo_Enviado as Maritimo ?? new();
+                        <div class="d-flex">
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <div class="d-flex flex-column">
+                                <h3>@mar.Tipo</h3>
+                                <h4 class="mb-5">@mar.Matricula</h4>
+                                <h4 class="mb-3">Eslora: @($"{mar.Eslora}m.")</h4>
+                                <h4 class="mb-3">Puntal: @mar.Puntal m aproximadamente.</h4>
+                                <h4 class="mb-3">Manga: @mar.Manga m aproximadamente.</h4>
+                                <h4 class="mb-3">Antigüedad: @mar.Antiguedad años aproximadamente.</h4>
+                                <h4 class="mb-3">Deuda: @(mar.Deuda==0? "Libre de deuda." : "$" + mar.Deuda.ToString())</h4>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <ul>
+                                <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                    <h3>@Dueño_Envia.Nombre</h3>
+                                    <h4>@Dueño_Envia.Email</h4>
+                                    <h4>@Dueño_Envia.Contacto</h4>
+                                </div></li>
+                                <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@mar.descripcion</div></li>
+                            </ul>
+                        </div>
+                } else {
+                    Terrestre ter = Vehiculo_Enviado as Terrestre ?? new();
+                    <div class="d-flex">
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <div class="d-flex flex-column">
+                            <h3>@ter.Tipo</h3>
+                            <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
+                            <h4 class="mb-5">@ter.Matricula</h4>
+                            <h4 class="mb-3">Antiguedad: @ter.Antiguedad años.</h4>
+                            <h4 class="mb-3">Kilometraje: @ter.Kilometraje km aproximadamente.</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <ul>
+                            <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                <h3>@Dueño_Envia.Nombre</h3>
+                                <h4>@Dueño_Envia.Email</h4>
+                                <h4>@Dueño_Envia.Contacto</h4>
+                            </div></li>
+                            <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@ter.descripcion</div></li>
+                        </ul>
+                    </div>
+                }
+            </div>
+            <div class="d-flex flex-row">
+                @if (Vehiculo_Recibido is Maritimo) {
+                    Maritimo mar = Vehiculo_Recibido as Maritimo ?? new();
+                        <div class="d-flex">
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <div class="d-flex flex-column">
+                                <h3>@mar.Tipo</h3>
+                                <h4 class="mb-5">@mar.Matricula</h4>
+                                <h4 class="mb-3">Eslora: @($"{mar.Eslora}m.")</h4>
+                                <h4 class="mb-3">Puntal: @mar.Puntal m aproximadamente.</h4>
+                                <h4 class="mb-3">Manga: @mar.Manga m aproximadamente.</h4>
+                                <h4 class="mb-3">Antigüedad: @mar.Antiguedad años aproximadamente.</h4>
+                                <h4 class="mb-3">Deuda: @(mar.Deuda==0? "Libre de deuda." : "$" + mar.Deuda.ToString())</h4>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <ul>
+                                <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                    <h3>@Dueño_Recibe.Nombre</h3>
+                                    <h4>@Dueño_Recibe.Email</h4>
+                                    <h4>@Dueño_Recibe.Contacto</h4>
+                                </div></li>
+                                <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@mar.descripcion</div></li>
+                            </ul>
+                        </div>
+                } else {
+                    Terrestre ter = Vehiculo_Recibido as Terrestre ?? new();
+                    <div class="d-flex">
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <div class="d-flex flex-column">
+                            <h3>@ter.Tipo</h3>
+                            <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
+                            <h4 class="mb-5">@ter.Matricula</h4>
+                            <h4 class="mb-3">Antiguedad: @ter.Antiguedad años.</h4>
+                            <h4 class="mb-3">Kilometraje: @ter.Kilometraje km aproximadamente.</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <ul>
+                            <li><h3>Info del dueño:</h3> <div class="border rounded p-3 mb-3">
+                                <h3>@Dueño_Recibe.Nombre</h3>
+                                <h4>@Dueño_Recibe.Email</h4>
+                                <h4>@Dueño_Recibe.Contacto</h4>
+                            </div></li>
+                            <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@ter.descripcion</div></li>
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+    [Parameter] public ReporteTrueque? reporte { get; set; }
+    [Parameter] public Modal modal {get;set;} = default!;
+    private ReporteTrueque rep = new();
+    public Cliente Dueño_Envia {get; set;} = new();
+    public Cliente Dueño_Recibe {get; set;} = new();
+    public Vehiculo Vehiculo_Enviado {get; set;} = new();
+    public Vehiculo Vehiculo_Recibido {get; set;} = new();
+
+    protected override async Task OnParametersSetAsync() {
+        /*
+        crit: Microsoft.AspNetCore.Components.WebAssembly.Rendering.WebAssemblyRenderer[100]
+            Unhandled exception rendering component: Object reference not set to an instance of an object.
+        System.NullReferenceException: Object reference not set to an instance of an object.
+        at OhMyBoat.UI.Client.Pages.ListTrueques.verDetalle(ReporteTrueque reporte)
+        at Microsoft.AspNetCore.Components.ComponentBase.CallStateHasChangedOnAsyncCompletion(Task task)
+        at Microsoft.AspNetCore.Components.RenderTree.Renderer.GetErrorHandledTask(Task taskToHandle, ComponentState owningComponentState)
+        */
+
+        await JsRuntime.InvokeVoidAsync("alert", "Entrando");
+
+        if (reporte != null){
+
+            rep = reporte;
+
+            Vehiculo_Enviado.Id = rep.ID_VehiculoEnviaOferta;
+            HttpResponseMessage? responseSV_1;
+            if (rep.EsNavioEnvia) {
+                responseSV_1 = await HttpClient.PostAsJsonAsync("api/Vehiculos/GetNavio", Vehiculo_Enviado) ?? new();
+                if (responseSV_1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                    await JsRuntime.InvokeVoidAsync("alert", "ID de envia innexistente");
+                    await OnClickCallback.InvokeAsync();
+                    return;
+                }
+                Vehiculo_Enviado = await responseSV_1.Content.ReadFromJsonAsync<Maritimo>() ?? new();
+            } else {
+                responseSV_1 = await HttpClient.PostAsJsonAsync("api/Vehiculos/GetVehiculo", Vehiculo_Enviado) ?? new();
+                if (responseSV_1.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                    await JsRuntime.InvokeVoidAsync("alert", "ID de envia innexistente");
+                    await OnClickCallback.InvokeAsync();
+                    return;
+                }
+                Vehiculo_Enviado = await responseSV_1.Content.ReadFromJsonAsync<Terrestre>() ?? new();            
+            }
+
+            var responseSV_2 = await HttpClient.PostAsJsonAsync("api/Vehiculos/GetDueño", Vehiculo_Enviado) ?? new();
+            if (responseSV_2.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
+                await OnClickCallback.InvokeAsync();
+                return;
+            }
+                    
+            Dueño_Envia = await responseSV_2.Content.ReadFromJsonAsync<Cliente>() ?? new();
+            Dueño_Envia.Contacto = Dueño_Envia.Contacto == "" ? "No posee información de contacto." : Dueño_Envia.Contacto;
+
+            Vehiculo_Recibido.Id = rep.ID_VehiculoRecibeOferta;
+
+            HttpResponseMessage? responseSV_3;
+            if (rep.EsNavioRecibe) {
+                responseSV_3 = await HttpClient.PostAsJsonAsync("api/Vehiculos/GetNavio", Vehiculo_Recibido) ?? new();
+                if (responseSV_3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                    await JsRuntime.InvokeVoidAsync("alert", "ID de recibe innexistente");
+                    await OnClickCallback.InvokeAsync();
+                    return;
+                }
+                Vehiculo_Recibido = await responseSV_3.Content.ReadFromJsonAsync<Maritimo>() ?? new();
+            } else {
+                responseSV_3 = await HttpClient.PostAsJsonAsync("api/Vehiculos/GetVehiculo", Vehiculo_Recibido) ?? new();
+                if (responseSV_3.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                    await JsRuntime.InvokeVoidAsync("alert", "ID de recibe innexistente");
+                    await OnClickCallback.InvokeAsync();
+                    return;
+                }
+                Vehiculo_Recibido = await responseSV_3.Content.ReadFromJsonAsync<Terrestre>() ?? new();
+            }
+            
+            var responseSV_4 = await HttpClient.PostAsJsonAsync("api/Vehiculos/GetDueño", Vehiculo_Recibido) ?? new();
+                if (responseSV_4.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+                await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
+                await OnClickCallback.InvokeAsync();
+                return;
+            }
+
+            Dueño_Recibe = await responseSV_4.Content.ReadFromJsonAsync<Cliente>() ?? new();
+            Dueño_Recibe.Contacto = Dueño_Recibe.Contacto == "" ? "No posee información de contacto." : Dueño_Recibe.Contacto;
+
+        } else {
+            await JsRuntime.InvokeVoidAsync("alert", "Me vino un null?!");
+        }
+    
+    }
+
+    private async Task hideModal(){
+        await modal.ShowAsync();
+        await modal.HideAsync();
+    }
+
+}

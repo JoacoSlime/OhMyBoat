@@ -14,93 +14,98 @@
 
 <AuthorizeView Roles="cliente">
     <Authorized>
-    <Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.ExtraLarge" />
+        <Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.ExtraLarge" />
         <h1>Mis Ofertas Enviadas</h1>
-            @if (SentOffers.Count == 0)
-            {
-                <p>Usted no tiene ninguna oferta enviada aún</p>
-            } else {
-            <div class="d-flex flex-column p-4 border rounded">
+        @if (SentOffers.Count == 0)
+        {
+            <p>Usted no tiene ninguna oferta enviada aún</p>
+        } else {
+            <div class="d-flex flex-column p-4">
             @foreach (var vo in VehiculosOfertas ) {
-                <div class="mb-me-4 mb-4 p-4 border rounded">
+                <div class="mb-4 p-4 border rounded">
                     <div class="d-flex flex-row align-items-center justify-content-between" Style="width:auto;">
-                        <div class="flex-fill">
-                            <h1>Ofreciste:</h1>
-                            <div>
-                                <img class="rounded-3 m-3" src="@vo.Item3.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
+                            <div class="d-flex flex-column justify-content-center text-center align-items-center">
+                                <h1>Estado: @if (vo.Item1.EstadoOferta.Equals(EstadoOferta.Aceptada)) {
+                                            <span class="text-success">Aceptada</span>
+                                        } else if(vo.Item1.EstadoOferta.Equals(EstadoOferta.Enviada)){
+                                            <span class="text-warning">Pendiente</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-info">@vo.Item1.EstadoOferta</span>
+                                        }
+                                        </h1>
+                                <Button Color="ButtonColor.Primary" Size="Size.Large" class="position-relative end-0" 
+                                    @onclick="(async () => await (VerOferta(vo.Item1)))">Ver detalle
+                                </Button>
                             </div>
-                            <h2>
-                                @if (@vo.Item3 is Maritimo){
-                                    var m = @vo.Item3 as Maritimo;
-                                    <h4 class="mb-3">@m?.Tipo</h4>;
-                                }else{
-                                    @if(@vo.Item3 is Terrestre){
-                                        var t = @vo.Item3 as Terrestre;
-                                        <h4 class="mb-3">@t?.Tipo</h4>;
+                        <div>
+                            <Card Style="width:20vw;">
+                                <CardHeader>Ofreciste:</CardHeader>
+                                <img src="@vo.Item3.base64imagen" alt="placeholder" />
+                                <CardBody>
+                                    @if (@vo.Item3 is Maritimo){
+                                        var m = @vo.Item3 as Maritimo;
+                                        <CardTitle Class="mb-2 text-muted">@m?.Tipo</CardTitle>
+                                    }else{
+                                        @if(@vo.Item3 is Terrestre){
+                                            var t = @vo.Item3 as Terrestre;
+                                            <CardTitle Class="mb-2 text-muted">@t?.Tipo</CardTitle>
+                                        }
                                     }
-                                }
-                            </h2>
-                            <div class="ms-3">
-                                @if (@vo.Item3 is Maritimo){
-                                    var m = @vo.Item3 as Maritimo;
-                                    <li><h4 class="mb-3">Eslora: @m?.Eslora</h4></li>
-                                    <li><h4 class="mb-3">Puntal: @m?.Puntal</h4></li>
-                                    <li><h4 class="mb-3">Manga: @m?.Manga</h4></li>
-                                }else{
-                                    @if (@vo.Item3 is Terrestre){
-                                        var t = @vo.Item3 as Terrestre;
-                                        <li><h4 class="mb-3">Marca: @t?.Marca</h4></li>
-                                        <li><h4 class="mb-3">Modelo: @t?.Modelo</h4></li>
-                                        <li><h4 class="mb-3">Año: @t?.Anio</h4></li>
-                                    } 
-                                }
-                            </div>
+                                </CardBody>
+                                <ul class="list-group list-group-flush">
+                                    @if (@vo.Item3 is Maritimo){
+                                        var m = @vo.Item3 as Maritimo;
+                                        <li class="list-group-item">Eslora: @m?.Eslora</li>
+                                        <li class="list-group-item">Puntal: @m?.Puntal</li>
+                                        <li class="list-group-item">Manga: @m?.Manga</li>
+                                    }else{
+                                        @if (@vo.Item3 is Terrestre){
+                                            var t = @vo.Item3 as Terrestre;
+                                            <li class="list-group-item">Marca: @t?.Marca</li>
+                                            <li class="list-group-item">Modelo: @t?.Modelo</li>
+                                            <li class="list-group-item">Año: @t?.Anio</li>
+                                        } 
+                                    }
+                                </ul>
+                            </Card>
                         </div>
-                        <div class="flex-fill">
+                        <div>
                             <Icon Name="IconName.ArrowRight" Size="IconSize.x1"></Icon>
                         </div>
-                        <div class="flex-fill">
-                            <h1>A cambio de:</h1>
-                            <div>
-                                <img class="rounded-3 m-3" src="@vo.Item2.base64imagen" alt="" style="width:100%; height:auto; max-width: 50vh"/>
-                            </div>
-                            <h2>
-                                @if (@vo.Item2 is Maritimo){
-                                    var m = @vo.Item2 as Maritimo;
-                                    <h4 class="mb-3">@m?.Tipo</h4>;
-                                }else{
-                                    @if(@vo.Item2 is Terrestre){
-                                        var t = @vo.Item2 as Terrestre;
-                                        <h4 class="mb-3">@t?.Tipo</h4>;
+                        <div>
+                            <Card Style="width:20vw;">
+                                <CardHeader>A cambio de:</CardHeader>
+                                <img src="@vo.Item2.base64imagen" alt="placeholder" />
+                                <CardBody>
+                                    @if (@vo.Item2 is Maritimo){
+                                        var m = @vo.Item2 as Maritimo;
+                                        <CardTitle Class="mb-2 text-muted">@m?.Tipo</CardTitle>
+                                    }else{
+                                        @if(@vo.Item2 is Terrestre){
+                                            var t = @vo.Item2 as Terrestre;
+                                            <CardTitle Class="mb-2 text-muted">@t?.Tipo</CardTitle>
+                                        }
                                     }
-                                }
-                            </h2>
-                            <div class="ms-3">
-                                @if (@vo.Item2 is Maritimo){
-                                    var m = @vo.Item2 as Maritimo;
-                                    <li><h4 class="mb-3">Eslora: @m?.Eslora</h4></li>
-                                    <li><h4 class="mb-3">Puntal: @m?.Puntal</h4></li>
-                                    <li><h4 class="mb-3">Manga: @m?.Manga</h4></li>
-                                }else{
-                                    @if (@vo.Item2 is Terrestre){
-                                        var t = @vo.Item2 as Terrestre;
-                                        <h4 class="mb-3">Marca: @t?.Marca</h4>;
-                                        <h4 class="mb-3">Modelo: @t?.Modelo</h4>;
-                                        <h4 class="mb-3">Año: @t?.Anio</h4>;
-                                    } 
-                                }
-                            </div>
+                                </CardBody>
+                                <ul class="list-group list-group-flush">
+                                    @if (@vo.Item2 is Maritimo){
+                                        var m = @vo.Item2 as Maritimo;
+                                        <li class="list-group-item">Eslora: @m?.Eslora</li>
+                                        <li class="list-group-item">Puntal: @m?.Puntal</li>
+                                        <li class="list-group-item">Manga: @m?.Manga</li>
+                                    }else{
+                                        @if (@vo.Item2 is Terrestre){
+                                            var t = @vo.Item2 as Terrestre;
+                                            <li class="list-group-item">Marca: @t?.Marca</li>
+                                            <li class="list-group-item">Modelo: @t?.Modelo</li>
+                                            <li class="list-group-item">Año: @t?.Anio</li>
+                                        } 
+                                    }
+                                </ul>
+                            </Card>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <h1>Estado: @if (vo.Item1.Estado) {
-                                <span class="text-success">Aceptada</span>
-                            } else {
-                                <span class="text-warning">Pendiente</span>
-                            }</h1>
-                        <Button Color="ButtonColor.Primary" class="position-relative end-0" 
-                            @onclick="(async () => await (VerOferta(vo.Item1)))">Ver detalle
-                        </Button>
                     </div>
                 </div>
             }

@@ -2,14 +2,14 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize]
-
+@inject AuthenticationStateProvider authStateProvider
 @inject HttpClient HttpClient
 @using OhMyBoat.UI.Client.Extensions
 @using OhMyBoat.UI.Shared
 @using OhMyBoat.UI.Shared.Entidades
 @inject IJSRuntime JsRuntime
 @inject NavigationManager Navegador
-
+@using System.Security.Claims
 <AuthorizeView Roles="cliente" Context="OuterContext">
     <Authorized Context="OuterContext">
 <div> 
@@ -30,21 +30,31 @@
                 <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
                     @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
                 </GridColumn>
-                <GridColumn TItem="ReporteTrueque" HeaderText="Sede" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Sede" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
                     @context.Sucursal
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Maritimo" PropertyName="MaritimoId" SortKeySelector="@(item => item.MaritimoPatente)">
-                    @context.MaritimoPatente
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 1" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Patente_VehiculoRecibeOferta" SortKeySelector="@(item => item.Patente_VehiculoRecibeOferta )">
+                    @context.Patente_VehiculoRecibeOferta
                 </GridColumn>
-            <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" PropertyName="VehiculoId" SortKeySelector="@(item => item.VehiculoPatente)">
-                    @context.VehiculoPatente
-                </GridColumn>
-                <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" PropertyName="Concreto" SortKeySelector="@(item => item.Concreto)">
-                    @if(@context.Concreto ?? false) {
-                        <p>Concretado</p>
-                    } else if(@context.Concreto == false){
-                        <p>Inconcluso</p>
-                    }
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Tipo Vehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="EsNavioRecibe" SortKeySelector="@(item => item.EsNavioRecibe )">
+                   @if(context.EsNavioRecibe)
+                   {
+                        <p>Navio</p>
+                   }   
+                   else
+                   {
+                        <p>Terrestre</p>
+                   }
+                   
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Matricula 2" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Patente_VehiculoEnviaOferta" SortKeySelector="@(item => item.Patente_VehiculoEnviaOferta )">
+                    @context.Patente_VehiculoEnviaOferta
+            </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" >
+                        <button @onclick="() => verDetalle(context)" class="btn btn-primary">Ver Detalle</button>
+                    </GridColumn>
+                    <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
+                        <span>@context.Estado</span>
                 </GridColumn>
         </Grid>
     }
@@ -59,47 +69,29 @@
 @code {
 
     private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
-    private List<Trueque> Trueques = new();
-    private List<Turno> Turnos = new();
     private List<ReporteTrueque> ReporteTrueques = new();
     protected override async Task OnInitializedAsync()
     {
         await LoadTrueques();
     }
 
-    private async Task LoadTrueques() {
-        Trueques = await HttpClient.GetFromJsonAsync<List<Trueque>>("api/trueques/ListarTruequesCliente") ?? new();
-        Turnos = await HttpClient.GetFromJsonAsync<List<Turno>>("api/turnos/ListarTurnos") ?? new();
-        var Sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales") ?? new();
-        
-        foreach (Turno t in Turnos)
-        {
-            ReporteTrueque rt = new();
+    private async Task LoadTrueques() 
+    {
+        var Auth = await authStateProvider.GetAuthenticationStateAsync();
+        var  ema = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        LoginDTO necesitoEstoSinoExplotaElBack = new LoginDTO { Email = ema };
 
-            rt.FechaTurno = t.FechaTurno;
-            var nombre_sede = Sucursales.Where( s => s.Id == t.SucursalId).FirstOrDefault();
-            if (nombre_sede != null){
-                rt.Sucursal = nombre_sede.NombreSuck;
-            }
-            if (t.TruequeId != null){
-                rt.IdTrueque = (int) t.TruequeId;
-            }
-
-            var trueque = Trueques.Where(t => t.Id == rt.IdTrueque).FirstOrDefault();
-            if (trueque != null){
-                rt.MaritimoId = trueque.MaritimoId;
-                rt.VehiculoId = trueque.VehiculoId;                
-                rt.Concreto = trueque?.Concreto;
-            }
-            //sacar el trueque que me dara -> id_vehiculo_1 y id_vehiculo_2 para hacer el boton ver detalle vehiculo p/ c/ u/
-           
-            if (rt.Concreto != null)
-            {
-            ReporteTrueques.Add(rt);        
-            }            
-        }
-        
+        var respSV = await HttpClient.PostAsJsonAsync("api/Trueques/GetReporteCliente", necesitoEstoSinoExplotaElBack);
+        ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();
     }
+
+    private void verDetalle(ReporteTrueque reporte)
+   
+    {
+        // aca haces lo del modal y tenes todos los datos que se te canten desde reporte, un salu2
+    }
+
+
 
 
     }
