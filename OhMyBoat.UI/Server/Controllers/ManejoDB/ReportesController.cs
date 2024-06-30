@@ -208,10 +208,5 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 }
             }
         }
-
-
-
-
-
     }
 }

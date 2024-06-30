@@ -142,7 +142,6 @@
 
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
-
     private async Task BloquearUsuario(Cliente dueño)
     {
         if (dueño.Bloqueado){
@@ -158,7 +157,7 @@
             }
         }
 
-    
+    }
     private async Task EliminarPublicacion() {
         DenunciasDTO merequetengue = new() { EsNavio = true, VehiculoId = Navio.Id };
         var resp = await HttpClient.PostAsJsonAsync<DenunciasDTO>("api/denuncias/EliminarPublicacion", merequetengue);
