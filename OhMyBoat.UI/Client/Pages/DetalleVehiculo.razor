@@ -41,7 +41,9 @@
                         @if (!isSameClient) {
                             <div class="d-flex justify-content-end">
                             <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            <Button Color="ButtonColor.Warning" @onclick="()=>DenunciarPublicacion()" > Denunciar publicacion </Button>
                             </div>
+
                         }
                     </Authorized>
                 </AuthorizeView>
@@ -58,8 +60,14 @@
                     </Authorized>
                 </AuthorizeView>
         </div>
+        <AuthorizeView Roles="jefe" Context="blockContext">
+            <Authorized Context="blockContext">
+                <Button Color="ButtonColor.Danger" @onclick="(async() => await BloquearUsuario(Dueño))">Bloquear Usuario</Button>
+            </Authorized>
+        </AuthorizeView>
     </Authorized>
 </AuthorizeView>
+
 
 @code {
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
@@ -81,7 +89,7 @@
         Vehiculo = await responseSV.Content.ReadFromJsonAsync<Terrestre>() ?? new();
 
         responseSV = await HttpClient.PostAsJsonAsync<Vehiculo>("api/Vehiculos/GetDueño", Vehiculo) ?? new();
-            if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
             await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
             await OnClickCallback.InvokeAsync();
             return;
@@ -104,7 +112,17 @@
         cantidadDenuncias = await responseSV.Content.ReadFromJsonAsync<int>();
     }
 
-
+    private async Task DenunciarPublicacion()
+    {
+        Denuncia denuncia = new Denuncia(){ VehiculoId = Vehiculo.Id , EsNavio = false, ClienteId = Dueño.Id};
+        var responseSV = await HttpClient.PostAsJsonAsync<Denuncia>("api/denuncia/CargarDenuncia", denuncia); 
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "usted ya denunció esta publicación");
+            return;            
+        }
+        await JsRuntime.InvokeVoidAsync("alert", "“Oh My Boat!” investigará su denuncia");        
+    }
 
     private async Task hideModal(){
         await modal.ShowAsync();
@@ -116,20 +134,48 @@
         var parameters = new Dictionary<string, object>();
             parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
             parameters.Add("vehiculoOfertado" , Vehiculo);      
-        await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
+            await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 
-    private async Task BloquearUsuario() {
-
-    }
+    private async Task BloquearUsuario(Cliente dueño)
+    {
+        if (dueño.Bloqueado){
+            await JsRuntime.InvokeVoidAsync("alert", "Este usuario ya se encuentra bloqueado.");
+        } else {
+            var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", dueño);
+            if (RespuestaSV.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+                await JsRuntime.InvokeVoidAsync("alert", "El usuario ha sido bloqueado.");
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
+            }
+        }
     private async Task EliminarPublicacion() {
-        
+
+        DenunciasDTO merequetengue = new() { EsNavio = false, VehiculoId = Vehiculo.Id };
+        var resp = await HttpClient.PostAsJsonAsync<DenunciasDTO>("api/denuncias/EliminarPublicacion", merequetengue);
+        if (resp.IsSuccessStatusCode)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Se ha eliminado el vehiculo con exito");
+            await hideModal();
+            await OnClickCallback.InvokeAsync();
+            Navegador.NavigateTo(Navegador.Uri, true);
+            StateHasChanged();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"Error de API (codigo {resp.StatusCode})");
+            await OnClickCallback.InvokeAsync();
+            Navegador.NavigateTo(Navegador.Uri, true);
+        }
+
     }
     private async Task IgnorarDenuncias() {
         var responseSV = await HttpClient.PostAsJsonAsync("api/Denuncias/EliminarDenunciasVehiculo",Vehiculo); 
         if(!responseSV.IsSuccessStatusCode){
             await JsRuntime.InvokeVoidAsync("alert","No se encontraron las denuncias a eliminar");
         }
-        await OnClickCallback.InvokeAsync();
+        await OnClickCallback.InvokeAsync();}
     }
 }

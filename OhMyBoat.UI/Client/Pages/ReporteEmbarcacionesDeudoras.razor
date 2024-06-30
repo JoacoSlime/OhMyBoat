@@ -1,0 +1,85 @@
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@using System.Security.Cryptography
+@using System.Text
+@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
+
+
+
+
+
+
+<div>
+    @if (isEmpty) {
+        <h2>No se pudo realizar el informe</h2>
+        <p>No hay navios registrados.</p>
+    } else {
+        <BarChart @ref="barChart" Width="500" Height="300" />
+    }
+</div>
+
+
+@code {
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+    private List<IChartDataset> chartDataSets = default!;
+    private List<string> dataLabels = default!;
+
+    private bool isEmpty = false;
+    protected override  async Task OnInitializedAsync()
+    {
+        
+        dataLabels =  Enum.GetNames(typeof(TipoEmbarcacion)).ToList() ?? new();
+        chartDataSets = await GetDataSets();
+        chartData = new ChartData { Labels = dataLabels, Datasets = chartDataSets };
+     
+        barChartOptions = new BarChartOptions();
+        barChartOptions.Responsive = true;
+        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
+        barChartOptions.IndexAxis = "x";
+       
+        await barChart.InitializeAsync(chartData, barChartOptions);
+       
+    }
+
+
+
+
+    #region Data Preparation
+
+    private async Task<List<IChartDataset>> GetDataSets()
+    {
+        var sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales");
+                    
+        var datasets = new List<IChartDataset>();
+        var vacio = true;
+        foreach (Sucursal sucursal in sucursales ?? new())
+        {
+
+            var respSV = await HttpClient.PostAsJsonAsync("api/Reportes/GetReportenaviosDeudoresSucursal", sucursal);
+            if (respSV.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var dataList = await respSV.Content.ReadFromJsonAsync<List<double>>() ?? new();
+                vacio = vacio && dataList.All(d => d==0d);
+                datasets.Add(
+                    new BarChartDataset() {
+                        Label = sucursal.NombreSuck,
+                        Data = dataList,
+                    }
+                );
+            }
+        }
+        isEmpty = vacio;
+        return datasets;
+    }
+
+    #endregion  Data Preparation
+}
