@@ -193,8 +193,11 @@
         }
 
     }
-    private async Task IgnorarDenuncias() {        
-        await hideModal();
-        StateHasChanged();
+    private async Task IgnorarDenuncias() {
+        var responseSV = await HttpClient.PostAsJsonAsync("api/Denuncias/EliminarDenunciasNavio",Navio); 
+        if(!responseSV.IsSuccessStatusCode){
+            await JsRuntime.InvokeVoidAsync("alert","No se encontraron las denuncias a eliminar");
+        }
+        await OnClickCallback.InvokeAsync();
     }
 }
