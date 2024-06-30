@@ -98,9 +98,9 @@
             var resp = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/ReportarNaviosMasUsados", rango);
             if (resp.IsSuccessStatusCode)
             {
-                papaya = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();       
-
-                foreach(var coso in papaya)
+                papaya = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+                
+                foreach (var coso in papaya.OrderByDescending(ccccccccc => ccccccccc.Value))
                 {
                     labels.Add(coso.Key);
                     datos.Add(coso.Value);
