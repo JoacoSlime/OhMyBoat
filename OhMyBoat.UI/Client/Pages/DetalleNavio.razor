@@ -42,7 +42,9 @@
                         @if (!isSameClient) {
                             <div class="d-flex justify-content-end">
                             <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            <Button Color="ButtonColor.Warning" @onclick="()=>DenunciarPublicacion()" > Denunciar publicacion </Button>
                             </div>
+
                         }
                     </Authorized>
                 </AuthorizeView>
@@ -67,7 +69,8 @@
     </Authorized>
 </AuthorizeView>
 
-@code {
+@code 
+{
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
     [Parameter] public int Id { get; set; }
     public Maritimo Navio {get; set;} = new();
@@ -134,7 +137,20 @@
 
     }
 
-    private async Task EnviarOferta()
+    private async Task DenunciarPublicacion()
+    {
+        Denuncia denuncia = new Denuncia(){ VehiculoId = Navio.Id , EsNavio = true, ClienteId = Dueño.Id};
+        var responseSV = await HttpClient.PostAsJsonAsync<Denuncia>("api/denuncia/CargarDenuncia", denuncia); 
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "usted ya denunció esta publicación");
+            return;            
+        }
+        await JsRuntime.InvokeVoidAsync("alert", "“Oh My Boat!” investigará su denuncia");        
+    }
+
+      private async Task EnviarOferta()
+
     {
         var parameters = new Dictionary<string, object>();           
         parameters.Add("vehiculoOfertado" , Navio);     
