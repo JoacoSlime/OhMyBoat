@@ -1,0 +1,83 @@
+@page "/admin/reports"
+
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject NavigationManager Navegador
+@attribute [Authorize]
+
+<AuthorizeView Roles="jefe">
+    <Authorized>
+        <h1>Reportes</h1>
+        <Tabs EnableFadeEffect="true" NavStyle="NavStyle.VerticalPills" class="border rounded ms-3 me-3 p-3">
+            <Tab title="Vehiculo más usados en trueques">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteVehiculoUsado/>
+                    </div>
+                </Content>
+            </Tab>
+            <Tab title="Navios más usados en trueques">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteNaviosUsados/>
+                    </div>
+                </Content>
+            </Tab>
+            <Tab title="Tipo de embarcaciones deudoras">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteEmbarcacionesDeudoras/>
+                    </div>
+                </Content>
+            </Tab>
+            <Tab title="Tipo de embarcaciones registradas">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteTipoDeEmbarcacion/>
+                    </div>
+                </Content>
+            </Tab>
+            <Tab title="Tipo de vehículos registrados">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteTipoDeVehiculo/>
+                    </div>
+                </Content>
+            </Tab>
+            <Tab title="Clientes según sus trueques">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteClientes/>
+                    </div>
+                </Content>
+            </Tab>
+            <Tab title="Trueques conclusos e inconclusos">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteTrueques/>
+                    </div>
+                </Content>
+            </Tab>
+            <Tab title="Navios con deuda por sucursal">
+                <Content>
+                    <div class="d-flex border rounded ms-3 me-3 p-3">
+                        <ReporteNaviosDeuda/>
+                    </div>
+                </Content>
+            </Tab>
+        </Tabs>
+    </Authorized>
+    <NotAuthorized>
+        @{Navegador.NavigateTo("/");}
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    // No hay nada acá pa'
+}
