@@ -1,0 +1,71 @@
+@inject HttpClient HttpClient
+@using OhMyBoat.UI.Client.Extensions
+@using OhMyBoat.UI.Shared
+@using OhMyBoat.UI.Shared.Entidades
+@inject IJSRuntime JsRuntime
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject NavigationManager Navegador
+
+<div>
+    @if (NoHayTerrestres) {
+        <h2>No se pudo realizar el informe</h2>
+        <p>No hay vehículos terrestres registrados.</p>
+    } else {
+        <PieChart @ref="pieChart" Width="500" Class="mb-5" />
+    }
+</div>
+
+@code {
+    private PieChart pieChart = default!;
+    private PieChartOptions pieChartOptions = default!;
+    private ChartData chartData = default!;
+    private string[]? backgroundColors;
+    private List<IChartDataset> chartDataSets = default!;
+    private bool NoHayTerrestres = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        chartDataSets = await GetDataSets();
+        backgroundColors = ColorUtility.CategoricalTwelveColors;
+        chartData = new ChartData { Labels = GetDataLabels(), Datasets = chartDataSets };
+
+        pieChartOptions = new();
+        pieChartOptions.Responsive = true;
+        pieChartOptions.Plugins.Legend.Position = "right";
+        await pieChart.InitializeAsync(chartData, pieChartOptions);
+    }
+
+    #region Data Preparation
+
+    private async Task<List<IChartDataset>> GetDataSets()
+    {
+        var datasets = new List<IChartDataset>();
+        var dataList = await HttpClient.GetFromJsonAsync<List<double>>("api/Reportes/GetReporteTipoDeTerrestre") ?? new();
+        NoHayTerrestres = dataList.All(d => d==0d);
+        datasets.Add(
+            new PieChartDataset() {
+                Label = "data",
+                Data = dataList,
+            }
+        );
+        return datasets;
+    }
+
+    private List<string> GetDataLabels()
+    {
+        return Enum.GetNames(typeof(TipoVehiculo)).ToList();
+    }
+
+    private List<string> GetRandomDataBackgroundColor() {
+        var colors = new List<string>();
+        for (var index = 0; index < GetDataLabels().Count(); index++)
+        {
+            colors.Add(backgroundColors![index]);
+        }
+        return colors;
+    }
+
+    #endregion  Data Preparation
+}

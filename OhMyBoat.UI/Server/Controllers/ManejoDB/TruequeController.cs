@@ -70,7 +70,7 @@ namespace OhMyBoat.UI.Server.Controllers
 
                 Sucursal? suck = await db.Sucursales.Where(s => s.Id == idSuck).FirstOrDefaultAsync();
 
-                reportesito.Sucursal = suck?.NombreSuck ?? "La Pampa";
+                reportesito.Sucursal = suck?.NombreSuck ?? "Punta indio";
                 reportes.Add(reportesito);
 
             }

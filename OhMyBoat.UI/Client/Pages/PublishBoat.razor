@@ -43,6 +43,13 @@
             <option>Lancha</option>
         </select>
     </div>
+    <div class="mb-3">
+        <label class="form-label"><h3>Elegir Sucursal ( seleccionada : @(sucursalElegida == null ? "no hay sucursal seleccionada" : sucursalElegida.NombreSuck))</h3></label>
+        @foreach (Sucursal suc in sucursales?? new())
+        {
+            <button class="me-2 btn btn-primary" @onclick="()=>{sucursalElegida=suc;}"> @suc.NombreSuck</button>
+        }
+    </div>
 
     <div class="mb-3">
         <label class="form-label" for="fecha de nacimiento"><h3>Antiguedad del navío (Años)</h3></label>
@@ -87,8 +94,11 @@
     [Required]
     public float? Manga { get; set; }   
     public float? Deuda { get; set; } 
-    
+    private Sucursal? sucursalElegida = null;
     private string descripcion { get; set; } = "";
+
+    private List<Sucursal>? sucursales;
+
     [Required]
     private TipoEmbarcacion tipoNav { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
@@ -111,6 +121,7 @@
     {
         Auth = await authStateProvider.GetAuthenticationStateAsync();
         Email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales");
     }
 
     private bool IsLong(string Patente)
@@ -187,11 +198,17 @@
             await JsRuntime.InvokeVoidAsync("alert", "La imagen que cargo tiene un formato no soportado, asegurese que el formato sea \".png\" o \".jpg\"  ");
             return;
         }
+        if (sucursalElegida == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Se necesita saber en que sucursal se encuentra el navio");
+            return;
+        }
 
 
 
         Maritimo nav = new Maritimo()
             {
+                SucursalId = this.sucursalElegida?.Id ?? 1,
                 Matricula = this.matricula,
                 Antiguedad = this.antiguedad??0,
                 descripcion = this.descripcion,
