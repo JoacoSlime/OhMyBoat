@@ -17,7 +17,8 @@
     @if(ReporteTrueques.Count() == 0){
         <h4> No hay trueques </h4>
     }else{
-
+        <Card Style="min-width:fit-content; ">
+           <CardBody>
             <Grid @ref="grid"
                 TItem="ReporteTrueque"
                 Class="table table-hover table-bordered table-striped"
@@ -25,10 +26,12 @@
                 AllowFiltering="true"
                 PageSize="10"
                 Responsive="true"
-                AllowSorting="true">
+                AllowSorting="true"
+                HeaderRowCssClass="bg-secondary text-white border-bottom-0"
+                FiltersRowCssClass="bg-secondary text-white bg-opacity-25 border-bottom-0">
 
                 <GridColumn TItem="ReporteTrueque" HeaderText="Fecha del turno" PropertyName="FechaTurno" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.FechaTurno)">
-                    @context.FechaTurno.ToString("yyyy/MM/dd hh:mm")
+                    @context.FechaTurno.ToString("yyyy/MM/dd HH:mm")
                 </GridColumn>
                     <GridColumn TItem="ReporteTrueque" HeaderText="Sede" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" PropertyName="Sucursal" SortKeySelector="@(item => item.Sucursal)">
                     @context.Sucursal
@@ -68,9 +71,10 @@
                 </div>
                 </GridColumn>
         </Grid>
+       
+        </CardBody>
+        </Card>
     }
-
-
 
 </div>
     </Authorized>
@@ -84,11 +88,21 @@
 
     private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
     private List<ReporteTrueque> ReporteTrueques = new();
+    private Modal DetalleModal = default!;
 
-    private void verDetalle(ReporteTrueque reporte)
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
 
-    {
+    private async Task verDetalle(ReporteTrueque reporte) {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+        parameters.Add("Reporte", reporte);
+        await DetalleModal.ShowAsync<DetalleTrueque>(title: "Detalles", parameters: parameters);
+
         // aca haces lo del modal y tenes todos los datos que se te canten desde reporte, un salu2
+
     }
 
     protected override async Task OnInitializedAsync()

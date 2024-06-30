@@ -240,15 +240,6 @@ namespace OhMyBoat.UI.Server.Controllers
                              return StatusCode(StatusCodes.Status200OK);
                     }
                 }
-                /*
-                else
-                {
-                    trueque.Concreto = false;
-                    db.Update(trueque);
-                    await db.SaveChangesAsync();
-                    return StatusCode(StatusCodes.Status200OK);
-                }
-               
                         
                     
             }
