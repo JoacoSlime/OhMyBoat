@@ -59,6 +59,11 @@
                     </Authorized>
                 </AuthorizeView>
         </div>
+        <AuthorizeView Roles="jefe" Context="blockContext">
+            <Authorized Context="blockContext">
+                <Button Color="ButtonColor.Danger" @onclick="(async() => await BloquearUsuario(Dueño))">Bloquear Usuario</Button>
+            </Authorized>
+        </AuthorizeView>
     </Authorized>
 </AuthorizeView>
 
@@ -68,8 +73,6 @@
     public Maritimo Navio {get; set;} = new();
     public Cliente Dueño {get; set;} = new();
     [Parameter] public Modal modal { get; set; } = default!;
-
-
 
     public String deuda {get; set;} = "";
     public bool isSameClient = true;
@@ -124,24 +127,36 @@
         cantidadDenuncias = await responseSV.Content.ReadFromJsonAsync<int>();
     }
 
-
-    private async Task hideModal(){
+    private async Task hideModal()
+    {
         await modal.ShowAsync();
         await modal.HideAsync();
        
     }
 
-        private async Task EnviarOferta()
+    private async Task EnviarOferta()
     {
-
         var parameters = new Dictionary<string, object>();           
             parameters.Add("vehiculoOfertado" , Navio);     
             parameters.Add("OnClickCallback",EventCallback.Factory.Create<MouseEventArgs>(this, hideModal)); 
         
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
-
-    private async Task BloquearUsuario() {
+    
+    private async Task BloquearUsuario(Cliente dueño)
+    {
+        if (dueño.Bloqueado){
+            await JsRuntime.InvokeVoidAsync("alert", "Este usuario ya se encuentra bloqueado.");
+        } else {
+            var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", dueño);
+            if (RespuestaSV.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+                await JsRuntime.InvokeVoidAsync("alert", "El usuario ha sido bloqueado.");
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
+            }
+        }
 
     }
     private async Task EliminarPublicacion() {

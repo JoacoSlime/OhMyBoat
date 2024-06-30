@@ -58,8 +58,14 @@
                     </Authorized>
                 </AuthorizeView>
         </div>
+        <AuthorizeView Roles="jefe" Context="blockContext">
+            <Authorized Context="blockContext">
+                <Button Color="ButtonColor.Danger" @onclick="(async() => await BloquearUsuario(Dueño))">Bloquear Usuario</Button>
+            </Authorized>
+        </AuthorizeView>
     </Authorized>
 </AuthorizeView>
+
 
 @code {
     [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
@@ -119,9 +125,20 @@
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 
-    private async Task BloquearUsuario() {
-
-    }
+    private async Task BloquearUsuario(Cliente dueño)
+    {
+        if (dueño.Bloqueado){
+            await JsRuntime.InvokeVoidAsync("alert", "Este usuario ya se encuentra bloqueado.");
+        } else {
+            var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", dueño);
+            if (RespuestaSV.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+                await JsRuntime.InvokeVoidAsync("alert", "El usuario ha sido bloqueado.");
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
+            }
+        }
     private async Task EliminarPublicacion() {
         
     }
