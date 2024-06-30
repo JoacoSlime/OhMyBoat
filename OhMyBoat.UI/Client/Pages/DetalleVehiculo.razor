@@ -120,9 +120,9 @@
     private async Task EnviarOferta()
     {
         var parameters = new Dictionary<string, object>();
-        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
-        parameters.Add("vehiculoOfertado" , Vehiculo);      
-        await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
+            parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+            parameters.Add("vehiculoOfertado" , Vehiculo);      
+            await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 
     private async Task BloquearUsuario(Cliente dueño)
