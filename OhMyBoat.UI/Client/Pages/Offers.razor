@@ -26,7 +26,7 @@ else
     {
         <p>Usted no tiene vehiculos por favor haga click en "Cerrar" para continuar.</p>
         <CardFooter class="text-end">
-        <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>NoHayVehiculos()">Cerrar</Button>
+        <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>NoHayVehiculos()">Cerrar</Button>
          </CardFooter>       
     }
     else
@@ -58,7 +58,7 @@ else
                 <CardText>@nav.Antiguedad</CardText>
             </CardBody>
             <CardFooter class="text-end">
-                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success"
+                <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success"
                 @onclick="()=>OnClick(nav.Id, true)">Ofertar Navio</Button>
             </CardFooter>
         </Card>
@@ -79,7 +79,7 @@ else
                 <CardText>@vec.Antiguedad</CardText>
             </CardBody>
             <CardFooter class="text-end">
-                <Button Size="Size.ExtraLarge" Color="ButtonColor.Success"
+                <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success"
                     @onclick="()=>OnClickVehiculo(vec.Id)">Ofertar Vehiculo</Button>
             </CardFooter>
         </Card>
