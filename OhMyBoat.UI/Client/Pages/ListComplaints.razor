@@ -1,0 +1,103 @@
+﻿@page "/admin/complaints"
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@using System.Security.Cryptography
+@using System.Text
+@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
+@attribute [Authorize(Roles = "jefe")]
+
+<Modal @ref="modal" Size="ModalSize.ExtraLarge"/>
+
+<AuthorizeView Context="cremoso">
+    <Authorized Context="cremoso">
+        @if(denuncias.Count>=1){
+            <Card Style="min-width:fit-content; ">
+                <CardBody>
+                    <Grid @ref="grid"
+                          TItem="DenunciasDTO"
+                          Class="mb-0 table table-hover table-striped"
+                          Data="denuncias"
+                          AllowFiltering="true"
+                          PageSize="10"
+                          Responsive="true"
+                          AllowSorting="true"
+                          HeaderRowCssClass="bg-secondary text-white border-bottom-0"
+                          FiltersRowCssClass="bg-secondary text-white bg-opacity-25 border-bottom-0">
+                
+                            <GridColumn TItem="DenunciasDTO" Filterable="false"  HeaderText="Id Vehiculo" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
+                            @context.VehiculoId
+                        </GridColumn>
+
+                        <GridColumn TItem="DenunciasDTO" HeaderText="Tipo Vehiculo" PropertyName="EsNavio" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.EsNavio)">
+                            @(context.EsNavio?"Maritimo":"Terrestre")                   
+                        </GridColumn>
+
+                        <GridColumn TItem="DenunciasDTO" HeaderText="Cantidad de denuncias" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" IsDefaultSortColumn="true" PropertyName="Cantidad" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.Cantidad)">
+                            @context.Cantidad
+                        </GridColumn>
+
+                            <GridColumn TItem="DenunciasDTO" Filterable="false" HeaderText="Detalles" PropertyName="IdVehiculo" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" SortDirection="SortDirection.Descending" SortKeySelector="@(item => item.VehiculoId)">
+                            <button @onclick="() => VerDetalle(context.VehiculoId,context.EsNavio)" class="btn btn-primary">Ver Detalle</button>
+                        </GridColumn>
+                
+                    </Grid>
+                </CardBody>
+            </Card>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                <strong>Oh My Boat!</strong>, parece ser que no hay denuncias en el sitio</div>
+        }
+
+       
+    </Authorized>
+    <NotAuthorized Context="cremoso">
+        <p>Nuh uh.</p>
+        @{
+            Navegador.NavigateTo("/");
+        }
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    private BlazorBootstrap.Grid<DenunciasDTO> grid = default!;
+    private List<DenunciasDTO> denuncias = new();
+    private Modal modal = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ListarDenuncias();
+    }
+    private async Task ListarDenuncias(){
+        denuncias = await HttpClient.GetFromJsonAsync<List<DenunciasDTO>>("api/denuncias/GetDenuncias") ?? new();
+    }
+
+    private async Task VerDetalle(int idVehiculo,bool esNavio)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, HideModalAsync));
+        parameters.Add("Id", idVehiculo);
+        if(esNavio) {
+            await modal.ShowAsync<DetalleNavio>(title: "Oferta denunciada", parameters: parameters);
+        } else {
+            await modal.ShowAsync<DetalleVehiculo>(title: "Oferta denunciada", parameters: parameters);
+        }
+    }
+
+    private async Task HideModalAsync() {
+        await modal.ShowAsync();
+        await modal.HideAsync();
+        await ListarDenuncias();
+        StateHasChanged();
+    }
+
+
+   
+}

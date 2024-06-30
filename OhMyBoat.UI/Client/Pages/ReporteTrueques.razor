@@ -1,0 +1,176 @@
+@using OhMyBoat.UI.Shared.Entidades;
+@using OhMyBoat.UI.Shared;
+@using Microsoft.JSInterop;
+@using System;
+@using System.Security.Cryptography
+@using System.Text
+@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+@inject IJSRuntime JsRuntime;
+@inject HttpClient HttpClient;
+@inject NavigationManager Navegador;
+
+<div class="mb-6">
+    <strong>Ingrese un rango de fechas para buscar la proporción de trueques inconclusos de cada sede</strong>
+    <br>
+    <div class="mb-3">
+        <strong>Fecha Inicial</strong>:
+        <DateInput TValue="DateOnly" @bind-Value="@FechaInicio" EnableMinMax="true" Max="@FechaFin" Placeholder="Enter Date" />
+    </div>
+    <br>
+    <div class="mb-3">
+        <strong>Fecha final</strong>:
+        <DateInput TValue="DateOnly" @bind-Value="@FechaFin" EnableMinMax="true" Max="@FechaHoy" Placeholder="Enter Date" />
+    </div>
+    <br>
+
+    @if (error) {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh My Boat!</strong>, así no funcionan los rangos, ingrese una fecha de inicio menor a la fecha de fin.
+        </div>
+        <br>
+    }
+
+    <div>
+        <Button @onclick="async () => await traerDatos()" Color="ButtonColor.Primary">Generar reporte</Button>
+    </div>
+
+    <br>
+    @if (TrajeDatos) {
+        @if (HayInconclusos) {
+            <div>
+                <BarChart @ref="barChart" Width="500" Height="300"/>
+                <br>
+                <div class="alert alert-info" role="alert">
+                    @foreach (var elemento in DiccionarioInconclusos) {                    
+                       <span>@elemento.Key  :  @elemento.Value</span>
+                       <br>
+                    }
+                </div>
+            </div>
+        } else {
+            <div class="alert alert-info" role="alert">
+                <strong>Oh My Boat!</strong> No hay trueques inconclusos registrados en este rango de fechas.
+            </div>
+        }
+        @if (HayConcretados) {
+            <div>
+                <BarChart @ref="barChart" Width="500" Height="300"/>
+                <br>
+                <div class="alert alert-info" role="alert">
+                    @foreach (var elemento in DiccionarioConcretados) {                    
+                        <span>@elemento.Key  :  @elemento.Value</span>
+                        <br>
+                    }
+                </div>
+            </div>
+        } else {
+            <div class="alert alert-info" role="alert">
+                <strong>Oh My Boat!</strong> No hay trueques concretados registrados en este rango de fechas.
+            </div>
+        }
+    } else {
+        <div class="alert alert-info" role="alert">
+            <strong>Oh My Boat!</strong> No hay trueques registrados en este rango de fechas.
+        </div>
+    }
+</div>
+
+@code {
+    private DateOnly FechaInicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+    private DateOnly FechaFin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+    private DateOnly FechaHoy = DateOnly.FromDateTime(DateTime.Now);
+    private bool TrajeDatos, HayInconclusos, HayConcretados = false;
+    private bool error = false;
+
+    private Dictionary<String, int> DiccionarioInconclusos = new();
+    private Dictionary<String, int> DiccionarioConcretados = new();
+
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+
+   private async Task traerDatos()
+    {
+        RangoDTO rango = new RangoDTO() { inicio = FechaInicio, fin = FechaFin };
+
+        var labels = new List<string>();
+        var datos = new List<double>();
+        var datasets = new List<IChartDataset>();
+
+        if (FechaInicio <= FechaFin && FechaFin <= FechaHoy) {
+
+            error = false;
+
+            var resp = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/TruequesInconclusosPorSede", rango);
+            
+            if (resp.IsSuccessStatusCode) {
+
+                DiccionarioInconclusos = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+                
+                foreach (var tupla in DiccionarioInconclusos.OrderByDescending(d => d.Value)) {
+                    labels.Add(tupla.Key);
+                    datos.Add(tupla.Value);
+                }
+
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
+            }
+
+            var resp_2 = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/TruequesConcretadosPorSede", rango);
+            
+            if (resp_2.IsSuccessStatusCode) {
+
+                DiccionarioConcretados = await resp_2.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
+                
+                foreach (var tupla in DiccionarioConcretados.OrderByDescending(d => d.Value)) {
+                    labels.Add(tupla.Key);
+                    datos.Add(tupla.Value);
+                }
+                
+            } else {
+                await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
+            }
+
+            TrajeDatos = true;
+            HayInconclusos = !DiccionarioInconclusos.All(c => c.Value == 0);
+            HayConcretados = !DiccionarioConcretados.All(c => c.Value == 0);
+            StateHasChanged();
+
+        } else {
+        
+            HayInconclusos = false;
+            HayConcretados = false;
+            TrajeDatos = false;
+            error = true;
+        }
+
+        var dataset1 = new BarChartDataset()
+        {
+                Data = datos,
+                BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BorderWidth = new List<double> { 0 },
+            };
+
+        datasets.Add(dataset1);
+
+        chartData = new ChartData { Labels = labels, Datasets = datasets };
+
+        barChartOptions = new BarChartOptions();
+        barChartOptions.Responsive = true;
+        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Y };
+        barChartOptions.IndexAxis = "y";
+
+        barChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = "Cantidad Trueques Inconclusos", Display = true };
+        barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Sedes", Display = true };
+
+        barChartOptions.Plugins.Legend.Display = false;
+  
+        await barChart.InitializeAsync(chartData, barChartOptions);
+        await barChart.UpdateAsync(chartData, barChartOptions);    
+
+    }
+
+}

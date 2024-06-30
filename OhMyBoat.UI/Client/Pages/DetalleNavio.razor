@@ -37,15 +37,27 @@
                     <li><h3>Descripcion:</h3> <div class="border rounded p-3 mb-3">@Navio.descripcion</div></li>
                 </ul>
             </div>
-            <div class="d-flex justify-content-end">
                 <AuthorizeView Roles="cliente" Context="clientContext">
                     <Authorized Context="clientContext">
                         @if (!isSameClient) {
-                            <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            <div class="d-flex justify-content-end">
+                            <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            </div>
                         }
                     </Authorized>
                 </AuthorizeView>
-            </div>
+                <AuthorizeView Roles="jefe" Context="adminContext">
+                    <Authorized Context="adminContext">
+                        <div class="d-flex flex-row justify-content-between align-items-center text-center">
+                            <h3>Cantidad de denuncias: @cantidadDenuncias</h3>
+                            <div>
+                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Danger" @onclick="async ()=> await BloquearUsuario()">Bloquear usuario</Button>
+                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Warning" @onclick="async ()=> await EliminarPublicacion()">Eliminar publicación</Button>
+                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Primary" @onclick="async ()=> await IgnorarDenuncias()">Ignorar denuncias</Button>
+                            </div>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
         </div>
     </Authorized>
 </AuthorizeView>
@@ -61,6 +73,7 @@
 
     public String deuda {get; set;} = "";
     public bool isSameClient = true;
+    private int cantidadDenuncias = 0;
 
 
     protected override async Task OnParametersSetAsync() {
@@ -103,6 +116,12 @@
         var nuevoU = await HttpClient.PostAsJsonAsync<LoginDTO>("api/usuario/ObtenerUsuario", log); // ver ese coso
         var user = await nuevoU.Content.ReadFromJsonAsync<Usuario>();
         isSameClient = Dueño.Id == user?.Id;
+
+        responseSV = await HttpClient.PostAsJsonAsync("api/Denuncias/GetCantidadDenunciasNavio", Navio) ?? new();
+        if(!responseSV.IsSuccessStatusCode) {
+            await JsRuntime.InvokeVoidAsync("alert", "Esto no debería de explotar,\nen serio, es imposible.");
+        }
+        cantidadDenuncias = await responseSV.Content.ReadFromJsonAsync<int>();
     }
 
 
@@ -120,5 +139,15 @@
             parameters.Add("OnClickCallback",EventCallback.Factory.Create<MouseEventArgs>(this, hideModal)); 
         
         await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
+    }
+
+    private async Task BloquearUsuario() {
+
+    }
+    private async Task EliminarPublicacion() {
+        
+    }
+    private async Task IgnorarDenuncias() {
+        
     }
 }
