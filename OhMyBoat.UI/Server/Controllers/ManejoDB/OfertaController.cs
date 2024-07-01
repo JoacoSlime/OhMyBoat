@@ -32,14 +32,15 @@ namespace OhMyBoat.UI.Server.Controllers
         }
 
         [HttpPost]
-        [Route("EliminarOferta")]
-        public async Task<IActionResult> EliminarOferta([FromBody] Oferta o)
+        [Route("CancelarOferta")]
+        public async Task<IActionResult> CancelarOferta([FromBody] Oferta o)
         {
             using var db = new OhMyBoatUIServerContext();
             var cli = db.Usuarios.Where(cli => cli.Email == o.ID_RecibeOferta).FirstAsync();
         if (cli != null)
             {
-                db.Ofertas.Remove(o);
+                o.EstadoOferta = EstadoOferta.Cancelada;
+                db.Ofertas.Update(o);
                 await db.SaveChangesAsync();
                 return StatusCode(StatusCodes.Status200OK, o);
             }
@@ -137,8 +138,8 @@ namespace OhMyBoat.UI.Server.Controllers
         [Route ("RechazarOferta")]
         public async Task<IActionResult> RechazarOferta([FromBody] Oferta o){
             using var bd = new OhMyBoatUIServerContext();
-            Oferta? offer = await bd.Ofertas.Where( of => of.Id == o.Id).FirstOrDefaultAsync();
-            if (offer != null) {
+            var offer = await bd.Ofertas.Where( of => of.Id == o.Id).FirstOrDefaultAsync();
+            if (offer != null) {    
                 offer.EstadoOferta = EstadoOferta.Rechazada;
                 bd.Ofertas.Update(offer);
                 await bd.SaveChangesAsync();
@@ -153,15 +154,23 @@ namespace OhMyBoat.UI.Server.Controllers
         public async Task<IActionResult> chekearExsiste([FromBody] Oferta o)
         {
             using var db = new OhMyBoatUIServerContext();
-            Oferta? offer = await db.Ofertas.Where
-                (of =>of.EstadoOferta != (EstadoOferta.Enviada) && ((of.ID_VehiculoEnviaOferta == o.ID_VehiculoEnviaOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoRecibeOferta) ||
-                (of.ID_VehiculoEnviaOferta == o.ID_VehiculoRecibeOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoEnviaOferta )))
+            var offer = await db.Ofertas.Where
+                (
+                    // of =>of.EstadoOferta != (EstadoOferta.Enviada) && ((of.ID_VehiculoEnviaOferta == o.ID_VehiculoEnviaOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoRecibeOferta) || (of.ID_VehiculoEnviaOferta == o.ID_VehiculoRecibeOferta && of.ID_VehiculoRecibeOferta == o.ID_VehiculoEnviaOferta )) ONE-LINER ORIGINAL
+
+                    of => (of.EstadoOferta != EstadoOferta.Rechazada || of.EstadoOferta != EstadoOferta.Cancelada || of.EstadoOferta != EstadoOferta.Concretada || of.EstadoOferta != EstadoOferta.Inconclusa) // SI LA OFERTA ESTA PENDIENTE
+                    && (
+                        (of.ID_VehiculoEnviaOferta == o.ID_VehiculoEnviaOferta && of.EsNavioEnvia == o.EsNavioEnvia && of.ID_VehiculoRecibeOferta == o.ID_VehiculoRecibeOferta && of.EsNavioRecibe == o.EsNavioRecibe) // Y ES IGUAL LA QUE SE VA A HACER
+                        ||
+                        (of.ID_VehiculoEnviaOferta == o.ID_VehiculoRecibeOferta && of.EsNavioEnvia == o.EsNavioRecibe && of.ID_VehiculoRecibeOferta == o.ID_VehiculoEnviaOferta && of.EsNavioRecibe == o.EsNavioEnvia) // O ESTÁ ESPEJADA
+                        )
+                )
                 .FirstOrDefaultAsync();
             if (offer != null)
             {
-                return StatusCode(StatusCodes.Status200OK, offer);
+                return StatusCode(StatusCodes.Status200OK, offer); // TONCE TA MAL.
             }
-            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null);
+            return StatusCode(StatusCodes.Status511NetworkAuthenticationRequired, null); // TINO TA BIEN
         }
 
     /*

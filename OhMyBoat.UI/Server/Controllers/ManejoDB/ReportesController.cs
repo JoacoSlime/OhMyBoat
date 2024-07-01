@@ -58,6 +58,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 dataList.Add(await db.Maritimos.Where(maritimo => maritimo.Tipo == tipo).CountAsync());
             }
             return StatusCode(StatusCodes.Status200OK, dataList);
+        }
 
         [HttpPost]
         [Route("TruequesInconclusosPorSede")]
@@ -166,6 +167,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             }
 
             return StatusCode(StatusCodes.Status200OK, diccionario);
+        }   
         [HttpPost]
         [Route("ReporteTruequesClientes")]
 
@@ -200,14 +202,17 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
 
         [HttpPost]
         [Route("ReportarNaviosMasUsados")]
-        private async Task<IActionResult> ReporteNaviosMasUsados([FromBody] RangoDTO rango)
+        public async Task<IActionResult> ReporteNaviosMasUsados([FromBody] RangoDTO rango)
         {
-            using var db = new OhMyBoatUIServerContext();
-            var turnosQueVan = await db.Turno.Where(t => DateOnly.FromDateTime(t.FechaTurno) >= rango.inicio && DateOnly.FromDateTime(t.FechaTurno) <= rango.fin).ToListAsync();
-            List<Oferta> ofertasFiltradas = new();
+            DateTime inicio = new DateTime(rango.inicio.Year, rango.inicio.Month, rango.inicio.Day);
+            DateTime fin = new DateTime(rango.fin.Year, rango.fin.Month, rango.fin.Day);
 
+            using var db = new OhMyBoatUIServerContext();
+            var turnosQueVan = await db.Turno.Where(turno => (turno.FechaTurno.Year > inicio.Year || (turno.FechaTurno.Year == inicio.Year && (turno.FechaTurno.Month > inicio.Month || (turno.FechaTurno.Month == inicio.Month && turno.FechaTurno.Day >= inicio.Day)))) &&
+            (turno.FechaTurno.Year < fin.Year || (turno.FechaTurno.Year == fin.Year && (turno.FechaTurno.Month < fin.Month || (turno.FechaTurno.Month == fin.Month && turno.FechaTurno.Day <= fin.Day))))).ToListAsync(); // este filtrado demencial lo tengo que hacer si o si porque sino el entity framework explota pq no puedo usar operadores de fechas ni llamar a una funcion, que paja
+            List<Oferta> ofertasFiltradas = new();
             var ofertasSinFiltrar = await db.Ofertas.Where(o => o.EstadoOferta == EstadoOferta.Concretada ||
-                                                          o.EstadoOferta == EstadoOferta.Inconclusa || o.EstadoOferta == EstadoOferta.Programada).ToListAsync();
+            o.EstadoOferta == EstadoOferta.Inconclusa || o.EstadoOferta == EstadoOferta.Programada).ToListAsync();
             if (ofertasSinFiltrar != null)
                 foreach (Turno t in turnosQueVan)
                 {
@@ -216,31 +221,38 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                         ofertasFiltradas.Add(o);
                 }
             Dictionary<String, int> diccionarioCremoso = new();
-            foreach(var t in Enum.GetNames(typeof(TipoEmbarcacion)))
+            foreach (var t in Enum.GetNames(typeof(TipoEmbarcacion))) // cambia aca moro por tipoVehiculo
             {
-                if(t!=null)
-                    diccionarioCremoso.Add(t,0);// agrego todo en 0
+                if (t != null)
+                    diccionarioCremoso.Add(t, 0);// agrego todo en 0
             }
 
             foreach (Oferta o in ofertasFiltradas)
             {
-                if (o.EsNavioEnvia)
+                if (o.EsNavioEnvia)  // tenes que cambiar esto por !esNavio y hacer las mismas consultas pero a la db de Terrestres
                 {
-                    Maritimo? si = await db.Maritimos.Where(m => m.Id == o.ID_VehiculoEnviaOferta).FirstOrDefaultAsync();
-                    if(si != null)
+                    Maritimo? si = await db.Maritimos.Where(m => m.Id == o.ID_VehiculoEnviaOferta).FirstOrDefaultAsync(); 
+                    if (si != null)
+                    {
+                        if (diccionarioCremoso.ContainsKey(si.Tipo.ToString()))
                         {
-                            if (diccionarioCremoso.ContainsKey(si.Tipo.ToString()))
-                            {
-
-                            }
+                            diccionarioCremoso[si.Tipo.ToString()] = diccionarioCremoso[si.Tipo.ToString()] + 1;
                         }
-                        
+                    }
                 }
-                if (o.EsNavioRecibe)
+                if (o.EsNavioRecibe)// tenes que cambiar esto por !esNavio y hacer las mismas consultas pero a la db de Terrestres
                 {
-
+                    Maritimo? si = await db.Maritimos.Where(m => m.Id == o.ID_VehiculoRecibeOferta).FirstOrDefaultAsync();
+                    if (si != null)
+                    {
+                        if (diccionarioCremoso.ContainsKey(si.Tipo.ToString()))
+                        {
+                            diccionarioCremoso[si.Tipo.ToString()] = diccionarioCremoso[si.Tipo.ToString()] + 1;
+                        }
+                    }
                 }
             }
+            return StatusCode(StatusCodes.Status200OK, diccionarioCremoso);
         }
     }
 }

@@ -42,29 +42,6 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
                 }
             }
         } 
-        private async Task<List<Turno>?> ObtenerTurnosReservados(DateTime dia, Sucursal suc)
-        {
-            using ( var db = new OhMyBoatUIServerContext())
-            {
-                return await db.Turno.Where(t => (t.OfertaId != null && t.SucursalId == suc.Id && t.FechaTurno.Year == dia.Year && t.FechaTurno.Month == dia.Month && t.FechaTurno.Day == dia.Day)).ToListAsync();          
-            }
-           // si no funciona hacer que esto devuelva null y listo            
-        }
-        private async Task<List<Turno>?> ObtenerTurnosDisponiblesSinReservados(List<Turno>todosLosTurnosDelDia, DateTime dia, Sucursal suc) 
-        {
-            var turnosReservados = await ObtenerTurnosReservados(dia, suc);
-            if(turnosReservados!= null)
-            {
-                foreach (Turno turnoReservado in turnosReservados)
-                {
-                    var posibleTurnoPisado = todosLosTurnosDelDia.Where(t => t.FechaTurno.Hour == turnoReservado.FechaTurno.Hour && t.FechaTurno.Minute == turnoReservado.FechaTurno.Minute).FirstOrDefault();
-                    if(posibleTurnoPisado != null)
-                            todosLosTurnosDelDia.Remove(posibleTurnoPisado); // pido los turnos ocupados del dia y voy sacando de a uno los turnos reservados
-                }                
-            }            
-            return todosLosTurnosDelDia;
-            
-        }
         private async Task <List<Turno>> obtenerTurnosDisponibles(DateTime dia, Sucursal suc) // 9am a 6pm los horarios de trabajo
         {
             return await Task.Run( () => {
@@ -179,7 +156,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         public async Task<IActionResult> Get()
         {
             using var db = new OhMyBoatUIServerContext();
-            var listTurnos = await db.Turno.Where( t => t.OfertaId != null).OrderBy(t => t.Id).ToListAsync();
+            var listTurnos = await db.Turno.OrderBy(t => t.Id).ToListAsync();
             return StatusCode(StatusCodes.Status200OK, listTurnos);
         }
         

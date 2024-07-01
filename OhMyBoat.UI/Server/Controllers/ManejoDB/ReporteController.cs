@@ -10,19 +10,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     [Route("api/reporte")]
     [ApiController]
     public class ReporteController : ControllerBase
-    {
-        [HttpGet]
-        [Route("a")]
-        public async Task<IActionResult> a()
-        {
-            return StatusCode(StatusCodes.Status200OK, new { gordas = "si porfavor", lama = "mentoplus" });
-        }
-
-        private bool pijaParaQueElEntityFrameworkNoTireExcepcion(DateTime turno, DateTime inicio, DateTime fin)
-        {
-            return true;
-        }
-
+    {   
         [HttpPost]
         [Route("ReporteCliente")]
         public async Task<IActionResult> reporteCliente([FromBody] RangoDTO rango)

@@ -40,7 +40,7 @@
                     <Authorized Context="clientContext">
                         @if (!isSameClient) {
                             <div class="d-flex justify-content-end">
-                            <Button Size="Size.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
+                            <Button class="me-3" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Success" @onclick="()=>EnviarOferta()"  >Hacer oferta</Button>
                             <Button Color="ButtonColor.Warning" @onclick="()=>DenunciarPublicacion()" > Denunciar publicacion </Button>
                             </div>
 
@@ -52,9 +52,9 @@
                         <div class="d-flex flex-row justify-content-between align-items-center text-center">
                             <h3>Cantidad de denuncias: @cantidadDenuncias</h3>
                             <div>
-                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Danger" @onclick="async ()=> await BloquearUsuario()">Bloquear usuario</Button>
-                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Warning" @onclick="async ()=> await EliminarPublicacion()">Eliminar publicación</Button>
-                                <Button Size="Size.ExtraLarge" Color="ButtonColor.Primary" @onclick="async ()=> await IgnorarDenuncias()">Ignorar denuncias</Button>
+                                <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Danger" @onclick="async ()=> await BloquearUsuario()">Bloquear usuario</Button>
+                                <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Warning" @onclick="async ()=> await EliminarPublicacion()">Eliminar publicación</Button>
+                                <Button Size="ButtonSize.ExtraLarge" Color="ButtonColor.Primary" @onclick="async ()=> await IgnorarDenuncias()">Ignorar denuncias</Button>
                             </div>
                         </div>
                     </Authorized>
@@ -62,7 +62,7 @@
         </div>
         <AuthorizeView Roles="jefe" Context="blockContext">
             <Authorized Context="blockContext">
-                <Button Color="ButtonColor.Danger" @onclick="(async() => await BloquearUsuario(Dueño))">Bloquear Usuario</Button>
+                <Button Color="ButtonColor.Danger" @onclick="(async() => await BloquearUsuario())">Bloquear Usuario</Button>
             </Authorized>
         </AuthorizeView>
     </Authorized>
@@ -137,12 +137,12 @@
             await modal.ShowAsync<Offers>(title: "Enviar Oferta", parameters: parameters);
     }
 
-    private async Task BloquearUsuario(Cliente dueño)
+    private async Task BloquearUsuario()
     {
-        if (dueño.Bloqueado){
+        if (Dueño.Bloqueado){
             await JsRuntime.InvokeVoidAsync("alert", "Este usuario ya se encuentra bloqueado.");
         } else {
-            var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", dueño);
+            var RespuestaSV = await HttpClient.PostAsJsonAsync("api/Cuenta/SwitchUserBlock", Dueño);
             if (RespuestaSV.IsSuccessStatusCode)
             {
                 StateHasChanged();
@@ -151,6 +151,7 @@
                 await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
             }
         }
+    }
     private async Task EliminarPublicacion() {
 
         DenunciasDTO merequetengue = new() { EsNavio = false, VehiculoId = Vehiculo.Id };
@@ -176,6 +177,6 @@
         if(!responseSV.IsSuccessStatusCode){
             await JsRuntime.InvokeVoidAsync("alert","No se encontraron las denuncias a eliminar");
         }
-        await OnClickCallback.InvokeAsync();}
+        await OnClickCallback.InvokeAsync();
     }
 }

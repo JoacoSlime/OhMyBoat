@@ -17,7 +17,7 @@
                 @if (Vehiculo_Enviado is Maritimo) {
                     Maritimo mar = Vehiculo_Enviado as Maritimo ?? new();
                         <div class="d-flex">
-                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                             <div class="d-flex flex-column">
                                 <h3>@mar.Tipo</h3>
                                 <h4 class="mb-5">@mar.Matricula</h4>
@@ -41,7 +41,7 @@
                 } else {
                     Terrestre ter = Vehiculo_Enviado as Terrestre ?? new();
                     <div class="d-flex">
-                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                         <div class="d-flex flex-column">
                             <h3>@ter.Tipo</h3>
                             <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
@@ -66,7 +66,7 @@
                 @if (Vehiculo_Recibido is Maritimo) {
                     Maritimo mar = Vehiculo_Recibido as Maritimo ?? new();
                         <div class="d-flex">
-                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                             <div class="d-flex flex-column">
                                 <h3>@mar.Tipo</h3>
                                 <h4 class="mb-5">@mar.Matricula</h4>
@@ -90,7 +90,7 @@
                 } else {
                     Terrestre ter = Vehiculo_Recibido as Terrestre ?? new();
                     <div class="d-flex">
-                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                         <div class="d-flex flex-column">
                             <h3>@ter.Tipo</h3>
                             <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
@@ -111,41 +111,47 @@
                     </div>
                 }
             </div>
-            @if (Oferta.EstadoOferta == (EstadoOferta.Aceptada)) {
-                <div class="d-flex flex-column border rounded mb-3">
-                @if (isReceiving) {
-                    @foreach (Turno turno in Turnos) {
-                        <div class="mb-3 p-2">
-                            <h3>A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
-                        </div>
-                    }
-                } else {
-                    @if (!hasTrueque){
-                        <h2>Seleccione el horario al que desea asistir:</h2>
-                        <div class="d-flex flex-column align-items-center justify-content-center">
+            @if (Oferta.EstadoOferta != EstadoOferta.Enviada ) {
+                @if (Oferta.EstadoOferta == EstadoOferta.Programada) {
+                    <div class="d-flex flex-column border rounded mb-3">
+                    @if (isReceiving) {
                         @foreach (Turno turno in Turnos) {
-                            <div class="mb-3 p-2">
-                                @if (turno.FechaTurno<DateTime.Today){
-                                    <Button Color="ButtonColor.Danger" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
-                                } else {
-                                    <Button Color="ButtonColor.Success" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
-                                }
+                            <div class="mb-3 p-2 d-flex justify-content-center align-content-center flex-column">
+                                <h2>Horario establecido:</h2> 
+                                <h3>A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
                             </div>
                         }
-                        <Button Color="ButtonColor.Primary" @onclick="async () => await Arreglar()">Arreglar por privado</Button>
-                        </div>
                     } else {
-                        <h2>Horario establecido:</h2> 
-                        <h3>A las @Turnos.First().FechaTurno.ToString("HH:mm") el @Turnos.First().FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
-
+                        @if (Oferta.EstadoOferta != EstadoOferta.Programada){
+                            <h2>Seleccione el horario al que desea asistir:</h2>
+                            <div class="d-flex flex-column align-items-center justify-content-center">
+                            @foreach (Turno turno in Turnos) {
+                                <div class="mb-3 p-2">
+                                    @if (turno.FechaTurno<DateTime.Today){
+                                        <Button Color="ButtonColor.Danger" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
+                                    } else {
+                                        <Button Color="ButtonColor.Success" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
+                                    }
+                                </div>
+                            }
+                            <Button Color="ButtonColor.Primary" @onclick="async () => await Arreglar()">Arreglar por privado</Button>
+                            </div>
+                        } else {
+                            <div class="mb-3 p-2 d-flex justify-content-center align-content-center flex-column">
+                                <h2>Horario establecido:</h2> 
+                                <h3>A las @Turnos.First().FechaTurno.ToString("HH:mm") el @Turnos.First().FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
+                            </div>
+                        }
                     }
+                    </div>
                 }
-                </div>
                 <div class="d-flex flex-row">
-                @if (isReceiving && !(isTruqueMade??false)) {
+                @if (isReceiving && (Oferta.EstadoOferta == EstadoOferta.Programada || (Oferta.EstadoOferta == EstadoOferta.Aceptada && Turnos.Count()>=0))) {
                      <Button @onclick="EditarHorario" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Primary">Editar Horarios</Button>
                 }
-                <Button class="ms-3" @onclick="CancelarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Danger">Cancelar Oferta</Button>
+                @if (Oferta.EstadoOferta == EstadoOferta.Aceptada || Oferta.EstadoOferta == EstadoOferta.Programada){
+                    <Button class="ms-3" @onclick="CancelarOferta" Size="ButtonSize.ExtraLarge" Color="ButtonColor.Danger">Cancelar Oferta</Button>
+                }
                 </div>
             } else {
                 @if (isReceiving) {
@@ -180,7 +186,7 @@
 
     protected override async Task OnParametersSetAsync() {
         Oferta.Id = Id_Oferta;
-        var responseSV = await HttpClient.PostAsJsonAsync<Oferta>("api/Oferta/GetOferta", Oferta) ?? new();
+        var responseSV = await HttpClient.PostAsJsonAsync<Oferta>("api/oferta/GetOferta", Oferta) ?? new();
         if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
             await JsRuntime.InvokeVoidAsync("alert", "El identificador de oferta es innexistente");
             await OnClickCallback.InvokeAsync();
@@ -276,7 +282,7 @@
                 Id = Oferta.Id,
             };
 
-        var responseamela = await HttpClient.PostAsJsonAsync("api/ofertas/GetOfertaVehiculos", oferta);
+        var responseamela = await HttpClient.PostAsJsonAsync("api/oferta/GetOfertaVehiculos", oferta);
         hasTrueque = responseamela.IsSuccessStatusCode;
         if (hasTrueque) {
             Oferta trueque = await responseamela.Content.ReadFromJsonAsync<Oferta>() ?? new();
@@ -284,8 +290,8 @@
         }
     }
 
-    async Task RechazarOferta() {
-        var responseSV = await HttpClient.PostAsJsonAsync("api/Oferta/EliminarOferta", Oferta);
+    async Task CancelarOferta() {
+        var responseSV = await HttpClient.PostAsJsonAsync("api/oferta/CancelarOferta", Oferta);
         await OnClickCallback.InvokeAsync();
     }
 
@@ -335,19 +341,14 @@
         }
     }
 
-    private async Task CancelarOferta() {
-
-            Oferta oferta;
-            oferta = new Oferta() {
-                Id = Oferta.Id,
-            };
-
-        var responseamela = await HttpClient.PostAsJsonAsync("api/ofertas/GetOfertaVehiculos", oferta);
-        if (responseamela.IsSuccessStatusCode) {
-            Oferta trueque = await responseamela.Content.ReadFromJsonAsync<Oferta>() ?? new();
-            var responseamela2 = await HttpClient.PostAsJsonAsync("api/ofertas/RechazarOferta", trueque);
+    private async Task RechazarOferta() {
+        var responseamela2 = await HttpClient.PostAsJsonAsync("api/oferta/RechazarOferta", Oferta);
+        if (responseamela2.IsSuccessStatusCode) {
+            await   JsRuntime.InvokeVoidAsync("alert", "Oferta rechazada con éxito");
+        } else {
+            await JsRuntime.InvokeVoidAsync("alert", "Fallo al rechazar la oferta.");
         }
-        await RechazarOferta();
+        StateHasChanged();
     }
 
     private async Task Arreglar() {

@@ -11,6 +11,7 @@ namespace OhMyBoat.UI.Shared.Entidades
         Enviada,
         Aceptada,
         Rechazada,
+        Cancelada,
         Programada,
         Concretada,
         Inconclusa,           

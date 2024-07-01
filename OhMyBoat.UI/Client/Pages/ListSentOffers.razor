@@ -29,13 +29,19 @@
                                             <span class="text-success">Aceptada</span>
                                         } else if(vo.Item1.EstadoOferta.Equals(EstadoOferta.Enviada)){
                                             <span class="text-warning">Pendiente</span>
+                                        } else if(vo.Item1.EstadoOferta.Equals(EstadoOferta.Cancelada)){
+                                            <span class="text-danger">Cancelada</span>
+                                        }
+                                        else if (vo.Item1.EstadoOferta.Equals(EstadoOferta.Rechazada))
+                                        {
+                                        <span class="text-danger">Rechazada</span>
                                         }
                                         else
                                         {
                                             <span class="text-info">@vo.Item1.EstadoOferta</span>
                                         }
                                         </h1>
-                                <Button Color="ButtonColor.Primary" Size="Size.Large" class="position-relative end-0" 
+                                <Button Color="ButtonColor.Primary" Size="ButtonSize.Large" class="position-relative end-0" 
                                     @onclick="(async () => await (VerOferta(vo.Item1)))">Ver detalle
                                 </Button>
                             </div>
