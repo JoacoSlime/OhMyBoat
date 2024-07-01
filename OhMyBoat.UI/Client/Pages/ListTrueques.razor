@@ -10,6 +10,8 @@
 @inject IJSRuntime JsRuntime
 @inject NavigationManager Navegador
 
+<Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.ExtraLarge" />
+
 <AuthorizeView Roles="jefe,empleado" Context="OuterContext">
     <Authorized Context="OuterContext">
 <div> 

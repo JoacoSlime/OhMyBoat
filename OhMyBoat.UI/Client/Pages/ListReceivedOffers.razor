@@ -230,7 +230,7 @@
             ofertante.Base64imagen = (ofertante.Base64imagen != "" ? ofertante.Base64imagen : "./user.png");
             VehiculosOfertas.Add((o, ofertante, recibe, envia));
         }
-
+        VehiculosOfertas = VehiculosOfertas.OrderBy(vo =>   (int) (vo.Item1.EstadoOferta)).ToList();
         StateHasChanged();
     }
 

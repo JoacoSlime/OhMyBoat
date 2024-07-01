@@ -31,7 +31,6 @@
         var sucursales = await HttpClient.GetFromJsonAsync<List<Sucursal>>("api/turnos/ObtenerSucursales");
         dataLabels = sucursales?.ConvertAll(s => s.NombreSuck) ?? new();
         chartDataSets = await GetDataSets();
-        backgroundColors = ColorUtility.CategoricalTwelveColors;
         chartData = new ChartData { Labels = dataLabels, Datasets = chartDataSets};
 
         pieChartOptions = new();
@@ -55,15 +54,6 @@
             }
         );
         return datasets;
-    }
-
-    private List<string> GetRandomDataBackgroundColor() {
-        var colors = new List<string>();
-        for (var index = 0; index < dataLabels.Count(); index++)
-        {
-            colors.Add(backgroundColors![index]);
-        }
-        return colors;
     }
 
     #endregion  Data Preparation

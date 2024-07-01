@@ -38,16 +38,17 @@
 
     <br>
     @if (TrajeDatos) {
-        @if (HayInconclusos) {
+        @if (HayInconclusos || HayConcretados) {
             <div>
-                <BarChart @ref="barChart" Width="500" Height="300"/>
-                <br>
-                <div class="alert alert-info" role="alert">
-                    @foreach (var elemento in DiccionarioInconclusos) {                    
-                       <span>@elemento.Key  :  @elemento.Value</span>
-                       <br>
-                    }
-                </div>
+            <BarChart @ref="barChart" Width="500" Height="300"/>
+            </div>
+        }
+        @if (HayInconclusos) {
+            <div class="alert alert-info" role="alert">
+                @foreach (var elemento in DiccionarioInconclusos) {                    
+                    <span>@elemento.Key  :  @elemento.Value</span>
+                    <br>
+                }
             </div>
         } else {
             <div class="alert alert-info" role="alert">
@@ -55,25 +56,17 @@
             </div>
         }
         @if (HayConcretados) {
-            <div>
-                <BarChart @ref="barChart" Width="500" Height="300"/>
-                <br>
-                <div class="alert alert-info" role="alert">
-                    @foreach (var elemento in DiccionarioConcretados) {                    
-                        <span>@elemento.Key  :  @elemento.Value</span>
-                        <br>
-                    }
-                </div>
+            <div class="alert alert-info" role="alert">
+                @foreach (var elemento in DiccionarioConcretados) {                    
+                    <span>@elemento.Key  :  @elemento.Value</span>
+                    <br>
+                }
             </div>
         } else {
             <div class="alert alert-info" role="alert">
                 <strong>Oh My Boat!</strong> No hay trueques concretados registrados en este rango de fechas.
             </div>
         }
-    } else {
-        <div class="alert alert-info" role="alert">
-            <strong>Oh My Boat!</strong> No hay trueques registrados en este rango de fechas.
-        </div>
     }
 </div>
 
@@ -81,7 +74,7 @@
     private DateOnly FechaInicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
     private DateOnly FechaFin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
     private DateOnly FechaHoy = DateOnly.FromDateTime(DateTime.Now);
-    private bool TrajeDatos, HayInconclusos, HayConcretados = false;
+    private bool TrajeDatos, HayInconclusos, HayConcretados = true;
     private bool error = false;
 
     private Dictionary<String, int> DiccionarioInconclusos = new();
@@ -91,44 +84,35 @@
     private BarChartOptions barChartOptions = default!;
     private ChartData chartData = default!;
 
-   private async Task traerDatos()
-    {
-        RangoDTO rango = new RangoDTO() { inicio = FechaInicio, fin = FechaFin };
 
-        var labels = new List<string>();
-        var datos = new List<double>();
-        var datasets = new List<IChartDataset>();
+    private async Task traerDatos()
+    {
+        List<IChartDataset> chartDataSets = default!;
+        List<string> dataLabels = default!;
+        RangoDTO rango = new RangoDTO() { inicio = FechaInicio, fin = FechaFin };
 
         if (FechaInicio <= FechaFin && FechaFin <= FechaHoy) {
 
             error = false;
 
             var resp = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/TruequesInconclusosPorSede", rango);
-            
-            if (resp.IsSuccessStatusCode) {
-
-                DiccionarioInconclusos = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
-                
-                foreach (var tupla in DiccionarioInconclusos.OrderByDescending(d => d.Value)) {
-                    labels.Add(tupla.Key);
-                    datos.Add(tupla.Value);
-                }
-
-            } else {
-                await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
-            }
-
             var resp_2 = await HttpClient.PostAsJsonAsync<RangoDTO>("api/reporte/TruequesConcretadosPorSede", rango);
             
-            if (resp_2.IsSuccessStatusCode) {
+            if (resp.IsSuccessStatusCode && resp_2.IsSuccessStatusCode) {
 
+                DiccionarioInconclusos = await resp.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
                 DiccionarioConcretados = await resp_2.Content.ReadFromJsonAsync<Dictionary<String, int>>() ?? new();
                 
-                foreach (var tupla in DiccionarioConcretados.OrderByDescending(d => d.Value)) {
-                    labels.Add(tupla.Key);
-                    datos.Add(tupla.Value);
+                foreach (var tupla in DiccionarioInconclusos.OrderByDescending(d => d.Value)) {
+                    dataLabels.Add(tupla.Key);
+                    chartDataSets.Add(
+                        new BarChartDataset() {
+                            Label = tupla.Key,
+                            Data = new List<double>() { tupla.Value, DiccionarioConcretados.GetValueOrDefault(tupla.Key) } 
+                        }
+                    );
                 }
-                
+
             } else {
                 await JsRuntime.InvokeVoidAsync("alert", $"Error : {resp.StatusCode}");
             }
@@ -146,31 +130,17 @@
             error = true;
         }
 
-        var dataset1 = new BarChartDataset()
-        {
-                Data = datos,
-                BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                BorderWidth = new List<double> { 0 },
-            };
-
-        datasets.Add(dataset1);
-
-        chartData = new ChartData { Labels = labels, Datasets = datasets };
-
+        chartData = new ChartData { Labels = dataLabels, Datasets = chartDataSets };
         barChartOptions = new BarChartOptions();
         barChartOptions.Responsive = true;
-        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Y };
-        barChartOptions.IndexAxis = "y";
-
+        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
+        barChartOptions.IndexAxis = "x";
         barChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = "Cantidad Trueques Inconclusos", Display = true };
         barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Sedes", Display = true };
 
         barChartOptions.Plugins.Legend.Display = false;
-  
-        await barChart.InitializeAsync(chartData, barChartOptions);
-        await barChart.UpdateAsync(chartData, barChartOptions);    
 
+        await barChart.InitializeAsync(chartData, barChartOptions);
     }
 
 }

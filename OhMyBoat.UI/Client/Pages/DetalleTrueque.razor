@@ -29,7 +29,7 @@
                 @if (Vehiculo_Enviado is Maritimo) {
                     Maritimo mar = Vehiculo_Enviado as Maritimo ?? new();
                         <div class="d-flex">
-                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                             <div class="d-flex flex-column">
                                 <h3>@mar.Tipo</h3>
                                 <h4 class="mb-5">@mar.Matricula</h4>
@@ -53,7 +53,7 @@
                 } else {
                     Terrestre ter = Vehiculo_Enviado as Terrestre ?? new();
                     <div class="d-flex">
-                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                         <div class="d-flex flex-column">
                             <h3>@ter.Tipo</h3>
                             <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
@@ -78,7 +78,7 @@
                 @if (Vehiculo_Recibido is Maritimo) {
                     Maritimo mar = Vehiculo_Recibido as Maritimo ?? new();
                         <div class="d-flex">
-                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                            <img class="rounded-3 m-3" src="@mar.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                             <div class="d-flex flex-column">
                                 <h3>@mar.Tipo</h3>
                                 <h4 class="mb-5">@mar.Matricula</h4>
@@ -102,7 +102,7 @@
                 } else {
                     Terrestre ter = Vehiculo_Recibido as Terrestre ?? new();
                     <div class="d-flex">
-                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh"/>
+                        <img class="rounded-3 m-3" src="@ter.base64imagen" alt="Imagen del vehículo" style="width:100%; height:auto; max-width: 50vh; object-fit:cover"/>
                         <div class="d-flex flex-column">
                             <h3>@ter.Tipo</h3>
                             <h4>@ter.Marca @ter.Modelo @ter.Anio</h4>
@@ -139,16 +139,7 @@
     public Vehiculo Vehiculo_Recibido {get; set;} = new();
 
     protected override async Task OnParametersSetAsync() {
-        /*
-        crit: Microsoft.AspNetCore.Components.WebAssembly.Rendering.WebAssemblyRenderer[100]
-            Unhandled exception rendering component: Object reference not set to an instance of an object.
-        System.NullReferenceException: Object reference not set to an instance of an object.
-        at OhMyBoat.UI.Client.Pages.ListTrueques.verDetalle(ReporteTrueque reporte)
-        at Microsoft.AspNetCore.Components.ComponentBase.CallStateHasChangedOnAsyncCompletion(Task task)
-        at Microsoft.AspNetCore.Components.RenderTree.Renderer.GetErrorHandledTask(Task taskToHandle, ComponentState owningComponentState)
-        */
-
-        await JsRuntime.InvokeVoidAsync("alert", "Entrando");
+        // Pongan el modal chicos
 
         if (reporte != null){
 

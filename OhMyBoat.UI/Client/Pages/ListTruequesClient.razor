@@ -10,6 +10,9 @@
 @inject IJSRuntime JsRuntime
 @inject NavigationManager Navegador
 @using System.Security.Claims
+
+<Modal @ref="DetalleModal" IsScrollable="true" Size="ModalSize.ExtraLarge" />
+
 <AuthorizeView Roles="cliente" Context="OuterContext">
     <Authorized Context="OuterContext">
 <div> 
@@ -51,7 +54,7 @@
                     @context.Patente_VehiculoEnviaOferta
             </GridColumn>
                     <GridColumn TItem="ReporteTrueque" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" >
-                        <button @onclick="() => verDetalle(context)" class="btn btn-primary">Ver Detalle</button>
+                        <button @onclick="async () => await verDetalle(context)" class="btn btn-primary">Ver Detalle</button>
                     </GridColumn>
                     <GridColumn TItem="ReporteTrueque" HeaderText="Concretado" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center"  PropertyName="Estado" SortKeySelector="@(item => item.Estado)">
                         <span>@context.Estado</span>
@@ -70,6 +73,11 @@
 
     private BlazorBootstrap.Grid<ReporteTrueque> grid = default!;
     private List<ReporteTrueque> ReporteTrueques = new();
+    private Modal DetalleModal = default!;  
+    private async Task hideModal(){
+        await DetalleModal.ShowAsync();
+        await DetalleModal.HideAsync();
+    }
     protected override async Task OnInitializedAsync()
     {
         await LoadTrueques();
@@ -85,9 +93,13 @@
         ReporteTrueques = await respSV.Content.ReadFromJsonAsync<List<ReporteTrueque>>() ?? new();
     }
 
-    private void verDetalle(ReporteTrueque reporte)
+    private async Task verDetalle(ReporteTrueque reporte)
    
     {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("OnClickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, hideModal));
+        parameters.Add("Reporte", reporte);
+        await DetalleModal.ShowAsync<DetalleTrueque>(title: "Detalles", parameters: parameters);
         // aca haces lo del modal y tenes todos los datos que se te canten desde reporte, un salu2
     }
 

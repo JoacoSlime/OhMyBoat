@@ -112,38 +112,38 @@
                 }
             </div>
             @if (Oferta.EstadoOferta != EstadoOferta.Enviada ) {
-                @if (Oferta.EstadoOferta == EstadoOferta.Programada) {
-                    <div class="d-flex flex-column border rounded mb-3">
-                    @if (isReceiving) {
-                        @foreach (Turno turno in Turnos) {
-                            <div class="mb-3 p-2 d-flex justify-content-center align-content-center flex-column">
-                                <h2>Horario establecido:</h2> 
-                                <h3>A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
-                            </div>
-                        }
-                    } else {
-                        @if (Oferta.EstadoOferta != EstadoOferta.Programada){
-                            <h2>Seleccione el horario al que desea asistir:</h2>
-                            <div class="d-flex flex-column align-items-center justify-content-center">
-                            @foreach (Turno turno in Turnos) {
-                                <div class="mb-3 p-2">
-                                    @if (turno.FechaTurno<DateTime.Today){
-                                        <Button Color="ButtonColor.Danger" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
-                                    } else {
-                                        <Button Color="ButtonColor.Success" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
-                                    }
-                                </div>
-                            }
-                            <Button Color="ButtonColor.Primary" @onclick="async () => await Arreglar()">Arreglar por privado</Button>
-                            </div>
-                        } else {
-                            <div class="mb-3 p-2 d-flex justify-content-center align-content-center flex-column">
-                                <h2>Horario establecido:</h2> 
-                                <h3>A las @Turnos.First().FechaTurno.ToString("HH:mm") el @Turnos.First().FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
-                            </div>
-                        }
+                @if(!(Oferta.EstadoOferta == EstadoOferta.Cancelada || Oferta.EstadoOferta == EstadoOferta.Rechazada)) {
+                <div class="d-flex flex-column border rounded mb-3">
+                @if (isReceiving) {
+                    @foreach (Turno turno in Turnos) {
+                        <div class="mb-3 p-2 d-flex justify-content-center align-content-center flex-column">
+                            <h2>Horario establecido:</h2> 
+                            <h3>A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
+                        </div>
                     }
-                    </div>
+                } else {
+                    @if (Oferta.EstadoOferta != EstadoOferta.Programada){
+                        <h2>Seleccione el horario al que desea asistir:</h2>
+                        <div class="d-flex flex-column align-items-center justify-content-center">
+                        @foreach (Turno turno in Turnos) {
+                            <div class="mb-3 p-2">
+                                @if (turno.FechaTurno<DateTime.Today){
+                                    <Button Color="ButtonColor.Danger" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
+                                } else {
+                                    <Button Color="ButtonColor.Success" @onclick="async () => await AceptarTurno(turno)">A las @turno.FechaTurno.ToString("HH:mm") el @turno.FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</Button>
+                                }
+                            </div>
+                        }
+                        <Button Color="ButtonColor.Primary" @onclick="async () => await Arreglar()">Arreglar por privado</Button>
+                        </div>
+                    } else {
+                        <div class="mb-3 p-2 d-flex justify-content-center align-content-center flex-column">
+                            <h2>Horario establecido:</h2> 
+                            <h3>A las @Turnos.First().FechaTurno.ToString("HH:mm") el @Turnos.First().FechaTurno.ToString("dd/MM/yyyy") en @(Sucursal.NombreSuck)</h3>
+                        </div>
+                    }
+                }
+                </div>
                 }
                 <div class="d-flex flex-row">
                 @if (isReceiving && (Oferta.EstadoOferta == EstadoOferta.Programada || (Oferta.EstadoOferta == EstadoOferta.Aceptada && Turnos.Count()>=0))) {
@@ -320,7 +320,9 @@
 
     private async Task AceptarTurno(Turno turno) {
         if (turno.FechaTurno>=DateTime.Today){
-
+            if (!(await JsRuntime.InvokeAsync<bool>("confirm", $"¿Está seguro de que desea aceptar el turno? A las {turno.FechaTurno.ToString("HH:mm")} el {turno.FechaTurno.ToString("dd/MM/yyyy")} en {Sucursal.NombreSuck}"))) {
+                return;
+            }
             Oferta oferta;
             oferta = new Oferta() {
                 Id = Oferta.Id,
@@ -352,11 +354,12 @@
     }
 
     private async Task Arreglar() {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", "¿Desea enviar sus datos de contacto a el otro usuario para arreglar por privado?"))
-        if ((await HttpClient.PostAsJsonAsync("api/Trueques/ArreglarTurno", Oferta)).IsSuccessStatusCode) {
-            await JsRuntime.InvokeVoidAsync("confirm", "Se ha enviado sus datos de contacto al usuario.");
-        } else {
-            await JsRuntime.InvokeVoidAsync("confirm", "Ocurrió un error al enviar los datos.");            
+        if (await JsRuntime.InvokeAsync<bool>("confirm", "¿Desea enviar sus datos de contacto a el otro usuario para arreglar por privado?")){
+            if ((await HttpClient.PostAsJsonAsync("api/Trueques/ArreglarTurno", Oferta)).IsSuccessStatusCode) {
+                await JsRuntime.InvokeVoidAsync("confirm", "Se ha enviado sus datos de contacto al usuario.");
+            } else {
+                await JsRuntime.InvokeVoidAsync("confirm", "Ocurrió un error al enviar los datos.");            
+            }
         }
     }
 }

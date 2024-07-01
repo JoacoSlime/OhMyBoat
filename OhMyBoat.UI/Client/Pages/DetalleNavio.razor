@@ -61,11 +61,6 @@
                     </Authorized>
                 </AuthorizeView>
         </div>
-        <AuthorizeView Roles="jefe" Context="blockContext">
-            <Authorized Context="blockContext">
-                <Button Color="ButtonColor.Danger" @onclick="(async() => await BloquearUsuario())">Bloquear Usuario</Button>
-            </Authorized>
-        </AuthorizeView>
     </Authorized>
 </AuthorizeView>
 
@@ -143,7 +138,7 @@
         var responseSV = await HttpClient.PostAsJsonAsync<Denuncia>("api/denuncia/CargarDenuncia", denuncia); 
         if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "usted ya denunció esta publicación");
+            await JsRuntime.InvokeVoidAsync("alert", "Usted ya ha denunciado esta publicación.");
             return;            
         }
         await JsRuntime.InvokeVoidAsync("alert", "“Oh My Boat!” investigará su denuncia");        
@@ -172,6 +167,18 @@
                 await JsRuntime.InvokeVoidAsync("alert", "El cliente no fue encontrado.");
             }
         }
+        
+        var responseSV = await HttpClient.PostAsJsonAsync<Vehiculo>("api/Vehiculos/GetDueño", Navio) ?? new();
+
+        if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired){
+            await JsRuntime.InvokeVoidAsync("alert", "Dueño innexistente");
+            await OnClickCallback.InvokeAsync();
+
+            return;
+        }
+
+        Dueño = await responseSV.Content.ReadFromJsonAsync<Cliente>() ?? new();
+        Dueño.Contacto = Dueño.Contacto == "" ? "No posee información de contacto." : Dueño.Contacto;
 
     }
     private async Task EliminarPublicacion() {

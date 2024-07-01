@@ -213,7 +213,7 @@
             VehiculosOfertas.Add((o,recibe,envia));
             
         }
-
+        VehiculosOfertas = VehiculosOfertas.OrderBy(vo =>   (int) (vo.Item1.EstadoOferta)).ToList();
         StateHasChanged();
     }
 
