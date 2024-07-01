@@ -63,8 +63,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             DateTime inicio = new DateTime(rango.inicio.Year, rango.inicio.Month, rango.inicio.Day);
             DateTime fin = new DateTime(rango.fin.Year, rango.fin.Month, rango.fin.Day);
             using var db = new OhMyBoatUIServerContext();
-            var TurnosTotales = await db.Turno.Where
-            (t => (t.FechaTurno.Year > inicio.Year || (t.FechaTurno.Year == inicio.Year && (t.FechaTurno.Month > inicio.Month || (t.FechaTurno.Month == inicio.Month && t.FechaTurno.Day >= inicio.Day))))
+            var TurnosTotales = await db.Turno.Where (t => (t.FechaTurno.Year > inicio.Year || (t.FechaTurno.Year == inicio.Year && (t.FechaTurno.Month > inicio.Month || (t.FechaTurno.Month == inicio.Month && t.FechaTurno.Day >= inicio.Day))))
             && (t.FechaTurno.Year < fin.Year || (t.FechaTurno.Year == fin.Year && (t.FechaTurno.Month < fin.Month || (t.FechaTurno.Month == fin.Month && t.FechaTurno.Day <= fin.Day))))).ToListAsync();
 
             var TruequesConcretados = await db.Ofertas.Where
