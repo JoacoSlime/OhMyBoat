@@ -30,7 +30,7 @@
     @if (error)
     {
         <div class="alert alert-danger" role="alert">
-            <strong>Oh My Boat!</strong>, parece que no entendes como funcionan los rangos, intenta ingresar una fecha de inicio menor a la fecha de fin
+            <strong>Oh My Boat!</strong>, parece que elegiste un rango de fechas inválido, intenta ingresar una fecha de inicio menor a la fecha de fin.
         </div>
         <br>
     }
@@ -62,7 +62,7 @@
         {
 
             <div class="alert alert-info" role="alert">
-                <strong>Oh My Boat!</strong>, parece que no hay trueques en este rango de fechas
+                <strong>Oh My Boat!</strong>, parece que no hay trueques en este rango de fechas.
             </div>
         }
 
@@ -147,8 +147,10 @@
         barChartOptions.Plugins.Legend.Display = false;
 
 
-        await barChart.InitializeAsync(chartData, barChartOptions);
-        await barChart.UpdateAsync(chartData, barChartOptions);
+        if (hayDatos) {
+            await barChart.InitializeAsync(chartData, barChartOptions);
+            await barChart.UpdateAsync(chartData, barChartOptions);
+        }
 
 
     }

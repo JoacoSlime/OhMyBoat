@@ -10,8 +10,9 @@
 
 <div>
     @if (hasLoadedNavios) {
-        <h2>No se pudo realizar el informe</h2>
-        <p>No hay navios registrados.</p>
+        <div class="alert alert-info" role="alert">
+            <strong>Oh My Boat!</strong>, parece que no hay navios registrados.
+        </div>
     } else {
         <PieChart @ref="pieChart" Width="500" Class="mb-5" />
     }
