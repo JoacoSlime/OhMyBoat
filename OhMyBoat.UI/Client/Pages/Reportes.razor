@@ -72,7 +72,12 @@
                 </Content>
             </Tab>
         </Tabs>
-        <Button @onclick="async ()=> await Nuke()" Class="btn-danger">Nukear base de datos</Button>
+        <br>
+        <br>
+        <Button Color="ButtonColor.Danger" Size="ButtonSize.ExtraLarge" @onclick="async ()=> await Nuke()" >
+            <Icon Name="IconName.Radioactive"></Icon> ඞ NUKEAR ඞ <Icon Name="IconName.Radioactive"></Icon>
+        </Button>
+        
     </Authorized>
     <NotAuthorized>
         @{Navegador.NavigateTo("/");}

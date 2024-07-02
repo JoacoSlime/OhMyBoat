@@ -26,6 +26,15 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         }
 
         [HttpPost]
+        [Route("mokeoDeBaseDeDatos")]
+        public async Task<IActionResult> mokeoDeBaseDeDatos()
+        {
+            using var db = new OhMyBoatUIServerContext();
+            
+            return StatusCode(StatusCodes.Status200OK, null);
+        }
+
+        [HttpPost]
         [Route("TruequesInconclusosPorSede")]
         public async Task<IActionResult> TruequesNoConcluidosPorSede([FromBody] RangoDTO rango)
         {
