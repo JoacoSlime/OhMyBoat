@@ -23,7 +23,7 @@
     <br>
     <div class="mb-3">
         <strong>Fin</strong>:
-        <DateInput TValue="DateOnly" @bind-Value="@Fin" Placeholder="Enter Date" />
+        <DateInput TValue="DateOnly" @bind-Value="@Fin" EnableMinMax="true" Max="@FechaHoy" Placeholder="Enter Date" />
     </div>
     <br>
 
@@ -72,7 +72,8 @@
 
 @code {
     private DateOnly Inicio = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
-    private DateOnly Fin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
+    private DateOnly Fin = DateOnly.FromDateTime(DateTime.Now.AddDays(1));    
+    private DateOnly FechaHoy = DateOnly.FromDateTime(DateTime.Now);
     private bool TrajeDatos, hayDatos = false;
     private bool error = false;
 
@@ -91,7 +92,7 @@
         var datasets = new List<IChartDataset>();
 
 
-        if (Inicio <= Fin)
+        if (Inicio <= Fin && Fin <= FechaHoy)
         {
             error = false;
             // await JsRuntime.InvokeVoidAsync("alert", $"inicio : {rango.inicio}/n fin {rango.fin}");
