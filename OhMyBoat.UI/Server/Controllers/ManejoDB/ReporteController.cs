@@ -12,6 +12,20 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
     public class ReporteController : ControllerBase
     {
         [HttpPost]
+        [Route("Nuke")]
+        public async Task<IActionResult> nukeoBaseDeDatos()
+        {
+            using var db = new OhMyBoatUIServerContext();
+            await db.Maritimos.ExecuteDeleteAsync();
+            await db.Terrestres.ExecuteDeleteAsync();
+            await db.Denuncias.ExecuteDeleteAsync();
+            await db.Ofertas.ExecuteDeleteAsync();
+            await db.Turno.ExecuteDeleteAsync();
+            await db.SaveChangesAsync();
+            return StatusCode(StatusCodes.Status200OK, null);
+        }
+
+        [HttpPost]
         [Route("TruequesInconclusosPorSede")]
         public async Task<IActionResult> TruequesNoConcluidosPorSede([FromBody] RangoDTO rango)
         {

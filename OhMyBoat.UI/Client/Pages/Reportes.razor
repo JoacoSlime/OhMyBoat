@@ -72,6 +72,7 @@
                 </Content>
             </Tab>
         </Tabs>
+        <Button @onclick="async ()=> await Nuke()" Class="btn-danger">Nukear base de datos</Button>
     </Authorized>
     <NotAuthorized>
         @{Navegador.NavigateTo("/");}
@@ -80,4 +81,23 @@
 
 @code {
     // No hay nada acá pa'
+
+    // ahora si amigazo
+
+    private async Task Nuke()
+    {
+        if (await JsRuntime.InvokeAsync<bool>("confirm", "USTED QUIERE BORRAR TODO LOS VEHICULOS/TURNOS/OFERTAS DEL SISTEMA?"))
+        {
+            var resp = await HttpClient.PostAsJsonAsync<object>("api/reporte/Nuke", null);
+            if (resp.IsSuccessStatusCode)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "La base de datos: Me han nukeado :(");
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Error de Api, no se nukeo la base de datos");
+            }
+        }
+
+    }
 }
