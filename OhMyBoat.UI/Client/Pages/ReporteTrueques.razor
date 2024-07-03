@@ -43,6 +43,12 @@
             <BarChart @ref="barChart" Width="500" Height="300"/>
             </div>
         }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                <strong>Oh My Boat!</strong> No hay trueques registrados en ninguna sede.
+            </div>
+        }
         @if (HayInconclusos) {
             <div class="alert alert-info" role="alert">
                 <p><strong>Inconclusos</strong></p>
