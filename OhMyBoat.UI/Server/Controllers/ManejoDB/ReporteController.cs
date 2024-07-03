@@ -29,8 +29,48 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [Route("mokeoDeBaseDeDatos")]
         public async Task<IActionResult> mokeoDeBaseDeDatos()
         {
+
             using var db = new OhMyBoatUIServerContext(); // aca hago la magia 
-           // db.Terrestres.Add(new Terrestre() { })                   
+            String c1 = "cliente@cliente.com";
+            String c2 = "cliente2@cliente.com";
+            String cb1 = "clientebloq1@cliente.com";
+            String cb2 = "clientebloq2@cliente.com";
+            db.Terrestres.Add(new Terrestre() { Id = 1, IDCliente = "cliente@cliente.com", Tipo = TipoVehiculo.Moto });                   
+            db.Terrestres.Add(new Terrestre() { Id = 2, IDCliente = "clientebloq2@cliente.com", Tipo = TipoVehiculo.Auto });                   
+            db.Terrestres.Add(new Terrestre() { Id = 3, IDCliente = "cliente2@cliente.com", Tipo = TipoVehiculo.Camioneta });                   
+            db.Terrestres.Add(new Terrestre() { Id = 4, IDCliente = "clientebloq1@cliente.com", Tipo = TipoVehiculo.Auto });                   
+            db.Terrestres.Add(new Terrestre() { Id = 5, IDCliente = "cliente@cliente.com", Tipo = TipoVehiculo.Moto });                   
+            db.Terrestres.Add(new Terrestre() { Id = 6, IDCliente = "clientebloq2@cliente.com", Tipo = TipoVehiculo.Camioneta });
+
+            db.Maritimos.Add(new Maritimo() { Id = 1, IDCliente = "clientebloq2@cliente.com", Tipo = TipoEmbarcacion.Crucero, Deuda =0,SucursalId=1});
+            db.Maritimos.Add(new Maritimo() { Id = 2, IDCliente = "clientebloq2@cliente.com", Tipo = TipoEmbarcacion.Catamaran, Deuda =100, SucursalId =2});
+            db.Maritimos.Add(new Maritimo() { Id = 3, IDCliente = "clientebloq2@cliente.com", Tipo = TipoEmbarcacion.Velero, Deuda =0, SucursalId =3});
+            db.Maritimos.Add(new Maritimo() { Id = 4, IDCliente = "clientebloq2@cliente.com", Tipo = TipoEmbarcacion.Lancha, Deuda =10000, SucursalId =3});
+            db.Maritimos.Add(new Maritimo() { Id = 5, IDCliente = "clientebloq2@cliente.com", Tipo = TipoEmbarcacion.Velero ,Deuda=20000, SucursalId =2});
+            db.Maritimos.Add(new Maritimo() { Id = 6, IDCliente = "clientebloq2@cliente.com", Tipo = TipoEmbarcacion.Crucero,Deuda =0, SucursalId =1});
+
+            db.Ofertas.Add(new Oferta() {Id=1, ID_VehiculoRecibeOferta = 1, ID_VehiculoEnviaOferta = 2, EsNavioEnvia = true, EsNavioRecibe = false, ID_RecibeOferta = c1, ID_EnviaOferta = c2,EstadoOferta=EstadoOferta.Concretada});
+            db.Turno.Add(new Turno() { Id = 1, OfertaId = 1, SucursalId = 1,FechaTurno= new DateTime(2024,02,1,19,00,00)});
+            
+            db.Ofertas.Add(new Oferta() {Id=2, ID_VehiculoRecibeOferta = 3, ID_VehiculoEnviaOferta = 1, EsNavioEnvia = true, EsNavioRecibe = true, ID_RecibeOferta = cb1, ID_EnviaOferta = c2,EstadoOferta=EstadoOferta.Inconclusa});
+            db.Turno.Add(new Turno() { Id = 2, OfertaId = 2, SucursalId = 2, FechaTurno = new DateTime(2024, 02, 1, 19, 00, 00) });
+            
+            db.Ofertas.Add(new Oferta() {Id=3, ID_VehiculoRecibeOferta = 5, ID_VehiculoEnviaOferta = 3, EsNavioEnvia = false, EsNavioRecibe = true, ID_RecibeOferta = cb2, ID_EnviaOferta = c1,EstadoOferta=EstadoOferta.Concretada});
+            db.Turno.Add(new Turno() { Id = 3, OfertaId = 3, SucursalId = 2, FechaTurno = new DateTime(2024, 02, 1, 19, 00, 00) });
+            
+            db.Ofertas.Add(new Oferta() {Id=4, ID_VehiculoRecibeOferta = 1, ID_VehiculoEnviaOferta = 5, EsNavioEnvia = false, EsNavioRecibe = true, ID_RecibeOferta = c2, ID_EnviaOferta = cb2,EstadoOferta=EstadoOferta.Inconclusa});
+            db.Turno.Add(new Turno() { Id = 4, OfertaId = 4, SucursalId = 3, FechaTurno = new DateTime(2024, 04, 3, 19, 00, 00) });
+            
+            db.Ofertas.Add(new Oferta() {Id=5, ID_VehiculoRecibeOferta = 4, ID_VehiculoEnviaOferta = 4, EsNavioEnvia = true, EsNavioRecibe = false, ID_RecibeOferta = c1, ID_EnviaOferta = cb2,EstadoOferta=EstadoOferta.Concretada});
+            db.Turno.Add(new Turno() { Id = 5, OfertaId = 5, SucursalId = 3, FechaTurno = new DateTime(2024, 04, 3, 19, 00, 00) });
+            
+            db.Ofertas.Add(new Oferta() {Id=6, ID_VehiculoRecibeOferta = 3, ID_VehiculoEnviaOferta = 2, EsNavioEnvia = false, EsNavioRecibe = true, ID_RecibeOferta = c2, ID_EnviaOferta = c1,EstadoOferta=EstadoOferta.Inconclusa });
+            db.Turno.Add(new Turno() { Id = 6, OfertaId = 6, SucursalId = 1, FechaTurno = new DateTime(2024, 04, 3, 19, 00, 00) });
+
+            await db.SaveChangesAsync();
+
+
+
             return StatusCode(StatusCodes.Status200OK, null);
         }
 

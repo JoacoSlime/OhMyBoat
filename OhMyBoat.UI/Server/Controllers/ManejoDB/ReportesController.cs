@@ -33,7 +33,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             using var db = new OhMyBoatUIServerContext();
             List<double> dataList = new();
             foreach(Sucursal s in await db.Sucursales.ToListAsync()) { // Esto es una mierda parte 2 -J
-                dataList.Add(await db.Maritimos.Where(maritimo => maritimo.SucursalId == s.Id).CountAsync());
+                dataList.Add(await db.Maritimos.Where(maritimo => maritimo.SucursalId == s.Id && maritimo.Deuda > 0).CountAsync());
             }
             return StatusCode(StatusCodes.Status200OK, dataList);
         }
