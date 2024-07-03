@@ -29,8 +29,8 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
         [Route("mokeoDeBaseDeDatos")]
         public async Task<IActionResult> mokeoDeBaseDeDatos()
         {
-            using var db = new OhMyBoatUIServerContext();
-            
+            using var db = new OhMyBoatUIServerContext(); // aca hago la magia 
+           // db.Terrestres.Add(new Terrestre() { })                   
             return StatusCode(StatusCodes.Status200OK, null);
         }
 

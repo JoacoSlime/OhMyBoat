@@ -74,8 +74,13 @@
         </Tabs>
         <br>
         <br>
-        <Button Color="ButtonColor.Danger" Size="ButtonSize.ExtraLarge" @onclick="async ()=> await Nuke()" >
+        <Button Color="ButtonColor.Danger" Size="ButtonSize.ExtraLarge" @onclick="async ()=> await Nuke()">
             <Icon Name="IconName.Radioactive"></Icon> ඞ NUKEAR ඞ <Icon Name="IconName.Radioactive"></Icon>
+        </Button>
+        <br>
+        <br>
+        <Button Color="ButtonColor.Success" Size="ButtonSize.ExtraLarge" @onclick="async ()=> await Cremoso()">
+            <Icon Name="IconName.Whatsapp"></Icon> ඞ Generar datos para demo ඞ <Icon Name="IconName.Whatsapp"></Icon>
         </Button>
         
     </Authorized>
@@ -88,10 +93,25 @@
     // No hay nada acá pa'
 
     // ahora si amigazo
+    private async Task Cremoso()
+    {
+        
+            var resp = await HttpClient.PostAsJsonAsync<object>("api/reporte/mokeoDeBaseDeDatos", null);
+            if (resp.IsSuccessStatusCode)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Tuve un momento de reminisencia y recorde que tenia datos");
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Error de Api, reminisencian't");
+            }
+        
+
+    }
 
     private async Task Nuke()
     {
-        if (await JsRuntime.InvokeAsync<bool>("confirm", "USTED QUIERE BORRAR TODO LOS VEHICULOS/TURNOS/OFERTAS DEL SISTEMA?"))
+        if (await JsRuntime.InvokeAsync<bool>("confirm", "USTED QUIERE BORRAR TODOS LOS VEHICULOS/TURNOS/OFERTAS/DENUNCIAS DEL SISTEMA?"))
         {
             var resp = await HttpClient.PostAsJsonAsync<object>("api/reporte/Nuke", null);
             if (resp.IsSuccessStatusCode)

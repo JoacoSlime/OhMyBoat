@@ -177,8 +177,7 @@ namespace OhMyBoat.UI.Server.Controllers.ManejoDB
             var turnosQueVan = await db.Turno.Where(t => DateOnly.FromDateTime(t.FechaTurno) >= rango.inicio && DateOnly.FromDateTime(t.FechaTurno) <= rango.fin).ToListAsync();
             List<Oferta> ofertasFiltradas = new();
 
-            var ofertasSinFiltrar = await db.Ofertas.Where(o => o.EstadoOferta == EstadoOferta.Concretada ||
-                                                          o.EstadoOferta == EstadoOferta.Inconclusa || o.EstadoOferta == EstadoOferta.Programada).ToListAsync();
+            var ofertasSinFiltrar = await db.Ofertas.Where(o => o.EstadoOferta == EstadoOferta.Concretada).ToListAsync();
             if (ofertasSinFiltrar != null)
                 foreach (Turno t in turnosQueVan)
                 {
