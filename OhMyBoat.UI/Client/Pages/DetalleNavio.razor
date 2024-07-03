@@ -134,7 +134,15 @@
 
     private async Task DenunciarPublicacion()
     {
-        Denuncia denuncia = new Denuncia(){ VehiculoId = Navio.Id , EsNavio = true, ClienteId = Dueño.Id};
+        var Auth = await authStateProvider.GetAuthenticationStateAsync();
+        var email = Auth.User.Claims.Where(c => c.Type == ClaimTypes.Email).First().Value;
+        LoginDTO auxSession = new LoginDTO();
+        auxSession.Email = email;      
+        var respuestaSV = await HttpClient.PostAsJsonAsync("api/usuario/ObtenerUsuario", auxSession);
+        var miIdentidad = await respuestaSV.Content.ReadFromJsonAsync<Usuario>() ?? new();
+
+
+        Denuncia denuncia = new Denuncia(){ VehiculoId = Navio.Id , EsNavio = true, ClienteId = miIdentidad.Id};
         var responseSV = await HttpClient.PostAsJsonAsync<Denuncia>("api/denuncia/CargarDenuncia", denuncia); 
         if (responseSV.StatusCode == System.Net.HttpStatusCode.NetworkAuthenticationRequired)
         {
